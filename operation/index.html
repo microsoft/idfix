@@ -1,0 +1,646 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+        <link rel="canonical" href="https://microsoft.github.io/idfix/operation/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.1, mkdocs-material-3.0.3">
+    
+    
+      
+        <title>Operation - Microsoft - IdFix</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.22915126.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#546e7a">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+    
+    
+      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+      
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="blue-grey" data-md-color-accent="">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="__github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="../#operation" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://microsoft.github.io/idfix" title="Microsoft - IdFix" class="md-header-nav__button md-logo">
+          
+            <img src="../img/Logo.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                Microsoft - IdFix
+              </span>
+              <span class="md-header-nav__topic">
+                Operation
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+            
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/microsoft/idfix/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+        
+
+<nav class="md-tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  <li class="md-tabs__item">
+    
+      <a href=".." title="Home" class="md-tabs__link md-tabs__link--active">
+        Home
+      </a>
+    
+  </li>
+
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </ul>
+  </div>
+</nav>
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://microsoft.github.io/idfix" title="Microsoft - IdFix" class="md-nav__button md-logo">
+      
+        <img src="../img/Logo.png" width="48" height="48">
+      
+    </a>
+    Microsoft - IdFix
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/microsoft/idfix/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../preperation/" title="Preperation" class="md-nav__link">
+      Preperation
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../installation/" title="Installation" class="md-nav__link">
+      Installation
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Operation
+      </label>
+    
+    <a href="./" title="Operation" class="md-nav__link md-nav__link--active">
+      Operation
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#error-explanations" title="Error Explanations" class="md-nav__link">
+    Error Explanations
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../supported-errors/" title="Supported Errors" class="md-nav__link">
+      Supported Errors
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../faq/" title="F.A.Q." class="md-nav__link">
+      F.A.Q.
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../build-docs/" title="Build Documentation" class="md-nav__link">
+      Build Documentation
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#error-explanations" title="Error Explanations" class="md-nav__link">
+    Error Explanations
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/microsoft/idfix/edit/master/docs/operation.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="operation">Operation<a class="headerlink" href="#operation" title="Permanent link">&para;</a></h1>
+<p><img alt="Screen shot of the tool running" src="../img/3-1-running-the-tool.png" /></p>
+<ul>
+<li>Log-on to the workstation where you installed IdFix using an account which can read and, if desired, write changes to your on-premises Active Directory objects.</li>
+<li>Directory synchronization rule sets are different depending on which version of Office 365 is in use. The Settings icon allows you to choose between running the Multi-Tenant or Dedicated/ITAR rule sets in order to detect attribute values known to cause directory synchronization errors relevant to the version of Office 365 in use.</li>
+<li>The scope of the query can be limited by selecting the Filter icon and entering a valid directory path to use as a start for the subtree search.  Only one starting point can be designated at a time.  The subtree point will be used for all successive queries until changed.  Deleting the value will reset the query to the whole forest.  The value must be entered in the format OU=myOu,DC=Contoso,DC=com in order to function.</li>
+<li>Query for relevant directory synchronization errors. IdFix queries all objects with a filter for applicable attributes. IdFix updates the status line on the bottom of the dataGridView and writes all values to the log.</li>
+<li>Cancel terminates a running query if the user does not wish to continue.</li>
+<li>IdFix applies rules against the required AD attributes to determine which objects must be remediated and presents you with any detected error conditions. <ul>
+<li>IdFix displays items with information related to the object in question and the error conditions. Objects are identified by the distinguishedName with the associated error type and value that is in error.</li>
+<li>Where feasible, IdFix presents a recommendation for corrective data in the UPDATE column. Recommendations are based on a “best effort” approach for the specific object in question.  Since recommendations are object specific, they are not checked against the existing data set and may introduce additional errors.</li>
+<li>For certain types of errors (duplicates and format errors), a recommendation for correction is NOT provided.  Corrective information must be manually entered to correct the issue.</li>
+<li>In the event multiple errors are associated with a single attribute, errors are combined into a single line item.</li>
+<li>If a blank datagrid is displayed after execution, then no errors were returned.  This is a good thing.</li>
+</ul>
+</li>
+<li>To correct the object attribute values, select one of the following ACTION options from the drop down list:
+|||
+|-|-|
+|COMPLETE|The original value is acceptable and should not be changed despite being identified as being in an error state.  For example, two users may have a proxyAddress identified as duplicate.  Only one can use the value for mail delivery.  The user with the correct value should be marked as COMPLETE, while the other user is marked as REMOVE.|
+|REMOVE|The attribute value will be cleared from the source object.  In the case of a multi-valued attribute; e.g. proxyAddresses, only the individual value shown will be cleared.|
+|EDIT|The information in the UPDATE column will be used to modify the attribute value for the selected object.  In many cases, a valid update value has been predetermined.  In these cases, you can mark the ACTION as EDIT and go on to the next error. If the predetermined update value is not desired, you can manually input the new value.|
+|UNDO|This value is only shown if the user has loaded a previously saved Update file.  The sole operation that can be executed is to restore the original value.|
+|FAIL|This value is only shown if an update value has an unknown conflict with the directory rules.  In this case, you may attempt to edit the value again. It may be necessary to analyze the values in the object using ADSIEDIT.|</li>
+</ul>
+<blockquote>
+<p>Only errors with a customer selected Action will be considered for update.  To reiterate; unless a specific choice is made IdFix will not perform any operation on the error.   </p>
+</blockquote>
+<ul>
+<li>The option to Accept all suggested updates is available.  </li>
+<li>After selecting the ACTION for one or more errors, choose the Apply menu item to write the values to Active Directory.  Successful writes are indicated by displaying “COMPLETE” in the ACTION column.</li>
+<li>IdFix writes all UPDATE transactions to a transaction log. The following is an example.</li>
+</ul>
+<div class="codehilite"><pre><span></span>7/22/2013 6:36:44 AM INITIALIZED - IDFIX VERSION 2.0.0 - MULTI-TENANT
+7/22/2013 6:36:47 AM QUERY AD
+7/22/2013 6:36:47 AM FOREST:E2K10.COM SERVER:DC1.E2K10.COM FILTER:(|(OBJECTCATEGORY=PERSON)(OBJECTCATEGORY=GROUP))
+7/22/2013 6:36:47 AM PLEASE WAIT WHILE THE LDAP CONNECTION IS ESTABLISHED.
+7/22/2013 6:36:49 AM QUERY COUNT: 140  ERROR COUNT: 29  DUPLICATE CHECK COUNT: 191
+7/22/2013 6:36:49 AM ELAPSED TIME: AD QUERY - 00:00:02.3890432
+7/22/2013 6:36:49 AM WRITE SPLIT FILES
+7/22/2013 6:36:49 AM MERGE SPLIT FILES
+7/22/2013 6:36:49 AM COUNT DUPLICATES
+7/22/2013 6:36:49 AM WRITE FILTERED DUPLICATE OBJECTS
+7/22/2013 6:36:49 AM READ FILTERED DUPLICATE OBJECTS
+7/22/2013 6:36:49 AM READ ERROR FILE
+7/22/2013 6:36:49 AM ELAPSED TIME: DUPLICATE CHECKS - 00:00:00.0780785
+7/22/2013 6:36:49 AM POPULATING DATAGRID
+7/22/2013 6:36:50 AM ELAPSED TIME: POPULATE DATAGRIDVIEW - 00:00:00.0780785
+7/22/2013 6:36:50 AM QUERY COUNT: 140  ERROR COUNT: 53
+7/22/2013 6:37:34 AM APPLY PENDING
+7/22/2013 6:37:34 AM UPDATE: [CN=USER000001,OU=E2K10OU1,DC=E2K10,DC=COM][USER][MAILNICKNAME][CHARACTER][USER?^|000001][USER000001][EDIT]
+7/22/2013 6:37:34 AM UPDATE: [CN=USER000008,OU=E2K10OU1,DC=E2K10,DC=COM][USER][TARGETADDRESS][DUPLICATE][SMTP:USER000008@CUSTOMER.COM][][REMOVE]
+7/22/2013 6:37:34 AM COMPLETE
+7/22/2013 6:37:40 AM LOADING UPDATES
+7/22/2013 6:37:40 AM ACTION SELECTION
+7/22/2013 6:37:57 AM APPLY PENDING
+7/22/2013 6:37:57 AM UPDATE: [CN=USER000001,OU=E2K10OU1,DC=E2K10,DC=COM][USER][MAILNICKNAME][CHARACTER][USER?^|000001][USER000001][UNDO]
+7/22/2013 6:37:57 AM UPDATE: [CN=USER000008,OU=E2K10OU1,DC=E2K10,DC=COM][USER][TARGETADDRESS][DUPLICATE][SMTP:USER000008@CUSTOMER.COM][][UNDO]
+7/22/2013 6:37:57 AM COMPLETE
+</pre></div>
+
+
+<ul>
+<li>In the event of an unwanted correction, you may perform a transaction update undo one level deep per UPDATE transaction.<ul>
+<li>Apply generates a LDF file for the transactions that are applied</li>
+<li>To Undo a transaction, select the LDF file that contains the appropriate transaction and reload it into the table
+    &gt; Note: IdFix cannot track updates to objects or attributes that occur outside of the application. If you and someone else edit the same attribute, then the last change is the one committed to the object.  </li>
+</ul>
+</li>
+<li>You have the ability to Export what’s in the table to review with others before taking corrective action, or to use as the source of a later bulk import using a separate utility like CSVDE or LDIFDE.  Testing is strongly recommended, no matter which tool you use.</li>
+<li>You have the ability to Import data from a CSV file to allow offline manual edits to be applied.  Be very careful with manually edited files and use an Exported CSV file as a template.  Testing is strongly recommended and there is no guarantee that what you do offline will be correctly recognized by IdFix.</li>
+<li>If the query returns more than 50,000 errors the menu items Next Block and Previous Block are displayed.  The number of errors that can be displayed on the screen at one time is limited to avoid application exceptions resulting from exceeding physical memory.</li>
+</ul>
+<blockquote>
+<p>You may always submit suggestions for improvement or support requests via the <a href="https://github.com/Microsoft/idfix/issues">issues list</a>.</p>
+</blockquote>
+<h2 id="error-explanations">Error Explanations<a class="headerlink" href="#error-explanations" title="Permanent link">&para;</a></h2>
+<p>For details on the errors that apply to each attribute see the Supported Errors section in the Appendix.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Character</td>
+<td>The Value contains a character which is invalid.  The suggested Update will show the value with the character removed.</td>
+</tr>
+<tr>
+<td>Format</td>
+<td>The Value violates the format requirements for the attribute usage.  The suggested Update will show the Value with any invalid characters removed.  If there are no invalid characters the Update and Value will appear the same.  It is up to the user to determine what they really want in the Update.  For example SMTP addresses must comply with rfc 2822 and mailNickName cannot start or end with a period.</td>
+</tr>
+<tr>
+<td>TopLevelDomain</td>
+<td>This applies to values subject to rfc2822 formatting.  If the top level domain is not internet routable then this will be identified as an error.  For example a smtp address ending in .local is not internet routable and would cause this error.</td>
+</tr>
+<tr>
+<td>DomainPart</td>
+<td>This applies to values subject to rfc2822 formatting.  If the domain portion of the value is invalid beyond the top level domain routing this will be generated.</td>
+</tr>
+<tr>
+<td>LocalPart</td>
+<td>This applies to values subject to rfc2822 formatting.  If the local portion of the value is invalid this will be generated.</td>
+</tr>
+<tr>
+<td>Length</td>
+<td>The Value violates the length limit for the attribute.   This is most commonly encountered when the schema has been altered.  The suggested Update will truncate the value to the attribute standard length.</td>
+</tr>
+<tr>
+<td>Duplicate</td>
+<td>The Value has a duplicate within the scope of the query.  All duplicate values will be displayed as errors.  The user can Edit or Remove values to eliminate duplication.</td>
+</tr>
+<tr>
+<td>Blank</td>
+<td>The Value violates the null restriction for attributes to be synchronized.  Only a few values must contain a value.  The suggested Update will leverage other attribute values in order to generate a likely substitute.</td>
+</tr>
+<tr>
+<td>MailMatch</td>
+<td>This applies to Dedicated only.  The Value does not match the mail attribute.  The suggested Update will be the mail attribute value prefixed by “SMTP:”.</td>
+</tr>
+</tbody>
+</table>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../installation/" title="Installation" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Installation
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../supported-errors/" title="Supported Errors" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Supported Errors
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+        
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.583bbe55.js"></script>
+      
+      <script>app.initialize({version:"1.0.1",url:{base:".."}})</script>
+      
+    
+    
+      
+    
+  </body>
+</html>
