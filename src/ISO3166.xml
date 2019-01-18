@@ -1,0 +1,251 @@
+<ISO3166 xml:lang="en">
+<country><name>Afghanistan</name><alpha2>AF</alpha2><alpha3>AFG</alpha3><numeric>4</numeric></country>
+<country><name>land Islands</name><alpha2>AX</alpha2><alpha3>ALA</alpha3><numeric>248</numeric></country>
+<country><name>Albania</name><alpha2>AL</alpha2><alpha3>ALB</alpha3><numeric>8</numeric></country>
+<country><name>Algeria</name><alpha2>DZ</alpha2><alpha3>DZA</alpha3><numeric>12</numeric></country>
+<country><name>American Samoa</name><alpha2>AS</alpha2><alpha3>ASM</alpha3><numeric>16</numeric></country>
+<country><name>Andorra</name><alpha2>AD</alpha2><alpha3>AND</alpha3><numeric>20</numeric></country>
+<country><name>Angola</name><alpha2>AO</alpha2><alpha3>AGO</alpha3><numeric>24</numeric></country>
+<country><name>Anguilla</name><alpha2>AI</alpha2><alpha3>AIA</alpha3><numeric>660</numeric></country>
+<country><name>Antarctica</name><alpha2>AQ</alpha2><alpha3>ATA</alpha3><numeric>10</numeric></country>
+<country><name>Antigua and Barbuda</name><alpha2>AG</alpha2><alpha3>ATG</alpha3><numeric>28</numeric></country>
+<country><name>Argentina</name><alpha2>AR</alpha2><alpha3>ARG</alpha3><numeric>32</numeric></country>
+<country><name>Armenia</name><alpha2>AM</alpha2><alpha3>ARM</alpha3><numeric>51</numeric></country>
+<country><name>Aruba</name><alpha2>AW</alpha2><alpha3>ABW</alpha3><numeric>533</numeric></country>
+<country><name>Australia</name><alpha2>AU</alpha2><alpha3>AUS</alpha3><numeric>36</numeric></country>
+<country><name>Austria</name><alpha2>AT</alpha2><alpha3>AUT</alpha3><numeric>40</numeric></country>
+<country><name>Azerbaijan</name><alpha2>AZ</alpha2><alpha3>AZE</alpha3><numeric>31</numeric></country>
+<country><name>Bahamas, The</name><alpha2>BS</alpha2><alpha3>BHS</alpha3><numeric>44</numeric></country>
+<country><name>Bahrain</name><alpha2>BH</alpha2><alpha3>BHR</alpha3><numeric>48</numeric></country>
+<country><name>Bangladesh</name><alpha2>BD</alpha2><alpha3>BGD</alpha3><numeric>50</numeric></country>
+<country><name>Barbados</name><alpha2>BB</alpha2><alpha3>BRB</alpha3><numeric>52</numeric></country>
+<country><name>Belarus</name><alpha2>BY</alpha2><alpha3>BLR</alpha3><numeric>112</numeric></country>
+<country><name>Belgium</name><alpha2>BE</alpha2><alpha3>BEL</alpha3><numeric>56</numeric></country>
+<country><name>Belize</name><alpha2>BZ</alpha2><alpha3>BLZ</alpha3><numeric>84</numeric></country>
+<country><name>Benin</name><alpha2>BJ</alpha2><alpha3>BEN</alpha3><numeric>204</numeric></country>
+<country><name>Bermuda</name><alpha2>BM</alpha2><alpha3>BMU</alpha3><numeric>60</numeric></country>
+<country><name>Bhutan</name><alpha2>BT</alpha2><alpha3>BTN</alpha3><numeric>64</numeric></country>
+<country><name>Bolivia, Plurinational State of</name><alpha2>BO</alpha2><alpha3>BOL</alpha3><numeric>68</numeric></country>
+<country><name>Bonaire, Sint Eustatius and Saba</name><alpha2>BQ</alpha2><alpha3>BES</alpha3><numeric>535</numeric></country>
+<country><name>Bosnia and Herzegovina</name><alpha2>BA</alpha2><alpha3>BIH</alpha3><numeric>70</numeric></country>
+<country><name>Botswana</name><alpha2>BW</alpha2><alpha3>BWA</alpha3><numeric>72</numeric></country>
+<country><name>Bouvet Island</name><alpha2>BV</alpha2><alpha3>BVT</alpha3><numeric>74</numeric></country>
+<country><name>Brazil</name><alpha2>BR</alpha2><alpha3>BRA</alpha3><numeric>76</numeric></country>
+<country><name>British Indian Ocean Territory</name><alpha2>IO</alpha2><alpha3>IOT</alpha3><numeric>86</numeric></country>
+<country><name>Brunei Darussalam</name><alpha2>BN</alpha2><alpha3>BRN</alpha3><numeric>96</numeric></country>
+<country><name>Bulgaria</name><alpha2>BG</alpha2><alpha3>BGR</alpha3><numeric>100</numeric></country>
+<country><name>Burkina Faso</name><alpha2>BF</alpha2><alpha3>BFA</alpha3><numeric>854</numeric></country>
+<country><name>Burundi</name><alpha2>BI</alpha2><alpha3>BDI</alpha3><numeric>108</numeric></country>
+<country><name>Cambodia</name><alpha2>KH</alpha2><alpha3>KHM</alpha3><numeric>116</numeric></country>
+<country><name>Cameroon</name><alpha2>CM</alpha2><alpha3>CMR</alpha3><numeric>120</numeric></country>
+<country><name>Canada</name><alpha2>CA</alpha2><alpha3>CAN</alpha3><numeric>124</numeric></country>
+<country><name>Cape Verde</name><alpha2>CV</alpha2><alpha3>CPV</alpha3><numeric>132</numeric></country>
+<country><name>Cayman Islands</name><alpha2>KY</alpha2><alpha3>CYM</alpha3><numeric>136</numeric></country>
+<country><name>Central African Republic</name><alpha2>CF</alpha2><alpha3>CAF</alpha3><numeric>140</numeric></country>
+<country><name>Chad</name><alpha2>TD</alpha2><alpha3>TCD</alpha3><numeric>148</numeric></country>
+<country><name>Chile</name><alpha2>CL</alpha2><alpha3>CHL</alpha3><numeric>152</numeric></country>
+<country><name>China</name><alpha2>CN</alpha2><alpha3>CHN</alpha3><numeric>156</numeric></country>
+<country><name>Christmas Island</name><alpha2>CX</alpha2><alpha3>CXR</alpha3><numeric>162</numeric></country>
+<country><name>Cocos (Keeling) Islands</name><alpha2>CC</alpha2><alpha3>CCK</alpha3><numeric>166</numeric></country>
+<country><name>Colombia</name><alpha2>CO</alpha2><alpha3>COL</alpha3><numeric>170</numeric></country>
+<country><name>Comoros</name><alpha2>KM</alpha2><alpha3>COM</alpha3><numeric>174</numeric></country>
+<country><name>Congo</name><alpha2>CG</alpha2><alpha3>COG</alpha3><numeric>178</numeric></country>
+<country><name>Congo, the Democratic Republic of the</name><alpha2>CD</alpha2><alpha3>COD</alpha3><numeric>180</numeric></country>
+<country><name>Cook Islands</name><alpha2>CK</alpha2><alpha3>COK</alpha3><numeric>184</numeric></country>
+<country><name>Costa Rica</name><alpha2>CR</alpha2><alpha3>CRI</alpha3><numeric>188</numeric></country>
+<country><name>Cote d'Ivoire</name><alpha2>CI</alpha2><alpha3>CIV</alpha3><numeric>384</numeric></country>
+<country><name>Croatia</name><alpha2>HR</alpha2><alpha3>HRV</alpha3><numeric>191</numeric></country>
+<country><name>Cuba</name><alpha2>CU</alpha2><alpha3>CUB</alpha3><numeric>192</numeric></country>
+<country><name>Cura‡ao</name><alpha2>CW</alpha2><alpha3>CUW</alpha3><numeric>531</numeric></country>
+<country><name>Cyprus</name><alpha2>CY</alpha2><alpha3>CYP</alpha3><numeric>196</numeric></country>
+<country><name>Czech Republic</name><alpha2>CZ</alpha2><alpha3>CZE</alpha3><numeric>203</numeric></country>
+<country><name>Denmark</name><alpha2>DK</alpha2><alpha3>DNK</alpha3><numeric>208</numeric></country>
+<country><name>Djibouti</name><alpha2>DJ</alpha2><alpha3>DJI</alpha3><numeric>262</numeric></country>
+<country><name>Dominica</name><alpha2>DM</alpha2><alpha3>DMA</alpha3><numeric>212</numeric></country>
+<country><name>Dominican Republic</name><alpha2>DO</alpha2><alpha3>DOM</alpha3><numeric>214</numeric></country>
+<country><name>Ecuador</name><alpha2>EC</alpha2><alpha3>ECU</alpha3><numeric>218</numeric></country>
+<country><name>Egypt</name><alpha2>EG</alpha2><alpha3>EGY</alpha3><numeric>818</numeric></country>
+<country><name>El Salvador</name><alpha2>SV</alpha2><alpha3>SLV</alpha3><numeric>222</numeric></country>
+<country><name>Equatorial Guinea</name><alpha2>GQ</alpha2><alpha3>GNQ</alpha3><numeric>226</numeric></country>
+<country><name>Eritrea</name><alpha2>ER</alpha2><alpha3>ERI</alpha3><numeric>232</numeric></country>
+<country><name>Estonia</name><alpha2>EE</alpha2><alpha3>EST</alpha3><numeric>233</numeric></country>
+<country><name>Ethiopia</name><alpha2>ET</alpha2><alpha3>ETH</alpha3><numeric>231</numeric></country>
+<country><name>Falkland Islands (Malvinas)</name><alpha2>FK</alpha2><alpha3>FLK</alpha3><numeric>238</numeric></country>
+<country><name>Faroe Islands</name><alpha2>FO</alpha2><alpha3>FRO</alpha3><numeric>234</numeric></country>
+<country><name>Fiji</name><alpha2>FJ</alpha2><alpha3>FJI</alpha3><numeric>242</numeric></country>
+<country><name>Finland</name><alpha2>FI</alpha2><alpha3>FIN</alpha3><numeric>246</numeric></country>
+<country><name>France</name><alpha2>FR</alpha2><alpha3>FRA</alpha3><numeric>250</numeric></country>
+<country><name>French Guiana</name><alpha2>GF</alpha2><alpha3>GUF</alpha3><numeric>254</numeric></country>
+<country><name>French Polynesia</name><alpha2>PF</alpha2><alpha3>PYF</alpha3><numeric>258</numeric></country>
+<country><name>French Southern Territories</name><alpha2>TF</alpha2><alpha3>ATF</alpha3><numeric>260</numeric></country>
+<country><name>Gabon</name><alpha2>GA</alpha2><alpha3>GAB</alpha3><numeric>266</numeric></country>
+<country><name>Gambia</name><alpha2>GM</alpha2><alpha3>GMB</alpha3><numeric>270</numeric></country>
+<country><name>Georgia</name><alpha2>GE</alpha2><alpha3>GEO</alpha3><numeric>268</numeric></country>
+<country><name>Germany</name><alpha2>DE</alpha2><alpha3>DEU</alpha3><numeric>276</numeric></country>
+<country><name>Ghana</name><alpha2>GH</alpha2><alpha3>GHA</alpha3><numeric>288</numeric></country>
+<country><name>Gibraltar</name><alpha2>GI</alpha2><alpha3>GIB</alpha3><numeric>292</numeric></country>
+<country><name>Greece</name><alpha2>GR</alpha2><alpha3>GRC</alpha3><numeric>300</numeric></country>
+<country><name>Greenland</name><alpha2>GL</alpha2><alpha3>GRL</alpha3><numeric>304</numeric></country>
+<country><name>Grenada</name><alpha2>GD</alpha2><alpha3>GRD</alpha3><numeric>308</numeric></country>
+<country><name>Guadeloupe</name><alpha2>GP</alpha2><alpha3>GLP</alpha3><numeric>312</numeric></country>
+<country><name>Guam</name><alpha2>GU</alpha2><alpha3>GUM</alpha3><numeric>316</numeric></country>
+<country><name>Guatemala</name><alpha2>GT</alpha2><alpha3>GTM</alpha3><numeric>320</numeric></country>
+<country><name>Guernsey</name><alpha2>GG</alpha2><alpha3>GGY</alpha3><numeric>831</numeric></country>
+<country><name>Guinea</name><alpha2>GN</alpha2><alpha3>GIN</alpha3><numeric>324</numeric></country>
+<country><name>Guinea-Bissau</name><alpha2>GW</alpha2><alpha3>GNB</alpha3><numeric>624</numeric></country>
+<country><name>Guyana</name><alpha2>GY</alpha2><alpha3>GUY</alpha3><numeric>328</numeric></country>
+<country><name>Haiti</name><alpha2>HT</alpha2><alpha3>HTI</alpha3><numeric>332</numeric></country>
+<country><name>Heard Island and McDonald Islands</name><alpha2>HM</alpha2><alpha3>HMD</alpha3><numeric>334</numeric></country>
+<country><name>Holy See (Vatican City State)</name><alpha2>VA</alpha2><alpha3>VAT</alpha3><numeric>336</numeric></country>
+<country><name>Honduras</name><alpha2>HN</alpha2><alpha3>HND</alpha3><numeric>340</numeric></country>
+<country><name>Hong Kong</name><alpha2>HK</alpha2><alpha3>HKG</alpha3><numeric>344</numeric></country>
+<country><name>Hungary</name><alpha2>HU</alpha2><alpha3>HUN</alpha3><numeric>348</numeric></country>
+<country><name>Iceland</name><alpha2>IS</alpha2><alpha3>ISL</alpha3><numeric>352</numeric></country>
+<country><name>India</name><alpha2>IN</alpha2><alpha3>IND</alpha3><numeric>356</numeric></country>
+<country><name>Indonesia</name><alpha2>ID</alpha2><alpha3>IDN</alpha3><numeric>360</numeric></country>
+<country><name>Iran, Islamic Republic of</name><alpha2>IR</alpha2><alpha3>IRN</alpha3><numeric>364</numeric></country>
+<country><name>Iraq</name><alpha2>IQ</alpha2><alpha3>IRQ</alpha3><numeric>368</numeric></country>
+<country><name>Ireland</name><alpha2>IE</alpha2><alpha3>IRL</alpha3><numeric>372</numeric></country>
+<country><name>Isle of Man</name><alpha2>IM</alpha2><alpha3>IMN</alpha3><numeric>833</numeric></country>
+<country><name>Israel</name><alpha2>IL</alpha2><alpha3>ISR</alpha3><numeric>376</numeric></country>
+<country><name>Italy</name><alpha2>IT</alpha2><alpha3>ITA</alpha3><numeric>380</numeric></country>
+<country><name>Jamaica</name><alpha2>JM</alpha2><alpha3>JAM</alpha3><numeric>388</numeric></country>
+<country><name>Japan</name><alpha2>JP</alpha2><alpha3>JPN</alpha3><numeric>392</numeric></country>
+<country><name>Jersey</name><alpha2>JE</alpha2><alpha3>JEY</alpha3><numeric>832</numeric></country>
+<country><name>Jordan</name><alpha2>JO</alpha2><alpha3>JOR</alpha3><numeric>400</numeric></country>
+<country><name>Kazakhstan</name><alpha2>KZ</alpha2><alpha3>KAZ</alpha3><numeric>398</numeric></country>
+<country><name>Kenya</name><alpha2>KE</alpha2><alpha3>KEN</alpha3><numeric>404</numeric></country>
+<country><name>Kiribati</name><alpha2>KI</alpha2><alpha3>KIR</alpha3><numeric>296</numeric></country>
+<country><name>Korea, Democratic People's Republic of</name><alpha2>KP</alpha2><alpha3>PRK</alpha3><numeric>408</numeric></country>
+<country><name>Korea, Republic of</name><alpha2>KR</alpha2><alpha3>KOR</alpha3><numeric>410</numeric></country>
+<country><name>Kuwait</name><alpha2>KW</alpha2><alpha3>KWT</alpha3><numeric>414</numeric></country>
+<country><name>Kyrgyzstan</name><alpha2>KG</alpha2><alpha3>KGZ</alpha3><numeric>417</numeric></country>
+<country><name>Lao People's Democratic Republic</name><alpha2>LA</alpha2><alpha3>LAO</alpha3><numeric>418</numeric></country>
+<country><name>Latvia</name><alpha2>LV</alpha2><alpha3>LVA</alpha3><numeric>428</numeric></country>
+<country><name>Lebanon</name><alpha2>LB</alpha2><alpha3>LBN</alpha3><numeric>422</numeric></country>
+<country><name>Lesotho</name><alpha2>LS</alpha2><alpha3>LSO</alpha3><numeric>426</numeric></country>
+<country><name>Liberia</name><alpha2>LR</alpha2><alpha3>LBR</alpha3><numeric>430</numeric></country>
+<country><name>Libya</name><alpha2>LY</alpha2><alpha3>LBY</alpha3><numeric>434</numeric></country>
+<country><name>Liechtenstein</name><alpha2>LI</alpha2><alpha3>LIE</alpha3><numeric>438</numeric></country>
+<country><name>Lithuania</name><alpha2>LT</alpha2><alpha3>LTU</alpha3><numeric>440</numeric></country>
+<country><name>Luxembourg</name><alpha2>LU</alpha2><alpha3>LUX</alpha3><numeric>442</numeric></country>
+<country><name>Macao</name><alpha2>MO</alpha2><alpha3>MAC</alpha3><numeric>446</numeric></country>
+<country><name>Macedonia, The Former Yugoslav Republic of</name><alpha2>MK</alpha2><alpha3>MKD</alpha3><numeric>807</numeric></country>
+<country><name>Madagascar</name><alpha2>MG</alpha2><alpha3>MDG</alpha3><numeric>450</numeric></country>
+<country><name>Malawi</name><alpha2>MW</alpha2><alpha3>MWI</alpha3><numeric>454</numeric></country>
+<country><name>Malaysia</name><alpha2>MY</alpha2><alpha3>MYS</alpha3><numeric>458</numeric></country>
+<country><name>Maldives</name><alpha2>MV</alpha2><alpha3>MDV</alpha3><numeric>462</numeric></country>
+<country><name>Mali</name><alpha2>ML</alpha2><alpha3>MLI</alpha3><numeric>466</numeric></country>
+<country><name>Malta</name><alpha2>MT</alpha2><alpha3>MLT</alpha3><numeric>470</numeric></country>
+<country><name>Marshall Islands</name><alpha2>MH</alpha2><alpha3>MHL</alpha3><numeric>584</numeric></country>
+<country><name>Martinique</name><alpha2>MQ</alpha2><alpha3>MTQ</alpha3><numeric>474</numeric></country>
+<country><name>Mauritania</name><alpha2>MR</alpha2><alpha3>MRT</alpha3><numeric>478</numeric></country>
+<country><name>Mauritius</name><alpha2>MU</alpha2><alpha3>MUS</alpha3><numeric>480</numeric></country>
+<country><name>Mayotte</name><alpha2>YT</alpha2><alpha3>MYT</alpha3><numeric>175</numeric></country>
+<country><name>Mexico</name><alpha2>MX</alpha2><alpha3>MEX</alpha3><numeric>484</numeric></country>
+<country><name>Micronesia, Federated States of</name><alpha2>FM</alpha2><alpha3>FSM</alpha3><numeric>583</numeric></country>
+<country><name>Moldova, Republic of</name><alpha2>MD</alpha2><alpha3>MDA</alpha3><numeric>498</numeric></country>
+<country><name>Monaco</name><alpha2>MC</alpha2><alpha3>MCO</alpha3><numeric>492</numeric></country>
+<country><name>Mongolia</name><alpha2>MN</alpha2><alpha3>MNG</alpha3><numeric>496</numeric></country>
+<country><name>Montenegro</name><alpha2>ME</alpha2><alpha3>MNE</alpha3><numeric>499</numeric></country>
+<country><name>Montserrat</name><alpha2>MS</alpha2><alpha3>MSR</alpha3><numeric>500</numeric></country>
+<country><name>Morocco</name><alpha2>MA</alpha2><alpha3>MAR</alpha3><numeric>504</numeric></country>
+<country><name>Mozambique</name><alpha2>MZ</alpha2><alpha3>MOZ</alpha3><numeric>508</numeric></country>
+<country><name>Myanmar</name><alpha2>MM</alpha2><alpha3>MMR</alpha3><numeric>104</numeric></country>
+<country><name>Namibia</name><alpha2>NA</alpha2><alpha3>NAM</alpha3><numeric>516</numeric></country>
+<country><name>Nauru</name><alpha2>NR</alpha2><alpha3>NRU</alpha3><numeric>520</numeric></country>
+<country><name>Nepal</name><alpha2>NP</alpha2><alpha3>NPL</alpha3><numeric>524</numeric></country>
+<country><name>Netherlands</name><alpha2>NL</alpha2><alpha3>NLD</alpha3><numeric>528</numeric></country>
+<country><name>New Caledonia</name><alpha2>NC</alpha2><alpha3>NCL</alpha3><numeric>540</numeric></country>
+<country><name>New Zealand</name><alpha2>NZ</alpha2><alpha3>NZL</alpha3><numeric>554</numeric></country>
+<country><name>Nicaragua</name><alpha2>NI</alpha2><alpha3>NIC</alpha3><numeric>558</numeric></country>
+<country><name>Niger</name><alpha2>NE</alpha2><alpha3>NER</alpha3><numeric>562</numeric></country>
+<country><name>Nigeria</name><alpha2>NG</alpha2><alpha3>NGA</alpha3><numeric>566</numeric></country>
+<country><name>Niue</name><alpha2>NU</alpha2><alpha3>NIU</alpha3><numeric>570</numeric></country>
+<country><name>Norfolk Island</name><alpha2>NF</alpha2><alpha3>NFK</alpha3><numeric>574</numeric></country>
+<country><name>Northern Mariana Islands</name><alpha2>MP</alpha2><alpha3>MNP</alpha3><numeric>580</numeric></country>
+<country><name>Norway</name><alpha2>NO</alpha2><alpha3>NOR</alpha3><numeric>578</numeric></country>
+<country><name>Oman</name><alpha2>OM</alpha2><alpha3>OMN</alpha3><numeric>512</numeric></country>
+<country><name>Pakistan</name><alpha2>PK</alpha2><alpha3>PAK</alpha3><numeric>586</numeric></country>
+<country><name>Palau</name><alpha2>PW</alpha2><alpha3>PLW</alpha3><numeric>585</numeric></country>
+<country><name>Palestine, State of</name><alpha2>PS</alpha2><alpha3>PSE</alpha3><numeric>275</numeric></country>
+<country><name>Panama</name><alpha2>PA</alpha2><alpha3>PAN</alpha3><numeric>591</numeric></country>
+<country><name>Papua New Guinea</name><alpha2>PG</alpha2><alpha3>PNG</alpha3><numeric>598</numeric></country>
+<country><name>Paraguay</name><alpha2>PY</alpha2><alpha3>PRY</alpha3><numeric>600</numeric></country>
+<country><name>Peru</name><alpha2>PE</alpha2><alpha3>PER</alpha3><numeric>604</numeric></country>
+<country><name>Philippines</name><alpha2>PH</alpha2><alpha3>PHL</alpha3><numeric>608</numeric></country>
+<country><name>Pitcairn</name><alpha2>PN</alpha2><alpha3>PCN</alpha3><numeric>612</numeric></country>
+<country><name>Poland</name><alpha2>PL</alpha2><alpha3>POL</alpha3><numeric>616</numeric></country>
+<country><name>Portugal</name><alpha2>PT</alpha2><alpha3>PRT</alpha3><numeric>620</numeric></country>
+<country><name>Puerto Rico</name><alpha2>PR</alpha2><alpha3>PRI</alpha3><numeric>630</numeric></country>
+<country><name>Qatar</name><alpha2>QA</alpha2><alpha3>QAT</alpha3><numeric>634</numeric></country>
+<country><name>R‚union</name><alpha2>RE</alpha2><alpha3>REU</alpha3><numeric>638</numeric></country>
+<country><name>Romania</name><alpha2>RO</alpha2><alpha3>ROU</alpha3><numeric>642</numeric></country>
+<country><name>Russian Federation</name><alpha2>RU</alpha2><alpha3>RUS</alpha3><numeric>643</numeric></country>
+<country><name>Rwanda</name><alpha2>RW</alpha2><alpha3>RWA</alpha3><numeric>646</numeric></country>
+<country><name>Saint Barth‚lemy</name><alpha2>BL</alpha2><alpha3>BLM</alpha3><numeric>652</numeric></country>
+<country><name>Saint Helena, Ascension and Tristan da Cunha</name><alpha2>SH</alpha2><alpha3>SHN</alpha3><numeric>654</numeric></country>
+<country><name>Saint Kitts and Nevis</name><alpha2>KN</alpha2><alpha3>KNA</alpha3><numeric>659</numeric></country>
+<country><name>Saint Lucia</name><alpha2>LC</alpha2><alpha3>LCA</alpha3><numeric>662</numeric></country>
+<country><name>Saint Martin (French part)</name><alpha2>MF</alpha2><alpha3>MAF</alpha3><numeric>663</numeric></country>
+<country><name>Saint Pierre and Miquelon</name><alpha2>PM</alpha2><alpha3>SPM</alpha3><numeric>666</numeric></country>
+<country><name>Saint Vincent and the Grenadines</name><alpha2>VC</alpha2><alpha3>VCT</alpha3><numeric>670</numeric></country>
+<country><name>Samoa</name><alpha2>WS</alpha2><alpha3>WSM</alpha3><numeric>882</numeric></country>
+<country><name>San Marino</name><alpha2>SM</alpha2><alpha3>SMR</alpha3><numeric>674</numeric></country>
+<country><name>Sao Tome and Principe</name><alpha2>ST</alpha2><alpha3>STP</alpha3><numeric>678</numeric></country>
+<country><name>Saudi Arabia</name><alpha2>SA</alpha2><alpha3>SAU</alpha3><numeric>682</numeric></country>
+<country><name>Senegal</name><alpha2>SN</alpha2><alpha3>SEN</alpha3><numeric>686</numeric></country>
+<country><name>Serbia</name><alpha2>RS</alpha2><alpha3>SRB</alpha3><numeric>688</numeric></country>
+<country><name>Seychelles</name><alpha2>SC</alpha2><alpha3>SYC</alpha3><numeric>690</numeric></country>
+<country><name>Sierra Leone</name><alpha2>SL</alpha2><alpha3>SLE</alpha3><numeric>694</numeric></country>
+<country><name>Singapore</name><alpha2>SG</alpha2><alpha3>SGP</alpha3><numeric>702</numeric></country>
+<country><name>Sint Maarten (Dutch part)</name><alpha2>SX</alpha2><alpha3>SXM</alpha3><numeric>534</numeric></country>
+<country><name>Slovakia</name><alpha2>SK</alpha2><alpha3>SVK</alpha3><numeric>703</numeric></country>
+<country><name>Slovenia</name><alpha2>SI</alpha2><alpha3>SVN</alpha3><numeric>705</numeric></country>
+<country><name>Solomon Islands</name><alpha2>SB</alpha2><alpha3>SLB</alpha3><numeric>90</numeric></country>
+<country><name>Somalia</name><alpha2>SO</alpha2><alpha3>SOM</alpha3><numeric>706</numeric></country>
+<country><name>South Africa</name><alpha2>ZA</alpha2><alpha3>ZAF</alpha3><numeric>710</numeric></country>
+<country><name>South Georgia and the South Sandwich Islands</name><alpha2>GS</alpha2><alpha3>SGS</alpha3><numeric>239</numeric></country>
+<country><name>South Sudan</name><alpha2>SS</alpha2><alpha3>SSD</alpha3><numeric>728</numeric></country>
+<country><name>Spain</name><alpha2>ES</alpha2><alpha3>ESP</alpha3><numeric>724</numeric></country>
+<country><name>Sri Lanka</name><alpha2>LK</alpha2><alpha3>LKA</alpha3><numeric>144</numeric></country>
+<country><name>Sudan</name><alpha2>SD</alpha2><alpha3>SDN</alpha3><numeric>729</numeric></country>
+<country><name>Suriname</name><alpha2>SR</alpha2><alpha3>SUR</alpha3><numeric>740</numeric></country>
+<country><name>Svalbard and Jan Mayen</name><alpha2>SJ</alpha2><alpha3>SJM</alpha3><numeric>744</numeric></country>
+<country><name>Swaziland</name><alpha2>SZ</alpha2><alpha3>SWZ</alpha3><numeric>748</numeric></country>
+<country><name>Sweden</name><alpha2>SE</alpha2><alpha3>SWE</alpha3><numeric>752</numeric></country>
+<country><name>Switzerland</name><alpha2>CH</alpha2><alpha3>CHE</alpha3><numeric>756</numeric></country>
+<country><name>Syrian Arab Republic</name><alpha2>SY</alpha2><alpha3>SYR</alpha3><numeric>760</numeric></country>
+<country><name>Taiwan, Province of China</name><alpha2>TW</alpha2><alpha3>TWN</alpha3><numeric>158</numeric></country>
+<country><name>Tajikistan</name><alpha2>TJ</alpha2><alpha3>TJK</alpha3><numeric>762</numeric></country>
+<country><name>Tanzania, United Republic of</name><alpha2>TZ</alpha2><alpha3>TZA</alpha3><numeric>834</numeric></country>
+<country><name>Thailand</name><alpha2>TH</alpha2><alpha3>THA</alpha3><numeric>764</numeric></country>
+<country><name>Timor-Leste</name><alpha2>TL</alpha2><alpha3>TLS</alpha3><numeric>626</numeric></country>
+<country><name>Togo</name><alpha2>TG</alpha2><alpha3>TGO</alpha3><numeric>768</numeric></country>
+<country><name>Tokelau</name><alpha2>TK</alpha2><alpha3>TKL</alpha3><numeric>772</numeric></country>
+<country><name>Tonga</name><alpha2>TO</alpha2><alpha3>TON</alpha3><numeric>776</numeric></country>
+<country><name>Trinidad and Tobago</name><alpha2>TT</alpha2><alpha3>TTO</alpha3><numeric>780</numeric></country>
+<country><name>Tunisia</name><alpha2>TN</alpha2><alpha3>TUN</alpha3><numeric>788</numeric></country>
+<country><name>Turkey</name><alpha2>TR</alpha2><alpha3>TUR</alpha3><numeric>792</numeric></country>
+<country><name>Turkmenistan</name><alpha2>TM</alpha2><alpha3>TKM</alpha3><numeric>795</numeric></country>
+<country><name>Turks and Caicos Islands</name><alpha2>TC</alpha2><alpha3>TCA</alpha3><numeric>796</numeric></country>
+<country><name>Tuvalu</name><alpha2>TV</alpha2><alpha3>TUV</alpha3><numeric>798</numeric></country>
+<country><name>Uganda</name><alpha2>UG</alpha2><alpha3>UGA</alpha3><numeric>800</numeric></country>
+<country><name>Ukraine</name><alpha2>UA</alpha2><alpha3>UKR</alpha3><numeric>804</numeric></country>
+<country><name>United Arab Emirates</name><alpha2>AE</alpha2><alpha3>ARE</alpha3><numeric>784</numeric></country>
+<country><name>United Kingdom</name><alpha2>GB</alpha2><alpha3>GBR</alpha3><numeric>826</numeric></country>
+<country><name>United States</name><alpha2>US</alpha2><alpha3>USA</alpha3><numeric>840</numeric></country>
+<country><name>United States Minor Outlying Islands</name><alpha2>UM</alpha2><alpha3>UMI</alpha3><numeric>581</numeric></country>
+<country><name>Uruguay</name><alpha2>UY</alpha2><alpha3>URY</alpha3><numeric>858</numeric></country>
+<country><name>Uzbekistan</name><alpha2>UZ</alpha2><alpha3>UZB</alpha3><numeric>860</numeric></country>
+<country><name>Vanuatu</name><alpha2>VU</alpha2><alpha3>VUT</alpha3><numeric>548</numeric></country>
+<country><name>Venezuela, Bolivarian Republic of</name><alpha2>VE</alpha2><alpha3>VEN</alpha3><numeric>862</numeric></country>
+<country><name>Viet Nam</name><alpha2>VN</alpha2><alpha3>VNM</alpha3><numeric>704</numeric></country>
+<country><name>Virgin Islands, British</name><alpha2>VG</alpha2><alpha3>VGB</alpha3><numeric>92</numeric></country>
+<country><name>Virgin Islands, U.S.</name><alpha2>VI</alpha2><alpha3>VIR</alpha3><numeric>850</numeric></country>
+<country><name>Wallis and Futuna</name><alpha2>WF</alpha2><alpha3>WLF</alpha3><numeric>876</numeric></country>
+<country><name>Western Sahara</name><alpha2>EH</alpha2><alpha3>ESH</alpha3><numeric>732</numeric></country>
+<country><name>Yemen</name><alpha2>YE</alpha2><alpha3>YEM</alpha3><numeric>887</numeric></country>
+<country><name>Zambia</name><alpha2>ZM</alpha2><alpha3>ZMB</alpha3><numeric>894</numeric></country>
+<country><name>Zimbabwe</name><alpha2>ZW</alpha2><alpha3>ZWE</alpha3><numeric>716</numeric></country>
+</ISO3166>
