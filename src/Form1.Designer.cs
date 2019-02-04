@@ -54,6 +54,13 @@ namespace IdFix
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.distinguishedName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.objectClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.attribute = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.error = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.update = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.action = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
@@ -62,13 +69,6 @@ namespace IdFix
             this.removeActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.undoActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.completeActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.distinguishedName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.objectClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.attribute = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.error = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.update = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.action = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -214,7 +214,7 @@ namespace IdFix
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(122, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(121, 17);
             this.toolStripStatusLabel1.Text = "To begin select Query";
             // 
             // dataGridView1
@@ -254,73 +254,6 @@ namespace IdFix
             this.dataGridView1.Size = new System.Drawing.Size(739, 480);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridView1_MouseClick);
-            // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.SystemColors.Highlight;
-            this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Controls.Add(this.menuStrip1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(784, 29);
-            this.panel1.TabIndex = 2;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.MenuHighlight;
-            this.pictureBox1.Image = global::IdFix.Properties.Resources.office365_logo;
-            this.pictureBox1.InitialImage = null;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(120, 30);
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            // 
-            // backgroundWorker1
-            // 
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
-            // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.editActionToolStripMenuItem,
-            this.removeActionToolStripMenuItem,
-            this.undoActionToolStripMenuItem,
-            this.completeActionToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(135, 92);
-            // 
-            // editActionToolStripMenuItem
-            // 
-            this.editActionToolStripMenuItem.Name = "editActionToolStripMenuItem";
-            this.editActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-            this.editActionToolStripMenuItem.Text = "EDIT";
-            this.editActionToolStripMenuItem.Click += new System.EventHandler(this.editActionToolStripMenuItem_Click);
-            // 
-            // removeActionToolStripMenuItem
-            // 
-            this.removeActionToolStripMenuItem.Name = "removeActionToolStripMenuItem";
-            this.removeActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-            this.removeActionToolStripMenuItem.Text = "REMOVE";
-            this.removeActionToolStripMenuItem.Click += new System.EventHandler(this.removeActionToolStripMenuItem_Click);
-            // 
-            // undoActionToolStripMenuItem
-            // 
-            this.undoActionToolStripMenuItem.Name = "undoActionToolStripMenuItem";
-            this.undoActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-            this.undoActionToolStripMenuItem.Text = "UNDO";
-            this.undoActionToolStripMenuItem.Visible = false;
-            this.undoActionToolStripMenuItem.Click += new System.EventHandler(this.undoActionToolStripMenuItem_Click);
-            // 
-            // completeActionToolStripMenuItem
-            // 
-            this.completeActionToolStripMenuItem.Name = "completeActionToolStripMenuItem";
-            this.completeActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
-            this.completeActionToolStripMenuItem.Text = "COMPLETE";
-            this.completeActionToolStripMenuItem.Click += new System.EventHandler(this.completeActionToolStripMenuItem_Click);
             // 
             // distinguishedName
             // 
@@ -401,6 +334,73 @@ namespace IdFix
             this.action.ToolTipText = "click to sort";
             this.action.Width = 72;
             // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.Highlight;
+            this.panel1.Controls.Add(this.pictureBox1);
+            this.panel1.Controls.Add(this.menuStrip1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(784, 29);
+            this.panel1.TabIndex = 2;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.pictureBox1.Image = global::IdFix.Properties.Resources.office365_logo;
+            this.pictureBox1.InitialImage = null;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(120, 30);
+            this.pictureBox1.TabIndex = 1;
+            this.pictureBox1.TabStop = false;
+            // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editActionToolStripMenuItem,
+            this.removeActionToolStripMenuItem,
+            this.undoActionToolStripMenuItem,
+            this.completeActionToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(135, 92);
+            // 
+            // editActionToolStripMenuItem
+            // 
+            this.editActionToolStripMenuItem.Name = "editActionToolStripMenuItem";
+            this.editActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.editActionToolStripMenuItem.Text = "EDIT";
+            this.editActionToolStripMenuItem.Click += new System.EventHandler(this.editActionToolStripMenuItem_Click);
+            // 
+            // removeActionToolStripMenuItem
+            // 
+            this.removeActionToolStripMenuItem.Name = "removeActionToolStripMenuItem";
+            this.removeActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.removeActionToolStripMenuItem.Text = "REMOVE";
+            this.removeActionToolStripMenuItem.Click += new System.EventHandler(this.removeActionToolStripMenuItem_Click);
+            // 
+            // undoActionToolStripMenuItem
+            // 
+            this.undoActionToolStripMenuItem.Name = "undoActionToolStripMenuItem";
+            this.undoActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.undoActionToolStripMenuItem.Text = "UNDO";
+            this.undoActionToolStripMenuItem.Visible = false;
+            this.undoActionToolStripMenuItem.Click += new System.EventHandler(this.undoActionToolStripMenuItem_Click);
+            // 
+            // completeActionToolStripMenuItem
+            // 
+            this.completeActionToolStripMenuItem.Name = "completeActionToolStripMenuItem";
+            this.completeActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.completeActionToolStripMenuItem.Text = "COMPLETE";
+            this.completeActionToolStripMenuItem.Click += new System.EventHandler(this.completeActionToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -416,7 +416,7 @@ namespace IdFix
             this.Name = "Form1";
             this.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "IdFix version 1.11";
+            this.Text = "IdFix version 2.0.1.0";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
