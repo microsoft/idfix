@@ -493,7 +493,7 @@ namespace IdFix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IdFix version 1.11.
+        ///   Looks up a localized string similar to IdFix version 2.0.1.0.
         /// </summary>
         internal static string IdFixVersion {
             get {
