@@ -126,9 +126,10 @@ namespace IdFix
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        if (!tldDict.ContainsKey(line.Trim().ToLowerInvariant()))
+                        var formattedLine = line.Trim().ToLowerInvariant();
+                        if (!tldDict.ContainsKey(formattedLine))
                         {
-                            tldDict.Add(line.Trim().ToLowerInvariant(), line.Trim().ToLowerInvariant());
+                            tldDict.Add(formattedLine, formattedLine);
                         }
                     }
                 }
