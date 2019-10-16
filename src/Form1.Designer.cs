@@ -214,7 +214,7 @@ namespace IdFix
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(121, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(120, 17);
             this.toolStripStatusLabel1.Text = "To begin select Query";
             // 
             // dataGridView1
@@ -370,26 +370,26 @@ namespace IdFix
             this.undoActionToolStripMenuItem,
             this.completeActionToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(135, 92);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(134, 92);
             // 
             // editActionToolStripMenuItem
             // 
             this.editActionToolStripMenuItem.Name = "editActionToolStripMenuItem";
-            this.editActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.editActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.editActionToolStripMenuItem.Text = "EDIT";
             this.editActionToolStripMenuItem.Click += new System.EventHandler(this.editActionToolStripMenuItem_Click);
             // 
             // removeActionToolStripMenuItem
             // 
             this.removeActionToolStripMenuItem.Name = "removeActionToolStripMenuItem";
-            this.removeActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.removeActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.removeActionToolStripMenuItem.Text = "REMOVE";
             this.removeActionToolStripMenuItem.Click += new System.EventHandler(this.removeActionToolStripMenuItem_Click);
             // 
             // undoActionToolStripMenuItem
             // 
             this.undoActionToolStripMenuItem.Name = "undoActionToolStripMenuItem";
-            this.undoActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.undoActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.undoActionToolStripMenuItem.Text = "UNDO";
             this.undoActionToolStripMenuItem.Visible = false;
             this.undoActionToolStripMenuItem.Click += new System.EventHandler(this.undoActionToolStripMenuItem_Click);
@@ -397,7 +397,7 @@ namespace IdFix
             // completeActionToolStripMenuItem
             // 
             this.completeActionToolStripMenuItem.Name = "completeActionToolStripMenuItem";
-            this.completeActionToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.completeActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.completeActionToolStripMenuItem.Text = "COMPLETE";
             this.completeActionToolStripMenuItem.Click += new System.EventHandler(this.completeActionToolStripMenuItem_Click);
             // 
@@ -416,7 +416,7 @@ namespace IdFix
             this.Name = "Form1";
             this.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "IdFix version 2.0.1.0";
+            this.Text = "IdFix version 2.0.2.0";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
