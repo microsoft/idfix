@@ -84,7 +84,7 @@ namespace IdFix
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Credentials Other - " + ex.Message);
+                myParent.statusDisplay(StringLiterals.Exception + "Settings - " + ex.Message);
             }
         }
 
@@ -94,6 +94,7 @@ namespace IdFix
             {
                 myParent.ldapFilter = textBoxFilter.Text;
                 myParent.ldapPort = comboBoxPort.Text;
+
                 if (myParent.settingsAD)
                 {
                     myParent.forestList = new List<string>();
@@ -127,6 +128,7 @@ namespace IdFix
                     myParent.serverName = textBoxServer.Text;
                     myParent.targetSearch = textBoxDomain.Text;
                 }
+
                 if (myParent.settingsMT)
                 {
                     myParent.attributesToReturn = new string[] { StringLiterals.Cn, StringLiterals.DistinguishedName, 
@@ -141,6 +143,13 @@ namespace IdFix
                     StringLiterals.HomeMdb, StringLiterals.Mail, StringLiterals.MailNickName, StringLiterals.ObjectClass, StringLiterals.ProxyAddresses, 
                     StringLiterals.SamAccountName, StringLiterals.Sn, StringLiterals.TargetAddress };
                 }
+
+                if (!myParent.settingsCU)
+                {
+                    myParent.user = textBoxUser.Text;
+                    myParent.password = textBoxPassword.Text;
+                }
+
                 this.Close();
             }
             catch (Exception ex)
