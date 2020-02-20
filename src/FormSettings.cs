@@ -38,6 +38,15 @@ namespace IdFix
                     radioButtonD.Checked = true;
                 }
 
+                if (myParent.AltLoginID)
+                {
+                    chk_alternateloginid.Checked = true;
+                }
+                else
+                {
+                    chk_alternateloginid.Checked = false;
+                }
+
                 if (myParent.searchBaseEnabled) //re-entrant case.
                 {
                     searchBaseCheckBox.Checked = true;
@@ -81,6 +90,7 @@ namespace IdFix
                     textBoxUser.Enabled = true;
                     textBoxPassword.Enabled = true;
                 }
+                
             }
             catch (Exception ex)
             {
@@ -182,6 +192,8 @@ namespace IdFix
                 myParent.statusDisplay(StringLiterals.Exception + "Rules Multi-Tenant - " + ex.Message);
             }
         }
+
+
 
         private void radioButtonD_CheckedChanged(object sender, EventArgs e)
         {
@@ -361,6 +373,26 @@ namespace IdFix
             }
             string newForestDN = myParent.GetScope(selectedForest, user, password);
             textBoxSearchBase.Text = newForestDN;
+        }
+
+        private void chk_alternateloginid_CheckedChanged(object sender, EventArgs e)
+        {
+                try
+                {
+                    if (chk_alternateloginid.Checked) { 
+                        myParent.AltLoginID = true;
+                    } else
+                {
+                    myParent.AltLoginID = false;
+                }
+
+
+            }
+                catch (Exception ex)
+                {
+                    myParent.statusDisplay(StringLiterals.Exception + "Rules AlternateLoginID - " + ex.Message);
+                }
+            
         }
     }
 }
