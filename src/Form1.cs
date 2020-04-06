@@ -47,6 +47,7 @@ namespace IdFix
         public bool settingsMT = true;
         public bool settingsAD = true;
         public bool settingsCU = true;
+        public bool AltLoginID = false;
         ModifyRequest modifyRequest;
         DirectoryResponse directoryResponse;
         public string[] attributesToReturn = new string[] { StringLiterals.Cn, 
@@ -1272,7 +1273,12 @@ namespace IdFix
                                         //  @ cannot be first character -- RegEx
                                         //  period (.), ampersand (&), space, or at sign (@) cannot be the last character -- RegEx 
                                         //  No duplicates -- checked in mtChecks
-                                        mtChecks(entry, StringLiterals.UserPrincipalName, 0, 113, invalidUpnRegEx, rfc2822, true, false, false);
+
+                                        if (AltLoginID == false)
+                                        {
+                                            mtChecks(entry, StringLiterals.UserPrincipalName, 0, 113, invalidUpnRegEx, rfc2822, true, false, false);
+                                        } 
+                                        
                                         #endregion
                                     }
                                     else
@@ -2342,7 +2348,12 @@ namespace IdFix
                  return true;
              }
 
-             string upn = entry.Attributes[StringLiterals.UserPrincipalName][0].ToString();
+            if (AltLoginID == true)
+            {
+                return true;
+            }
+
+            string upn = entry.Attributes[StringLiterals.UserPrincipalName][0].ToString();
 
              //If any invalid character matches, we are done
              if (invalidUpnRegEx.IsMatch(upn))

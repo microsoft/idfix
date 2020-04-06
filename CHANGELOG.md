@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 2.1.3.0 - 2020-04-06
+
+- Added Alternate ID option in the settings that permit to skip checks on UserPrincipalName attribute
+- Added .gmbh to list of valid domain extensions
+
 ## 2.0.2.0 - 2020-01-22
 
 - Added .cloud to the list of tld's supported by the application (#5)
