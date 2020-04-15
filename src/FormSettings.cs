@@ -2,34 +2,43 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.DirectoryServices.ActiveDirectory;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using IdFix.Settings;
 
 namespace IdFix
 {
     public partial class FormSettings : Form
     {
-        private Form1 myParent;
+        private SetDisplayDelegate _setDisplay;
 
-        public FormSettings(Form1 frm1)
+        public FormSettings(SetDisplayDelegate setDisplay)
         {
+            this._setDisplay = setDisplay;
+
             try
             {
                 InitializeComponent();
-                myParent = frm1;
 
-                foreach (string forest in myParent.forestList)
+                // need to merge in the active list and the found list
+                var forests = SettingsManager.Instance.ForestList;
+                foreach (string forest in forests.Concat(SettingsManager.Instance.ActiveForestList).Distinct().OrderBy(t => t))
                 {
-                    checkedListBoxAD.Items.Add(forest, true);
+                    checkedListBoxAD.Items.Add(forest, SettingsManager.Instance.ActiveForestList.Length == 0 || SettingsManager.Instance.ActiveForestList.Contains(forest));
                 }
-                textBoxDomain.Text = myParent.targetSearch;
-                textBoxServer.Text = myParent.serverName;
-                comboBoxPort.Text = myParent.ldapPort;
-                textBoxFilter.Text = myParent.ldapFilter;
 
-                if (myParent.settingsMT)
+                // fill in domain and server
+                textBoxDomain.Text = SettingsManager.Instance.LDAPDomain;
+                textBoxServer.Text = SettingsManager.Instance.LDAPServer;
+
+                // fill in port and filter
+                comboBoxPort.Text = SettingsManager.Instance.Port.ToString();
+                textBoxFilter.Text = SettingsManager.Instance.Filter;
+
+                if (SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant)
                 {
                     radioButtonMT.Checked = true;
                 }
@@ -38,7 +47,7 @@ namespace IdFix
                     radioButtonD.Checked = true;
                 }
 
-                if (myParent.AltLoginID)
+                if (SettingsManager.Instance.UseAlternateLogin)
                 {
                     chk_alternateloginid.Checked = true;
                 }
@@ -47,11 +56,11 @@ namespace IdFix
                     chk_alternateloginid.Checked = false;
                 }
 
-                if (myParent.searchBaseEnabled) //re-entrant case.
+                if (SettingsManager.Instance.SearchBaseEnabled) //re-entrant case.
                 {
                     searchBaseCheckBox.Checked = true;
                     textBoxSearchBase.Enabled = true;
-                    textBoxSearchBase.Text = myParent.searchBase;
+                    textBoxSearchBase.Text = SettingsManager.Instance.SearchBase;
                 }
                 else
                 {
@@ -59,7 +68,7 @@ namespace IdFix
                     textBoxSearchBase.Enabled = false;
                 }
 
-                if (myParent.settingsAD)
+                if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
                 {
                     radioButtonAD.Checked = true;
                     checkedListBoxAD.Enabled = true;
@@ -78,7 +87,7 @@ namespace IdFix
                     textBoxServer.Enabled = true;
                 }
 
-                if (myParent.settingsCU)
+                if (SettingsManager.Instance.CurrentCredentialMode == CredentialMode.CurrentUser)
                 {
                     radioButtonCurrent.Checked = true;
                     textBoxUser.Enabled = false;
@@ -90,11 +99,11 @@ namespace IdFix
                     textBoxUser.Enabled = true;
                     textBoxPassword.Enabled = true;
                 }
-                
+
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Settings - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "Settings - " + ex.Message);
             }
         }
 
@@ -102,69 +111,73 @@ namespace IdFix
         {
             try
             {
-                myParent.ldapFilter = textBoxFilter.Text;
-                myParent.ldapPort = comboBoxPort.Text;
+                SettingsManager.Instance.Filter = textBoxFilter.Text;
+                SettingsManager.Instance.Port = string.IsNullOrEmpty(comboBoxPort.Text) ? 0 : int.Parse(comboBoxPort.Text);
 
-                if (myParent.settingsAD)
+                if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
                 {
-                    myParent.forestList = new List<string>();
+                    var tempList = new List<string>();
                     foreach (object item in checkedListBoxAD.CheckedItems)
                     {
-                        myParent.forestList.Add(item.ToString());
+                        tempList.Add(item.ToString());
                     }
+                    SettingsManager.Instance.ActiveForestList = tempList.ToArray();
+
                     //If the checkbox is checked, we set the searchBase
-                    if(searchBaseCheckBox.Checked)
+                    if (searchBaseCheckBox.Checked)
                     {
                         if (String.IsNullOrEmpty(textBoxSearchBase.Text) || checkedListBoxAD.CheckedItems.Count > 1)
                         {
                             //If they checked it and nothing is set, then we clear the check box and set state.
                             searchBaseCheckBox.Checked = false;
-                            myParent.searchBaseEnabled = false;
-                            myParent.searchBase = String.Empty;
+                            SettingsManager.Instance.SearchBaseEnabled = false;
+                            SettingsManager.Instance.SearchBase = String.Empty;
                         }
                         else
                         {
-                            myParent.searchBaseEnabled = true;
-                            myParent.searchBase = textBoxSearchBase.Text;
-                        } 
+                            SettingsManager.Instance.SearchBaseEnabled = true;
+                            SettingsManager.Instance.SearchBase = textBoxSearchBase.Text;
+                        }
                     }
-                    else //This is for the re-entrant case. UI shows no SearchBase, so we should do that.
+                    else
                     {
-                        myParent.searchBase = String.Empty;
+                        // This is for the re-entrant case. UI shows no SearchBase, so we should do that.
+                        SettingsManager.Instance.SearchBase = String.Empty;
                     }
                 }
                 else
                 {
-                    myParent.serverName = textBoxServer.Text;
-                    myParent.targetSearch = textBoxDomain.Text;
+                    SettingsManager.Instance.LDAPServer = textBoxServer.Text;
+                    SettingsManager.Instance.LDAPDomain = textBoxDomain.Text;
                 }
 
-                if (myParent.settingsMT)
-                {
-                    myParent.attributesToReturn = new string[] { StringLiterals.Cn, StringLiterals.DistinguishedName, 
-                    StringLiterals.GroupType, StringLiterals.HomeMdb, StringLiterals.IsCriticalSystemObject, StringLiterals.Mail,
-                    StringLiterals.MailNickName, StringLiterals.MsExchHideFromAddressLists,
-                    StringLiterals.MsExchRecipientTypeDetails, StringLiterals.ObjectClass, StringLiterals.ProxyAddresses, 
-                    StringLiterals.SamAccountName, StringLiterals.TargetAddress, StringLiterals.UserPrincipalName };
-                }
-                else
-                {
-                    myParent.attributesToReturn = new string[] { StringLiterals.Cn, StringLiterals.DisplayName, StringLiterals.DistinguishedName, StringLiterals.GivenName, 
-                    StringLiterals.HomeMdb, StringLiterals.Mail, StringLiterals.MailNickName, StringLiterals.ObjectClass, StringLiterals.ProxyAddresses, 
-                    StringLiterals.SamAccountName, StringLiterals.Sn, StringLiterals.TargetAddress };
-                }
+                // TODO:: move this logic into the rule sets for each
+                //if (myParent.settingsMT)
+                //{
+                //    myParent.attributesToReturn = new string[] { StringLiterals.Cn, StringLiterals.DistinguishedName,
+                //    StringLiterals.GroupType, StringLiterals.HomeMdb, StringLiterals.IsCriticalSystemObject, StringLiterals.Mail,
+                //    StringLiterals.MailNickName, StringLiterals.MsExchHideFromAddressLists,
+                //    StringLiterals.MsExchRecipientTypeDetails, StringLiterals.ObjectClass, StringLiterals.ProxyAddresses,
+                //    StringLiterals.SamAccountName, StringLiterals.TargetAddress, StringLiterals.UserPrincipalName };
+                //}
+                //else
+                //{
+                //    myParent.attributesToReturn = new string[] { StringLiterals.Cn, StringLiterals.DisplayName, StringLiterals.DistinguishedName, StringLiterals.GivenName,
+                //    StringLiterals.HomeMdb, StringLiterals.Mail, StringLiterals.MailNickName, StringLiterals.ObjectClass, StringLiterals.ProxyAddresses,
+                //    StringLiterals.SamAccountName, StringLiterals.Sn, StringLiterals.TargetAddress };
+                //}
 
-                if (!myParent.settingsCU)
+                if (SettingsManager.Instance.CurrentCredentialMode != CredentialMode.CurrentUser)
                 {
-                    myParent.user = textBoxUser.Text;
-                    myParent.password = textBoxPassword.Text;
+                    SettingsManager.Instance.Username = textBoxUser.Text;
+                    SettingsManager.Instance.Password = textBoxPassword.Text;
                 }
 
                 this.Close();
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Settings - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "Settings - " + ex.Message);
             }
         }
 
@@ -176,7 +189,7 @@ namespace IdFix
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Cancel - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "Cancel - " + ex.Message);
             }
         }
 
@@ -184,27 +197,25 @@ namespace IdFix
         {
             try
             {
-                myParent.settingsMT = true;
-                textBoxFilter.Text = "(|(objectCategory=Person)(objectCategory=Group))";
+                SettingsManager.Instance.CurrentRuleMode = RuleMode.MultiTenant;
+                textBoxFilter.Text = SettingsManager.DefaultMTFilter;
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Rules Multi-Tenant - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "Rules Multi-Tenant - " + ex.Message);
             }
         }
-
-
-
+               
         private void radioButtonD_CheckedChanged(object sender, EventArgs e)
         {
             try
             {
-                myParent.settingsMT = false;
-                textBoxFilter.Text = "(&(mail=*)(|(objectCategory=Person)(objectCategory=Group)))";
+                SettingsManager.Instance.CurrentRuleMode = RuleMode.Dedicated;
+                textBoxFilter.Text = SettingsManager.DefaultDedicatedFilter;
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Rules Multi-Tenant - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "Rules Multi-Tenant - " + ex.Message);
             }
         }
 
@@ -215,11 +226,12 @@ namespace IdFix
                 if (!String.IsNullOrEmpty(textBoxAD.Text))
                 {
                     checkedListBoxAD.Items.Add(textBoxAD.Text, true);
+                    textBoxAD.Text = string.Empty;
                 }
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Add Forest - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "Add Forest - " + ex.Message);
             }
         }
 
@@ -227,7 +239,7 @@ namespace IdFix
         {
             try
             {
-                myParent.settingsAD = true;
+                SettingsManager.Instance.CurrentDirectoryType = DirectoryType.ActiveDirectory;
                 checkedListBoxAD.Enabled = true;
                 textBoxAD.Enabled = true;
                 forestButton.Enabled = true;
@@ -236,7 +248,7 @@ namespace IdFix
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Active Directory - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "Active Directory - " + ex.Message);
             }
         }
 
@@ -244,7 +256,7 @@ namespace IdFix
         {
             try
             {
-                myParent.settingsAD = false;
+                SettingsManager.Instance.CurrentDirectoryType = DirectoryType.LDAP;
                 checkedListBoxAD.Enabled = false;
                 textBoxAD.Enabled = false;
                 forestButton.Enabled = false;
@@ -253,7 +265,7 @@ namespace IdFix
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "LDAP - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "LDAP - " + ex.Message);
             }
         }
 
@@ -261,13 +273,15 @@ namespace IdFix
         {
             try
             {
-                myParent.settingsCU = true;
+                SettingsManager.Instance.CurrentCredentialMode = CredentialMode.CurrentUser;
                 textBoxUser.Enabled = false;
                 textBoxPassword.Enabled = false;
+                textBoxUser.Text = string.Empty;
+                textBoxPassword.Text = string.Empty;
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Credentials Current - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "Credentials Current - " + ex.Message);
             }
         }
 
@@ -275,24 +289,26 @@ namespace IdFix
         {
             try
             {
-                myParent.settingsCU = false;
+                SettingsManager.Instance.CurrentCredentialMode = CredentialMode.Specified;
                 textBoxUser.Enabled = true;
                 textBoxPassword.Enabled = true;
+                textBoxUser.Text = SettingsManager.Instance.Username;
+                textBoxPassword.Text = SettingsManager.Instance.Password;
             }
             catch (Exception ex)
             {
-                myParent.statusDisplay(StringLiterals.Exception + "Credentials Other - " + ex.Message);
+                this._setDisplay(StringLiterals.Exception + "Credentials Other - " + ex.Message);
             }
         }
 
         private void searchBaseCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            if(searchBaseCheckBox.Checked)
+            if (searchBaseCheckBox.Checked)
             {
                 //First we check if there is any forest selected
-                if (checkedListBoxAD.CheckedItems.Count == 1) 
+                if (checkedListBoxAD.CheckedItems.Count == 1)
                 {
-                    myParent.searchBaseEnabled = true;
+                    SettingsManager.Instance.SearchBaseEnabled = true;
                     textBoxSearchBase.Enabled = true;
                     //We need to put in default value
                     ResetSearchBase(0);
@@ -315,13 +331,13 @@ namespace IdFix
         private void checkedListBoxAD_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             //If nothing is selected, reset the boxes.
-            switch(checkedListBoxAD.CheckedItems.Count)
+            switch (checkedListBoxAD.CheckedItems.Count)
             {
                 case 0:
-                    if(e.NewValue == CheckState.Checked)
+                    if (e.NewValue == CheckState.Checked)
                     {
                         //A new value is added
-                        if(searchBaseCheckBox.Checked)
+                        if (searchBaseCheckBox.Checked)
                         {
                             //The problem here is that nothing is marked as checked at this point.
                             //So we have to assume that this happened at that index.
@@ -333,7 +349,7 @@ namespace IdFix
                     break;
                 case 1:
                     //If we go from 1->0 or 1->2, we have to uncheck.
-                    if(searchBaseCheckBox.Checked)
+                    if (searchBaseCheckBox.Checked)
                     {
                         searchBaseCheckBox.Checked = false;
                         textBoxSearchBase.Enabled = false;
@@ -341,7 +357,7 @@ namespace IdFix
                     }
                     break;
                 case 2:
-                    if(e.NewValue == CheckState.Unchecked)
+                    if (e.NewValue == CheckState.Unchecked)
                     {
                         if (searchBaseCheckBox.Checked)
                         {
@@ -358,8 +374,8 @@ namespace IdFix
 
         internal void ResetSearchBase(int index)
         {
-            string user = myParent.settingsCU ? null : textBoxUser.Text;
-            string password = myParent.settingsCU ? null : textBoxPassword.Text;
+            string user = SettingsManager.Instance.CurrentCredentialMode == CredentialMode.CurrentUser ? null : SettingsManager.Instance.Username;
+            string password = SettingsManager.Instance.CurrentCredentialMode == CredentialMode.CurrentUser ? null : SettingsManager.Instance.Password;
             string selectedForest = null;
 
             //We need to guard for the case where the item will be checked after the fact.
@@ -371,28 +387,40 @@ namespace IdFix
             {
                 selectedForest = checkedListBoxAD.CheckedItems[index].ToString();
             }
-            string newForestDN = myParent.GetScope(selectedForest, user, password);
-            textBoxSearchBase.Text = newForestDN;
+
+            textBoxSearchBase.Text = FormSettings.GetScope(selectedForest, user, password);
         }
 
         private void chk_alternateloginid_CheckedChanged(object sender, EventArgs e)
         {
-                try
-                {
-                    if (chk_alternateloginid.Checked) { 
-                        myParent.AltLoginID = true;
-                    } else
-                {
-                    myParent.AltLoginID = false;
-                }
-
-
+            try
+            {
+                SettingsManager.Instance.UseAlternateLogin = chk_alternateloginid.Checked;
             }
-                catch (Exception ex)
-                {
-                    myParent.statusDisplay(StringLiterals.Exception + "Rules AlternateLoginID - " + ex.Message);
-                }
-            
+            catch (Exception ex)
+            {
+                this._setDisplay(StringLiterals.Exception + "Rules AlternateLoginID - " + ex.Message);
+            }
+        }
+
+        private static string GetScope(string selectedForest, string user, string password)
+        {
+            DirectoryContext dcF = null;
+            try
+            {
+                if (!String.IsNullOrEmpty(user) && !String.IsNullOrEmpty(password))
+                    dcF = new DirectoryContext(DirectoryContextType.Forest, selectedForest, user, password);
+                else
+                    dcF = new DirectoryContext(DirectoryContextType.Forest, selectedForest);
+                //We get the currently selected forest and use that to construct the scope.
+
+                Forest f = Forest.GetForest(dcF);
+                return "dc=" + f.Name.Replace(".", ",dc=");
+            }
+            catch (Exception)
+            {
+                return String.Empty;
+            }
         }
     }
 }

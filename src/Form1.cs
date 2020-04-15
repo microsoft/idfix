@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IdFix.Settings;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.DirectoryServices;
@@ -6,59 +7,40 @@ using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.Protocols;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.Resources;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Threading;
 
 namespace IdFix
 {
     public partial class Form1 : Form
     {
         #region members
-        Dictionary<string, string> tldDict = new Dictionary<string, string>();
+        ValidTLDList tldList = null;
+        Files files = new Files();
+
         Dictionary<string, long> dupDict = new Dictionary<string, long>();
         Dictionary<string, DuplicateClass> dupObjDict = new Dictionary<string, DuplicateClass>();
         Dictionary<string, ErrorClass> errDict = new Dictionary<string, ErrorClass>();
+
         int blockSize = 50000;
         long entryCount;
         long errorCount;
         long duplicateCount;
         long displayCount;
-        string fileName = (new Regex(@"[/:]")).Replace(DateTime.Now.ToString(), "-") + ".txt";
-        string verboseFile;
-        string applyFile;
-        string errorFile;
-        string duplicateFile;
-        string filteredFile;
-        string countFile;
-        string mergeFile;
-        public List<string> forestList = new List<string>();
-        string forest = String.Empty;
+
         public string serverName = System.Environment.MachineName;
-        public string ldapPort = "3268";
-        public string searchBase;
-        public string ldapFilter = "(|(objectCategory=Person)(objectCategory=Group))";
-        public string user;
-        public string password;
         public string ruleString = string.Empty;
-        public bool settingsMT = true;
-        public bool settingsAD = true;
-        public bool settingsCU = true;
-        public bool AltLoginID = false;
         ModifyRequest modifyRequest;
         DirectoryResponse directoryResponse;
-        public string[] attributesToReturn = new string[] { StringLiterals.Cn, 
+        public string[] attributesToReturn = new string[] { StringLiterals.Cn,
                     StringLiterals.DisplayName, //Added in 1.11
-                    StringLiterals.DistinguishedName, 
+                    StringLiterals.DistinguishedName,
                     StringLiterals.GivenName, //Added in 1.11
-                    StringLiterals.GroupType, StringLiterals.HomeMdb, StringLiterals.IsCriticalSystemObject, StringLiterals.Mail, 
+                    StringLiterals.GroupType, StringLiterals.HomeMdb, StringLiterals.IsCriticalSystemObject, StringLiterals.Mail,
                     StringLiterals.MailNickName, StringLiterals.MsExchHideFromAddressLists,
-                    StringLiterals.MsExchRecipientTypeDetails, StringLiterals.ObjectClass, StringLiterals.ProxyAddresses, 
-                    StringLiterals.SamAccountName, StringLiterals.TargetAddress, StringLiterals.UserPrincipalName } ;
-        public string targetSearch = String.Empty;
+                    StringLiterals.MsExchRecipientTypeDetails, StringLiterals.ObjectClass, StringLiterals.ProxyAddresses,
+                    StringLiterals.SamAccountName, StringLiterals.TargetAddress, StringLiterals.UserPrincipalName };
         Regex doubleQuotes = new Regex("^[\"]+|[\"]+$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         Regex smtp = new Regex("smtp:", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         Regex periods = new Regex(@"^((?!^\.|\.$).)*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
@@ -78,11 +60,10 @@ namespace IdFix
         //Regex      invalidUpnRegEx = new Regex(@"[\s\\%&*+/=?{}|<>()\;\:\,\[\]""]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         Regex invalidUpnRegEx = new Regex(@"[\s\\%&*+/=?{}|<>()\;\:\,\[\]""äëïöüÿÄËÏÖÜŸ]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         DateTime stopwatch;
-        private static string[] wellKnownExclusions = { "Admini", "CAS_{", "DiscoverySearchMailbox", "FederatedEmail", "Guest", "HTTPConnector", "krbtgt", 
-                                                          "iusr_",  "iwam", "msol", "support_", "SystemMailbox",  "WWIOadmini", 
+        private static string[] wellKnownExclusions = { "Admini", "CAS_{", "DiscoverySearchMailbox", "FederatedEmail", "Guest", "HTTPConnector", "krbtgt",
+                                                          "iusr_",  "iwam", "msol", "support_", "SystemMailbox",  "WWIOadmini",
                                                           "HealthMailbox", "Exchange Online-ApplicationAccount"};
 
-        internal bool searchBaseEnabled = false;
         internal bool firstRun = false;
 
         internal const int maxUserNameLength = 64;
@@ -96,11 +77,8 @@ namespace IdFix
             {
                 this.firstRun = true; //Only the first time.
                 InitializeComponent();
-                verboseFile = "Verbose " + fileName;
-                targetSearch = String.Empty;
 
                 this.Text = StringLiterals.IdFixVersion;
-                this.searchBaseEnabled = false;
                 statusDisplay("Initialized - " + StringLiterals.IdFixVersion);
                 MessageBox.Show(StringLiterals.IdFixPrivacyBody,
                         StringLiterals.IdFixPrivacyTitle,
@@ -122,23 +100,7 @@ namespace IdFix
             try
             {
                 statusDisplay("Loading TopLevelDomain List");
-                using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("IdFix.domains.txt")))
-                {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        var formattedLine = line.Trim().ToLowerInvariant();
-                        if (!tldDict.ContainsKey(formattedLine))
-                        {
-                            tldDict.Add(formattedLine, formattedLine);
-                        }
-                    }
-                }
-                forestList.Add(Forest.GetCurrentForest().Name);
-                if (String.IsNullOrEmpty(targetSearch))
-                {
-                    targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, Forest.GetCurrentForest().Name)).Name.Replace(".", ",dc=");
-                }
+                tldList = new ValidTLDList();
                 statusDisplay("Ready");
             }
             catch (Exception ex)
@@ -146,13 +108,12 @@ namespace IdFix
                 statusDisplay(StringLiterals.Exception + "Form Load  " + ex.Message);
                 throw;
             }
-
         }
 
         private void EnableButtons()
         {
             //We use the firstRun flag to decide what to do
-            if(firstRun)
+            if (firstRun)
             {
                 //Disable everything except Query & Import
                 acceptToolStripMenuItem.Enabled = false;
@@ -221,7 +182,7 @@ namespace IdFix
                 throw;
             }
         }
-        
+
         private void acceptToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -294,7 +255,6 @@ namespace IdFix
                 }
 
                 statusDisplay(StringLiterals.ApplyPending);
-                applyFile = "Update " + (new Regex(@"[/:]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Replace(DateTime.Now.ToString(), "-") + ".ldf";
                 if (dataGridView1.Rows.Count > 0)
                 {
                     dataGridView1.CurrentCell = dataGridView1.Rows[0].Cells[StringLiterals.DistinguishedName];
@@ -342,33 +302,34 @@ namespace IdFix
                         # region server, target, port
                         string dnMod = rowError.Cells[StringLiterals.DistinguishedName].Value.ToString();
                         string domainMod = dnMod.Substring(dnMod.IndexOf("dc=", StringComparison.CurrentCultureIgnoreCase));
-                        string domainModName = domainMod.ToLowerInvariant().Replace(",dc=",".").Replace("dc=","");
+                        string domainModName = domainMod.ToLowerInvariant().Replace(",dc=", ".").Replace("dc=", "");
 
-                        if (settingsAD)
+                        if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
                         {
                             serverName = Domain.GetDomain(new DirectoryContext(DirectoryContextType.Domain, domainModName)).FindDomainController().Name;
                             statusDisplay(String.Format("Using server {0} for updating", serverName));
                         }
 
-                        if (ldapPort == "3268")
+                        if (SettingsManager.Instance.Port == 3268)
                         {
-                            ldapPort = "389";
+                            // TODO:: not sure we want to do this, maybe need a local port number
+                            SettingsManager.Instance.Port = 389;
                         }
                         #endregion
 
                         #region connection
-                        using (LdapConnection connection = new LdapConnection(serverName + ":" + ldapPort))
+                        using (LdapConnection connection = new LdapConnection(serverName + ":" + SettingsManager.Instance.Port))
                         {
                             #region connection parameters
-                            if (ldapPort == "636")
+                            if (SettingsManager.Instance.Port == 636)
                             {
                                 connection.SessionOptions.ProtocolVersion = 3;
                                 connection.SessionOptions.SecureSocketLayer = true;
                                 connection.AuthType = AuthType.Negotiate;
                             }
-                            if (!settingsCU)
+                            if (SettingsManager.Instance.CurrentCredentialMode == CredentialMode.Specified)
                             {
-                                NetworkCredential credential = new NetworkCredential(user, password);
+                                NetworkCredential credential = new NetworkCredential(SettingsManager.Instance.Username, SettingsManager.Instance.Password);
                                 connection.Credential = credential;
                             }
                             connection.Timeout = TimeSpan.FromSeconds(120);
@@ -377,14 +338,14 @@ namespace IdFix
                             #region get the object
                             SearchRequest findme = new SearchRequest();
                             findme.DistinguishedName = dnMod;
-                            findme.Filter = ldapFilter;
+                            findme.Filter = SettingsManager.Instance.Filter;
                             findme.Scope = System.DirectoryServices.Protocols.SearchScope.Base;
                             SearchResponse results = (SearchResponse)connection.SendRequest(findme);
                             SearchResultEntryCollection entries = results.Entries;
                             SearchResultEntry entry;
                             if (results.Entries.Count != 1)
                             {
-                                statusDisplay(StringLiterals.Exception + "Found " + results.Entries.Count.ToString() + " entries when searching for " + dnMod );
+                                statusDisplay(StringLiterals.Exception + "Found " + results.Entries.Count.ToString() + " entries when searching for " + dnMod);
                             }
                             else
                             {
@@ -408,7 +369,7 @@ namespace IdFix
                                         modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Delete, attributeString, null);
                                     }
                                     break;
-                                    #endregion
+                                #endregion
                                 case "EDIT":
                                     #region Edit
                                     if (attributeString.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase))
@@ -437,7 +398,7 @@ namespace IdFix
                                         }
                                     }
                                     break;
-                                    #endregion
+                                #endregion
                                 case "UNDO":
                                     #region Undo
                                     if (attributeString.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase))
@@ -508,7 +469,7 @@ namespace IdFix
                             #endregion
                         }
                         #endregion
-                      }
+                    }
                 }
                 statusDisplay(StringLiterals.Complete);
             }
@@ -580,7 +541,7 @@ namespace IdFix
                                         saveFile.WriteLine();
                                     }
                                     break;
-                                    #endregion
+                                #endregion
                                 case 2:
                                     #region save to LDF
                                     string vl;
@@ -641,8 +602,8 @@ namespace IdFix
             try
             {
                 statusDisplay(StringLiterals.ImportFile);
-                targetSearch = String.Empty;
-                if (settingsMT)
+                SettingsManager.Instance.LDAPDomain = string.Empty;
+                if (SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant)
                 {
                     this.Text = StringLiterals.IdFixVersion + StringLiterals.MultiTenant + " - Import";
                 }
@@ -718,9 +679,9 @@ namespace IdFix
                                                 case "FAIL":
                                                     dataGridView1.Rows[newRow].Cells[i].Value = col;
                                                     break;
-                                                //default:
-                                                //    dataGridView1.Rows[newRow].Cells[i].Value = String.Empty;
-                                                //    break;
+                                                    //default:
+                                                    //    dataGridView1.Rows[newRow].Cells[i].Value = String.Empty;
+                                                    //    break;
                                             }
                                         }
                                         else
@@ -950,7 +911,7 @@ namespace IdFix
         {
             try
             {
-                FormSettings formSettings = new FormSettings(this);
+                FormSettings formSettings = new FormSettings(this.statusDisplay);
                 formSettings.ShowDialog(this);
             }
             catch (Exception ex)
@@ -1019,92 +980,61 @@ namespace IdFix
                 e.Result = StringLiterals.Complete;
                 #endregion
 
-                #region clean up temporary files
-                errorFile = "Error " + fileName;
-                if (File.Exists(errorFile))
-                {
-                    File.Delete(errorFile);
-                }
+                // delete all the temp files
+                files.DeleteAll();
 
-                duplicateFile = "Duplicate " + fileName;
-                if (File.Exists(duplicateFile))
-                {
-                    File.Delete(duplicateFile);
-                }
-
-                filteredFile = "Filtered " + fileName;
-                if (File.Exists(filteredFile))
-                {
-                    File.Delete(filteredFile);
-                }
-
-                countFile = "Count " + fileName;
-                if (File.Exists(countFile))
-                {
-                    File.Delete(countFile);
-                }
-
-                mergeFile = "Merge " + fileName;
-                if (File.Exists(mergeFile))
-                {
-                    File.Delete(mergeFile);
-                }
-                #endregion
-
-                # region query
+                #region query
                 int forestListIndex = 0;
+                string targetSearch = SettingsManager.Instance.LDAPDomain;
                 while (true)
                 {
                     # region server, target, port
-                    if (settingsAD)
+                    if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
                     {
-                        if (ldapPort == "3268")
+                        if (SettingsManager.Instance.Port == 3268)
                         {
-                            serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, forestList[forestListIndex])).Name;
-                            if (!String.IsNullOrEmpty(searchBase))
-                                targetSearch = searchBase;
-                            else
-                                targetSearch = String.Empty;
+                            serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, SettingsManager.Instance.ActiveForestList[forestListIndex])).Name;
+                            targetSearch = String.IsNullOrEmpty(SettingsManager.Instance.SearchBase) ? string.Empty : SettingsManager.Instance.SearchBase;
                         }
                         else
                         {
-                            serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, forestList[forestListIndex])).Domains[0].FindDomainController().Name;
+                            serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, SettingsManager.Instance.ActiveForestList[forestListIndex])).Domains[0].FindDomainController().Name;
                             //targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, forestList[forestListIndex])).Name.Replace(".", ",dc=");
-                            if(!String.IsNullOrEmpty(searchBase))
-                                targetSearch = searchBase; 
+                            if (!String.IsNullOrEmpty(SettingsManager.Instance.SearchBase))
+                                targetSearch = SettingsManager.Instance.SearchBase;
                             else
-                                targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, forestList[forestListIndex])).Name.Replace(".", ",dc=");
+                                targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, SettingsManager.Instance.ActiveForestList[forestListIndex])).Name.Replace(".", ",dc=");
                         }
                     }
                     else
                     {
-                        if (String.IsNullOrEmpty(targetSearch))
+                        if (String.IsNullOrEmpty(SettingsManager.Instance.LDAPDomain))
                         {
-                            targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, forestList[forestListIndex])).Name.Replace(".", ",dc=");
+                            targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, SettingsManager.Instance.ActiveForestList[forestListIndex])).Name.Replace(".", ",dc=");
                         }
                     }
 
-                    ruleString = (settingsMT) ? "Multi-Tenant" : "Dedicated";
+                    ruleString = SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant ? "Multi-Tenant" : "Dedicated";
                     BeginInvoke((MethodInvoker)delegate
                     {
-                        statusDisplay("RULES:" + ruleString + " SERVER:" + serverName + " PORT:" + ldapPort + " FILTER:" + ldapFilter);
+                        statusDisplay("RULES:" + ruleString + " SERVER:" + serverName + " PORT:" + SettingsManager.Instance.Port + " FILTER:" + SettingsManager.Instance.Filter);
                     });
                     #endregion
 
                     #region connection
-                    using (LdapConnection connection = new LdapConnection(serverName + ":" + ldapPort))
+                    using (LdapConnection connection = new LdapConnection(serverName + ":" + SettingsManager.Instance.Port))
                     {
                         #region search request
-                        if (ldapPort == "636")
+                        if (SettingsManager.Instance.Port == 636)
                         {
                             connection.SessionOptions.ProtocolVersion = 3;
                             connection.SessionOptions.SecureSocketLayer = true;
                             connection.AuthType = AuthType.Negotiate;
                         }
 
-                        if (!settingsCU)
+                        if (SettingsManager.Instance.CurrentCredentialMode == CredentialMode.Specified)
                         {
-                            NetworkCredential credential = new NetworkCredential(user, password);
+                            NetworkCredential credential = new NetworkCredential(SettingsManager.Instance.Username, SettingsManager.Instance.Password);
                             connection.Credential = credential;
                         }
 
@@ -1115,7 +1045,7 @@ namespace IdFix
                         PageResultRequestControl pageRequest = new PageResultRequestControl(pageSize);
                         SearchRequest searchRequest = new SearchRequest(
                             targetSearch,
-                            ldapFilter,
+                            SettingsManager.Instance.Filter,
                             System.DirectoryServices.Protocols.SearchScope.Subtree,
                             attributesToReturn);
                         searchRequest.Controls.Add(pageRequest);
@@ -1157,17 +1087,9 @@ namespace IdFix
                                         cancelToolStripMenuItem.Enabled = false;
                                     });
 
-                                    errorFile = "Error " + fileName;
-                                    if (File.Exists(errorFile))
-                                    {
-                                        File.Delete(errorFile);
-                                    }
+                                    files.DeleteByType(FileTypes.Error);
+                                    files.DeleteByType(FileTypes.Duplicate);
 
-                                    duplicateFile = "Duplicate " + fileName;
-                                    if (File.Exists(duplicateFile))
-                                    {
-                                        File.Delete(duplicateFile);
-                                    }
                                     return;
                                 }
                                 #endregion
@@ -1178,7 +1100,7 @@ namespace IdFix
                                 try
                                 {
                                     string objectType = entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString();
-                                    if (settingsMT)
+                                    if (SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant)
                                     {
                                         #region do MT checks
                                         if (mtFilter(entry))
@@ -1219,16 +1141,16 @@ namespace IdFix
                                         //
                                         if (entry.Attributes.Contains(StringLiterals.ProxyAddresses))
                                         {
-                                            Regex invalidProxyAddressSMTPRegEx = 
+                                            Regex invalidProxyAddressSMTPRegEx =
                                                 new Regex(@"[\s<>()\;\,\[\]""]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                                             Regex invalidProxyAddressRegEx =
                                                 new Regex(@"[\s<>()\,\[\]""]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                                             for (int i = 0; i <= entry.Attributes[StringLiterals.ProxyAddresses].Count - 1; i++)
                                             {
                                                 bool isSmtp = smtp.IsMatch(entry.Attributes[StringLiterals.ProxyAddresses][i].ToString());
-                                                mtChecks(entry, StringLiterals.ProxyAddresses, i, 256, 
-                                                    isSmtp? invalidProxyAddressSMTPRegEx : invalidProxyAddressRegEx,
-                                                    isSmtp? rfc2822 : null, 
+                                                mtChecks(entry, StringLiterals.ProxyAddresses, i, 256,
+                                                    isSmtp ? invalidProxyAddressSMTPRegEx : invalidProxyAddressRegEx,
+                                                    isSmtp ? rfc2822 : null,
                                                     true, false, false);
                                             }
                                         }
@@ -1239,10 +1161,10 @@ namespace IdFix
                                         //Invalid Characters [ \ " | , \ : <  > + = ? * ]
                                         if (entry.Attributes.Contains(StringLiterals.SamAccountName) && !IsValidUpn(entry))
                                         {
-                                                mtChecks(entry, StringLiterals.SamAccountName, 0,
-                                                    objectType.Equals("user", StringComparison.CurrentCultureIgnoreCase) ? 20 : 256,
-                                                    new Regex(@"[\\""|,/\[\]:<>+=;?*]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant), null,
-                                                    entry.Attributes.Contains(StringLiterals.UserPrincipalName) ? false : true, false, false);
+                                            mtChecks(entry, StringLiterals.SamAccountName, 0,
+                                                objectType.Equals("user", StringComparison.CurrentCultureIgnoreCase) ? 20 : 256,
+                                                new Regex(@"[\\""|,/\[\]:<>+=;?*]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant), null,
+                                                entry.Attributes.Contains(StringLiterals.UserPrincipalName) ? false : true, false, false);
                                         }
 
                                         //Checks for TargetAddress
@@ -1255,12 +1177,12 @@ namespace IdFix
                                             //SMTP should follow rfc2822
                                             Regex invalidTargetAddressSMTPRegEx =
                                                 new Regex(@"[\s\\<>()\;\,\[\]""]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-                                            Regex invalidTargetAddressRegEx = 
+                                            Regex invalidTargetAddressRegEx =
                                                 new Regex(@"[\s\\<>()\,\[\]""]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                                             bool isSmtp = smtp.IsMatch(entry.Attributes[StringLiterals.TargetAddress][0].ToString());
-                                            mtChecks(entry, StringLiterals.TargetAddress, 0, 255, 
+                                            mtChecks(entry, StringLiterals.TargetAddress, 0, 255,
                                                 isSmtp ? invalidTargetAddressSMTPRegEx : invalidTargetAddressRegEx,
-                                                isSmtp ? rfc2822 : null, 
+                                                isSmtp ? rfc2822 : null,
                                                 true, false, false);
                                         }
 
@@ -1274,11 +1196,11 @@ namespace IdFix
                                         //  period (.), ampersand (&), space, or at sign (@) cannot be the last character -- RegEx 
                                         //  No duplicates -- checked in mtChecks
 
-                                        if (AltLoginID == false)
+                                        if (!SettingsManager.Instance.UseAlternateLogin)
                                         {
                                             mtChecks(entry, StringLiterals.UserPrincipalName, 0, 113, invalidUpnRegEx, rfc2822, true, false, false);
-                                        } 
-                                        
+                                        }
+
                                         #endregion
                                     }
                                     else
@@ -1346,10 +1268,10 @@ namespace IdFix
                     #endregion
 
                     #region exit query
-                    if (settingsAD)
+                    if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
                     {
                         // check to see if all forests have been queried
-                        if ((forestListIndex + 1) == forestList.Count)
+                        if ((forestListIndex + 1) == SettingsManager.Instance.ActiveForestList.Length)
                         {
                             break;
                         }
@@ -1377,19 +1299,8 @@ namespace IdFix
                 # region duplicate check
                 if (e.Cancel)
                 {
-                    # region stop query
-                    errorFile = "Error " + fileName;
-                    if (File.Exists(errorFile))
-                    {
-                        File.Delete(errorFile);
-                    }
-
-                    duplicateFile = "Duplicate " + fileName;
-                    if (File.Exists(duplicateFile))
-                    {
-                        File.Delete(duplicateFile);
-                    }
-                    #endregion
+                    files.DeleteByType(FileTypes.Error);
+                    files.DeleteByType(FileTypes.Duplicate);
                 }
                 else
                 {
@@ -1535,7 +1446,7 @@ namespace IdFix
         {
             try
             {
-                firstRun = false; 
+                firstRun = false;
                 //Oh cool, we don't have to enable anything.
                 queryToolStripMenuItem.Enabled = true;
                 cancelToolStripMenuItem.Enabled = false;
@@ -1637,23 +1548,23 @@ namespace IdFix
 
                         //Additionally if the attribute is either ProxyAddresses or TargetAddress
                         //We get rid of the ":" in the suffix part of the value.
-                        if(errorAttribute.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase) ||
+                        if (errorAttribute.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase) ||
                             errorAttribute.Equals(StringLiterals.TargetAddress, StringComparison.CurrentCultureIgnoreCase)
                           )
                         {
                             int colonPosn = errorUpdate.IndexOf(":");
-                            if(colonPosn > 0)
+                            if (colonPosn > 0)
                             {
                                 //In case the suffix has a colon, we need to show a character error.
                                 //And replace it.
-                                string suffix = errorUpdate.Substring(colonPosn+1);
-                                if(suffix.Contains(":")) 
+                                string suffix = errorUpdate.Substring(colonPosn + 1);
+                                if (suffix.Contains(":"))
                                 {
                                     errorAdd = true;
                                     errorString += StringLiterals.Character;
-                                     
-                                    errorUpdate = 
-                                        errorUpdate.Substring(0, colonPosn)  + ":"  + 
+
+                                    errorUpdate =
+                                        errorUpdate.Substring(0, colonPosn) + ":" +
                                         suffix.Replace(":", "");
                                 }
                             }
@@ -1697,14 +1608,14 @@ namespace IdFix
                                 if (tldDomain.Length > 1)
                                 {
                                     tldDomain = tldDomain.Substring(tldDomain.IndexOf(".") + 1);
-                                    if (!tldDict.ContainsKey(tldDomain))
+                                    if (!tldList.Contains(tldDomain))
                                     {
                                         errorAdd = true;
                                         errorString += StringLiterals.TopLevelDomain;
                                     }
                                 }
                             }
-#endregion
+                            #endregion
 
                             #region domainpart
                             if (!domainPart.IsMatch(validateAttribute))
@@ -1766,9 +1677,9 @@ namespace IdFix
                         errorString += StringLiterals.Length;
                         errorUpdate = errorUpdate.Length > errorLength ? errorUpdate.Substring(0, errorLength) : errorUpdate;
                     }
-                    
+
                     //For UPN, we also need to check the length of characters before and after @
-                    if(errorAttribute.Equals(StringLiterals.UserPrincipalName, StringComparison.CurrentCultureIgnoreCase))
+                    if (errorAttribute.Equals(StringLiterals.UserPrincipalName, StringComparison.CurrentCultureIgnoreCase))
                     {
                         string upn = entry.Attributes[errorAttribute][errorIndex].ToString();
                         int atPosn = upn.LastIndexOf("@", StringComparison.CurrentCulture);
@@ -1830,7 +1741,7 @@ namespace IdFix
                                     }
                                     else
                                     {
-                                        dupUpdate = "[E]" + errorUpdate; 
+                                        dupUpdate = "[E]" + errorUpdate;
                                     }
                                     break;
                                 case "userprincipalname":
@@ -1877,15 +1788,14 @@ namespace IdFix
                         }
                         #endregion
 
-                        using (StreamWriter duplicate = new StreamWriter(duplicateFile, true))
-                        {
-                            duplicate.WriteLine("DN:" + entry.Attributes[StringLiterals.DistinguishedName][0].ToString());
-                            duplicate.WriteLine("OB:" + entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString());
-                            duplicate.WriteLine("AT:" + errorAttribute);
-                            duplicate.WriteLine("VL:" + entry.Attributes[errorAttribute][errorIndex].ToString());
-                            duplicate.WriteLine("UP:" + dupUpdate);
-                            duplicate.WriteLine("---");
-                        }
+                        files.AppendTo(FileTypes.Duplicate, (writer) => {
+                            writer.WriteLine("DN:" + entry.Attributes[StringLiterals.DistinguishedName][0].ToString());
+                            writer.WriteLine("OB:" + entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString());
+                            writer.WriteLine("AT:" + errorAttribute);
+                            writer.WriteLine("VL:" + entry.Attributes[errorAttribute][errorIndex].ToString());
+                            writer.WriteLine("UP:" + dupUpdate);
+                            writer.WriteLine("---");
+                        });
                         duplicateCount++;
                     }
                     #endregion
@@ -1923,16 +1833,16 @@ namespace IdFix
                 #region errorAdd
                 if (errorAdd)
                 {
-                    using (StreamWriter swError = new StreamWriter(errorFile, true))
+                    files.AppendTo(FileTypes.Error, (writer) =>
                     {
-                        swError.WriteLine("DN:" + entry.Attributes[StringLiterals.DistinguishedName][0].ToString());
-                        swError.WriteLine("OB:" + entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString());
-                        swError.WriteLine("AT:" + errorAttribute);
-                        swError.WriteLine("ER:" + errorString);
-                        swError.WriteLine("VL:" + (entry.Attributes.Contains(errorAttribute) ? entry.Attributes[errorAttribute][errorIndex].ToString() : String.Empty));
-                        swError.WriteLine("UP:" + errorUpdate);
-                        swError.WriteLine("---");
-                    }
+                        writer.WriteLine("DN:" + entry.Attributes[StringLiterals.DistinguishedName][0].ToString());
+                        writer.WriteLine("OB:" + entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString());
+                        writer.WriteLine("AT:" + errorAttribute);
+                        writer.WriteLine("ER:" + errorString);
+                        writer.WriteLine("VL:" + (entry.Attributes.Contains(errorAttribute) ? entry.Attributes[errorAttribute][errorIndex].ToString() : String.Empty));
+                        writer.WriteLine("UP:" + errorUpdate);
+                        writer.WriteLine("---");
+                    });
                     errorCount++;
                 }
                 #endregion
@@ -1968,7 +1878,7 @@ namespace IdFix
                         {
                             errorAdd = true;
                             errorString += StringLiterals.Character;
-                            errorUpdate = String.IsNullOrEmpty(errorCharacter.Replace(errorUpdate, "")) 
+                            errorUpdate = String.IsNullOrEmpty(errorCharacter.Replace(errorUpdate, ""))
                                 ? entry.Attributes[StringLiterals.Cn][0].ToString()
                                 : errorCharacter.Replace(errorUpdate, "");
                         }
@@ -2006,7 +1916,7 @@ namespace IdFix
                                 if (tldDomain.Length > 1)
                                 {
                                     tldDomain = tldDomain.Substring(tldDomain.IndexOf(".") + 1);
-                                    if (!tldDict.ContainsKey(tldDomain))
+                                    if (!tldList.Contains(tldDomain))
                                     {
                                         errorAdd = true;
                                         errorString += StringLiterals.TopLevelDomain;
@@ -2159,15 +2069,14 @@ namespace IdFix
                         }
                         #endregion
 
-                        using (StreamWriter duplicate = new StreamWriter(duplicateFile, true))
-                        {
-                            duplicate.WriteLine("DN:" + entry.Attributes[StringLiterals.DistinguishedName][0].ToString());
-                            duplicate.WriteLine("OB:" + entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString());
-                            duplicate.WriteLine("AT:" + errorAttribute);
-                            duplicate.WriteLine("VL:" + entry.Attributes[errorAttribute][errorIndex].ToString());
-                            duplicate.WriteLine("UP:" + dupUpdate);
-                            duplicate.WriteLine("---");
-                        }
+                        files.AppendTo(FileTypes.Duplicate, (writer) => {
+                            writer.WriteLine("DN:" + entry.Attributes[StringLiterals.DistinguishedName][0].ToString());
+                            writer.WriteLine("OB:" + entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString());
+                            writer.WriteLine("AT:" + errorAttribute);
+                            writer.WriteLine("VL:" + entry.Attributes[errorAttribute][errorIndex].ToString());
+                            writer.WriteLine("UP:" + dupUpdate);
+                            writer.WriteLine("---");
+                        });
                         duplicateCount++;
                     }
                     #endregion
@@ -2312,16 +2221,16 @@ namespace IdFix
                 #region errorAdd
                 if (errorAdd)
                 {
-                    using (StreamWriter swError = new StreamWriter(errorFile, true))
+                    files.AppendTo(FileTypes.Error, (writer) =>
                     {
-                        swError.WriteLine("DN:" + entry.Attributes[StringLiterals.DistinguishedName][0].ToString());
-                        swError.WriteLine("OB:" + entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString());
-                        swError.WriteLine("AT:" + errorAttribute);
-                        swError.WriteLine("ER:" + errorString);
-                        swError.WriteLine("VL:" + (entry.Attributes.Contains(errorAttribute) ? entry.Attributes[errorAttribute][errorIndex].ToString() : String.Empty));
-                        swError.WriteLine("UP:" + errorUpdate);
-                        swError.WriteLine("---");
-                    }
+                        writer.WriteLine("DN:" + entry.Attributes[StringLiterals.DistinguishedName][0].ToString());
+                        writer.WriteLine("OB:" + entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString());
+                        writer.WriteLine("AT:" + errorAttribute);
+                        writer.WriteLine("ER:" + errorString);
+                        writer.WriteLine("VL:" + (entry.Attributes.Contains(errorAttribute) ? entry.Attributes[errorAttribute][errorIndex].ToString() : String.Empty));
+                        writer.WriteLine("UP:" + errorUpdate);
+                        writer.WriteLine("---");
+                    });
                     errorCount++;
                 }
                 #endregion
@@ -2343,51 +2252,51 @@ namespace IdFix
         /// <returns></returns>
         private bool IsValidUpn(SearchResultEntry entry)
         {
-             if (!entry.Attributes.Contains(StringLiterals.UserPrincipalName))
-             {
-                 return true;
-             }
+            if (!entry.Attributes.Contains(StringLiterals.UserPrincipalName))
+            {
+                return true;
+            }
 
-            if (AltLoginID == true)
+            if (SettingsManager.Instance.UseAlternateLogin)
             {
                 return true;
             }
 
             string upn = entry.Attributes[StringLiterals.UserPrincipalName][0].ToString();
 
-             //If any invalid character matches, we are done
-             if (invalidUpnRegEx.IsMatch(upn))
-             {
-                 return false;
-             }
+            //If any invalid character matches, we are done
+            if (invalidUpnRegEx.IsMatch(upn))
+            {
+                return false;
+            }
 
             //Additional rfc2822 related checks
-             #region topleveldomain
-             if (upn.LastIndexOf(".") != -1)
-             {
-                 string tldDomain = upn.ToLowerInvariant().Substring(upn.LastIndexOf("."));
-                 if (tldDomain.Length > 1)
-                 {
-                     tldDomain = tldDomain.Substring(tldDomain.IndexOf(".") + 1);
-                     if (!tldDict.ContainsKey(tldDomain))
-                     {
-                         return false;
-                     }
-                 }
-             }
-             #endregion
+            #region topleveldomain
+            if (upn.LastIndexOf(".") != -1)
+            {
+                string tldDomain = upn.ToLowerInvariant().Substring(upn.LastIndexOf("."));
+                if (tldDomain.Length > 1)
+                {
+                    tldDomain = tldDomain.Substring(tldDomain.IndexOf(".") + 1);
+                    if (!tldList.Contains(tldDomain))
+                    {
+                        return false;
+                    }
+                }
+            }
+            #endregion
 
-             if (
-                 (!domainPart.IsMatch(upn)) ||
-                 (!localPart.IsMatch(upn) ||
-                 (upn.Split('@').Length - 1 > 1)) || 
-                 !rfc2822.IsMatch(upn)
-                 )
-             {
-                 return false;
-             }
+            if (
+                (!domainPart.IsMatch(upn)) ||
+                (!localPart.IsMatch(upn) ||
+                (upn.Split('@').Length - 1 > 1)) ||
+                !rfc2822.IsMatch(upn)
+                )
+            {
+                return false;
+            }
 
-             return true;
+            return true;
         }
 
 
@@ -2409,9 +2318,9 @@ namespace IdFix
                 long dupDictValue;
                 DuplicateClass dupObjDictValue;
 
-                if (File.Exists(duplicateFile))
+                if (files.ExistsByType(FileTypes.Duplicate))
                 {
-                    using (StreamReader duplicate = new StreamReader(duplicateFile))
+                    files.ReadFrom(FileTypes.Duplicate, (reader) =>
                     {
                         #region write split files
                         statusDisplay("Write split files");
@@ -2422,7 +2331,7 @@ namespace IdFix
                         string splitFileName;
                         try
                         {
-                            while ((line = duplicate.ReadLine()) != null)
+                            while ((line = reader.ReadLine()) != null)
                             {
                                 if (line.Length < 3)
                                 {
@@ -2558,10 +2467,10 @@ namespace IdFix
                                         {
                                             if (splitValue[i] == writeSplit)
                                             {
-                                                using (StreamWriter merge = new StreamWriter(mergeFile, true))
+                                                files.AppendTo(FileTypes.Merge, (writer) =>
                                                 {
-                                                    merge.WriteLine(splitValue[i]);
-                                                }
+                                                    writer.WriteLine(splitValue[i]);
+                                                });
                                                 splitValue[i] = String.Empty;
                                             }
                                             allMerged = false;
@@ -2605,11 +2514,11 @@ namespace IdFix
                         string lastWritten = String.Empty;
                         try
                         {
-                            if (File.Exists(mergeFile))
+                            if (files.ExistsByType(FileTypes.Merge))
                             {
-                                using (StreamReader merge = new StreamReader(mergeFile))
+                                files.ReadFrom(FileTypes.Merge, (reader2) =>
                                 {
-                                    while ((line = merge.ReadLine()) != null)
+                                    while ((line = reader2.ReadLine()) != null)
                                     {
                                         if (line == lastLine && line != lastWritten)
                                         {
@@ -2618,8 +2527,8 @@ namespace IdFix
                                         }
                                         lastLine = line;
                                     }
-                                }
-                                File.Delete(mergeFile);
+                                });
+                                files.DeleteByType(FileTypes.Merge);
                             }
                             else
                             {
@@ -2632,17 +2541,18 @@ namespace IdFix
                             statusDisplay(StringLiterals.Exception + "Count Duplicate: " + ex.Message);
                         }
                         #endregion
-                    }
+                    });
+
 
                     if (dupDict.Count >= 1)
                     {
                         #region write filtered duplicate objects
                         statusDisplay("Write filtered duplicate objects");
-                        using (StreamReader duplicate = new StreamReader(duplicateFile))
+                        files.ReadFrom(FileTypes.Duplicate, (reader) =>
                         {
                             try
                             {
-                                while ((line = duplicate.ReadLine()) != null)
+                                while ((line = reader.ReadLine()) != null)
                                 {
                                     if (line.Length < 3)
                                     {
@@ -2674,15 +2584,15 @@ namespace IdFix
                                                 {
                                                     if (dupDictValue > 1)
                                                     {
-                                                        using (StreamWriter filtered = new StreamWriter(filteredFile, true))
+                                                        files.AppendTo(FileTypes.Filtered, (writer) =>
                                                         {
-                                                            filtered.WriteLine("DN:" + dn);
-                                                            filtered.WriteLine("OB:" + ob);
-                                                            filtered.WriteLine("AT:" + at);
-                                                            filtered.WriteLine("VL:" + vl);
-                                                            filtered.WriteLine("UP:" + up);
-                                                            filtered.WriteLine("---");
-                                                        }
+                                                            writer.WriteLine("DN:" + dn);
+                                                            writer.WriteLine("OB:" + ob);
+                                                            writer.WriteLine("AT:" + at);
+                                                            writer.WriteLine("VL:" + vl);
+                                                            writer.WriteLine("UP:" + up);
+                                                            writer.WriteLine("---");
+                                                        });
                                                     }
                                                 }
                                                 break;
@@ -2696,20 +2606,21 @@ namespace IdFix
                                 statusDisplay(StringLiterals.Exception + "Write Filtered: " + dn + "|" + ob + "|" + at + "|" + vl + "|" + up);
                                 statusDisplay(StringLiterals.Exception + "Write Filtered: " + ex.Message);
                             }
-                        }
+                        });
+                        
                         dupDict.Clear();
                         dupObjDict.Clear();
                         #endregion
 
                         #region read filtered duplicate objects
-                        if (File.Exists(filteredFile))
+                        if (files.ExistsByType(FileTypes.Filtered))
                         {
                             statusDisplay("Read filtered duplicate objects");
-                            using (StreamReader filtered = new StreamReader(filteredFile))
+                            files.ReadFrom(FileTypes.Filtered, (reader) =>
                             {
                                 try
                                 {
-                                    while ((line = filtered.ReadLine()) != null)
+                                    while ((line = reader.ReadLine()) != null)
                                     {
                                         if (line.Length < 3)
                                         {
@@ -2754,8 +2665,8 @@ namespace IdFix
                                     statusDisplay(StringLiterals.Exception + "Read Filtered: " + dn + "|" + ob + "|" + at + "|" + vl + "|" + up);
                                     statusDisplay(StringLiterals.Exception + "Read Filtered: " + ex.Message);
                                 }
-                            }
-                            File.Delete(filteredFile);
+                            });
+                            files.DeleteByType(FileTypes.Filtered);
                         }
                         #endregion
                     }
@@ -2763,7 +2674,8 @@ namespace IdFix
                     {
                         statusDisplay("No duplicate values in file");
                     }
-                    File.Delete(duplicateFile);
+
+                    files.DeleteByType(FileTypes.Duplicate);
                 }
                 else
                 {
@@ -2781,10 +2693,11 @@ namespace IdFix
         {
             try
             {
-                if (File.Exists(errorFile))
+                if (files.ExistsByType(FileTypes.Error))
                 {
                     statusDisplay("Read error file");
-                    using (StreamReader srError = new StreamReader(errorFile))
+
+                    files.ReadFrom(FileTypes.Error, (reader) =>
                     {
                         string line;
                         string dn = String.Empty;
@@ -2797,7 +2710,7 @@ namespace IdFix
                         ErrorClass errorDictValue;
                         try
                         {
-                            while ((line = srError.ReadLine()) != null)
+                            while ((line = reader.ReadLine()) != null)
                             {
                                 if (line.Length < 3)
                                 {
@@ -2846,8 +2759,9 @@ namespace IdFix
                             statusDisplay(StringLiterals.Exception + "Error File: " + dn + "|" + ob + "|" + at + "|" + er + "|" + vl + "|" + up);
                             statusDisplay(StringLiterals.Exception + "Error File: " + ex.Message);
                         }
-                    }
-                    File.Delete(errorFile);
+                    });
+
+                    files.DeleteByType(FileTypes.Error);
                 }
             }
             catch (Exception ex)
@@ -2862,10 +2776,11 @@ namespace IdFix
             try
             {
                 toolStripStatusLabel1.Text = display;
-                using (StreamWriter verbose = new StreamWriter(verboseFile, true))
+
+                files.AppendTo(FileTypes.Verbose, (writer) =>
                 {
-                    verbose.WriteLine(DateTime.Now.ToString() + " " + toolStripStatusLabel1.Text);
-                }
+                    writer.WriteLine(DateTime.Now.ToString() + " " + toolStripStatusLabel1.Text);
+                });
             }
             catch (Exception ex)
             {
@@ -2888,18 +2803,18 @@ namespace IdFix
 
                 if (wuAction == StringLiterals.Remove || wuAction == StringLiterals.Edit || wuAction == StringLiterals.Undo)
                 {
-                    using (StreamWriter apply = new StreamWriter(applyFile, true))
+                    files.AppendTo(FileTypes.Apply, (writer) =>
                     {
-                        apply.WriteLine("distinguishedName: " + wuDistinguishedName);
-                        apply.WriteLine("objectClass: " + wuObjectClass);
-                        apply.WriteLine("attribute: " + wuAttribute);
-                        apply.WriteLine("error: " + wuError);
-                        apply.WriteLine("value: " + wuValue);
-                        apply.WriteLine("update: " + wuUpdate);
-                        apply.WriteLine("action: " + wuAction);
-                        apply.WriteLine("-");
-                        apply.WriteLine();
-                    }
+                        writer.WriteLine("distinguishedName: " + wuDistinguishedName);
+                        writer.WriteLine("objectClass: " + wuObjectClass);
+                        writer.WriteLine("attribute: " + wuAttribute);
+                        writer.WriteLine("error: " + wuError);
+                        writer.WriteLine("value: " + wuValue);
+                        writer.WriteLine("update: " + wuUpdate);
+                        writer.WriteLine("action: " + wuAction);
+                        writer.WriteLine("-");
+                        writer.WriteLine();
+                    });
                 }
             }
             catch (Exception ex)
@@ -3118,7 +3033,7 @@ namespace IdFix
             return false;
         }
         #endregion
- 
+
         #region contextMenu
         private void dataGridView1_MouseClick(object sender, MouseEventArgs e)
         {
@@ -3214,26 +3129,5 @@ namespace IdFix
             }
         }
         #endregion
-
-        public string GetScope(string selectedForest, string user, string password)
-        {
-            DirectoryContext dcF = null;
-            try
-            {
-                if (!String.IsNullOrEmpty(user) && !String.IsNullOrEmpty(password))
-                    dcF = new DirectoryContext(DirectoryContextType.Forest, selectedForest, user, password);
-                else
-                    dcF = new DirectoryContext(DirectoryContextType.Forest, selectedForest);
-                //We get the currently selected forest and use that to construct the scope.
-
-                Forest f = Forest.GetForest(dcF);
-                return "dc=" + f.Name.Replace(".", ",dc=");
-            }
-            catch(Exception)
-            {
-                return String.Empty;
-            }
-        }
-
     }
 }
