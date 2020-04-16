@@ -192,7 +192,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="DuplicateClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\ConnectionManager.cs" />
+    <Compile Include="Rules\MultiTenantRuleCollection.cs" />
     <Compile Include="Rules\Rule.cs" />
+    <Compile Include="Rules\RuleCollection.cs" />
+    <Compile Include="Rules\RulesRunner.cs" />
     <Compile Include="Settings\Enums.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Settings\ValidTLDList.cs" />

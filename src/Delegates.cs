@@ -7,4 +7,6 @@ using System.Threading.Tasks;
 namespace IdFix
 {
     public delegate void SetDisplayDelegate(string message);
+
+    public delegate void OnStatusUpdateDelegate(string message);
 }

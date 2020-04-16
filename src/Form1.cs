@@ -1,4 +1,5 @@
-﻿using IdFix.Settings;
+﻿using IdFix.Rules;
+using IdFix.Settings;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,8 +30,6 @@ namespace IdFix
         long duplicateCount;
         long displayCount;
 
-        public string serverName = System.Environment.MachineName;
-        public string ruleString = string.Empty;
         ModifyRequest modifyRequest;
         DirectoryResponse directoryResponse;
         public string[] attributesToReturn = new string[] { StringLiterals.Cn,
@@ -68,6 +67,13 @@ namespace IdFix
 
         internal const int maxUserNameLength = 64;
         internal const int maxDomainLength = 48;
+
+
+        RulesRunner runner;
+
+
+
+
         #endregion
 
         #region Form1
@@ -102,6 +108,14 @@ namespace IdFix
                 statusDisplay("Loading TopLevelDomain List");
                 tldList = new ValidTLDList();
                 statusDisplay("Ready");
+
+                runner = new RulesRunner();
+                runner.OnStatusUpdate += (string message) => {
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        statusDisplay(message);
+                    });
+                };
             }
             catch (Exception ex)
             {
@@ -161,6 +175,32 @@ namespace IdFix
         {
             try
             {
+                statusDisplay(StringLiterals.Query);
+
+                dataGridView1.Rows.Clear();
+                dataGridView1.Refresh();
+                dataGridView1.Columns[StringLiterals.Update].ReadOnly = false;
+
+                queryToolStripMenuItem.Enabled = false;
+                cancelToolStripMenuItem.Enabled = true;
+                acceptToolStripMenuItem.Enabled = false;
+                applyToolStripMenuItem.Enabled = false;
+                exportToolStripMenuItem.Enabled = false;
+                importToolStripMenuItem.Enabled = false;
+                undoToolStripMenuItem.Enabled = false;
+                nextToolStripMenuItem.Visible = false;
+                previousToolStripMenuItem.Visible = false;
+
+                editActionToolStripMenuItem.Visible = true;
+                removeActionToolStripMenuItem.Visible = true;
+                undoActionToolStripMenuItem.Visible = false;
+
+                action.Items.Clear();
+                action.Items.Add(StringLiterals.Edit);
+                action.Items.Add(StringLiterals.Remove);
+                action.Items.Add(StringLiterals.Complete);
+
+
                 backgroundWorker1.RunWorkerAsync();
             }
             catch (Exception ex)
@@ -174,6 +214,10 @@ namespace IdFix
         {
             try
             {
+                BeginInvoke((MethodInvoker)delegate
+                {
+                    cancelToolStripMenuItem.Enabled = false;
+                });
                 backgroundWorker1.CancelAsync();
             }
             catch (Exception ex)
@@ -602,7 +646,7 @@ namespace IdFix
             try
             {
                 statusDisplay(StringLiterals.ImportFile);
-                SettingsManager.Instance.LDAPDomain = string.Empty;
+                SettingsManager.Instance.DistinguishedName = string.Empty;
                 if (SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant)
                 {
                     this.Text = StringLiterals.IdFixVersion + StringLiterals.MultiTenant + " - Import";
@@ -941,102 +985,10 @@ namespace IdFix
         {
             try
             {
-                #region prepare for query
-                BeginInvoke((MethodInvoker)delegate
-                {
-                    statusDisplay(StringLiterals.Query);
+                
 
-                    dataGridView1.Rows.Clear();
-                    dataGridView1.Refresh();
-                    dataGridView1.Columns[StringLiterals.Update].ReadOnly = false;
+                
 
-                    queryToolStripMenuItem.Enabled = false;
-                    cancelToolStripMenuItem.Enabled = true;
-                    acceptToolStripMenuItem.Enabled = false;
-                    applyToolStripMenuItem.Enabled = false;
-                    exportToolStripMenuItem.Enabled = false;
-                    importToolStripMenuItem.Enabled = false;
-                    undoToolStripMenuItem.Enabled = false;
-                    nextToolStripMenuItem.Visible = false;
-                    previousToolStripMenuItem.Visible = false;
-
-                    editActionToolStripMenuItem.Visible = true;
-                    removeActionToolStripMenuItem.Visible = true;
-                    undoActionToolStripMenuItem.Visible = false;
-
-                    action.Items.Clear();
-                    action.Items.Add(StringLiterals.Edit);
-                    action.Items.Add(StringLiterals.Remove);
-                    action.Items.Add(StringLiterals.Complete);
-                });
-
-                entryCount = 0;
-                errorCount = 0;
-                duplicateCount = 0;
-                stopwatch = DateTime.Now;
-                errDict.Clear();
-                dupDict.Clear();
-                dupObjDict.Clear();
-                e.Result = StringLiterals.Complete;
-                #endregion
-
-                // delete all the temp files
-                files.DeleteAll();
-
-                #region query
-                int forestListIndex = 0;
-                string targetSearch = SettingsManager.Instance.LDAPDomain;
-                while (true)
-                {
-                    # region server, target, port
-                    if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
-                    {
-                        if (SettingsManager.Instance.Port == 3268)
-                        {
-                            serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, SettingsManager.Instance.ActiveForestList[forestListIndex])).Name;
-                            targetSearch = String.IsNullOrEmpty(SettingsManager.Instance.SearchBase) ? string.Empty : SettingsManager.Instance.SearchBase;
-                        }
-                        else
-                        {
-                            serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, SettingsManager.Instance.ActiveForestList[forestListIndex])).Domains[0].FindDomainController().Name;
-                            //targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, forestList[forestListIndex])).Name.Replace(".", ",dc=");
-                            if (!String.IsNullOrEmpty(SettingsManager.Instance.SearchBase))
-                                targetSearch = SettingsManager.Instance.SearchBase;
-                            else
-                                targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, SettingsManager.Instance.ActiveForestList[forestListIndex])).Name.Replace(".", ",dc=");
-                        }
-                    }
-                    else
-                    {
-                        if (String.IsNullOrEmpty(SettingsManager.Instance.LDAPDomain))
-                        {
-                            targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, SettingsManager.Instance.ActiveForestList[forestListIndex])).Name.Replace(".", ",dc=");
-                        }
-                    }
-
-                    ruleString = SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant ? "Multi-Tenant" : "Dedicated";
-                    BeginInvoke((MethodInvoker)delegate
-                    {
-                        statusDisplay("RULES:" + ruleString + " SERVER:" + serverName + " PORT:" + SettingsManager.Instance.Port + " FILTER:" + SettingsManager.Instance.Filter);
-                    });
-                    #endregion
-
-                    #region connection
-                    using (LdapConnection connection = new LdapConnection(serverName + ":" + SettingsManager.Instance.Port))
-                    {
-                        #region search request
-                        if (SettingsManager.Instance.Port == 636)
-                        {
-                            connection.SessionOptions.ProtocolVersion = 3;
-                            connection.SessionOptions.SecureSocketLayer = true;
-                            connection.AuthType = AuthType.Negotiate;
-                        }
-
-                        if (SettingsManager.Instance.CurrentCredentialMode == CredentialMode.Specified)
-                        {
-                            NetworkCredential credential = new NetworkCredential(SettingsManager.Instance.Username, SettingsManager.Instance.Password);
-                            connection.Credential = credential;
-                        }
 
                         int pageSize = 1000;
                         displayCount = 0;
@@ -1082,10 +1034,7 @@ namespace IdFix
                                 {
                                     e.Cancel = true;
                                     e.Result = StringLiterals.CancelQuery;
-                                    BeginInvoke((MethodInvoker)delegate
-                                    {
-                                        cancelToolStripMenuItem.Enabled = false;
-                                    });
+                                  
 
                                     files.DeleteByType(FileTypes.Error);
                                     files.DeleteByType(FileTypes.Duplicate);

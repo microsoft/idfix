@@ -31,8 +31,8 @@ namespace IdFix
                 }
 
                 // fill in domain and server
-                textBoxDomain.Text = SettingsManager.Instance.LDAPDomain;
-                textBoxServer.Text = SettingsManager.Instance.LDAPServer;
+                textBoxDomain.Text = SettingsManager.Instance.DistinguishedName;
+                textBoxServer.Text = SettingsManager.Instance.Server;
 
                 // fill in port and filter
                 comboBoxPort.Text = SettingsManager.Instance.Port.ToString();
@@ -147,8 +147,8 @@ namespace IdFix
                 }
                 else
                 {
-                    SettingsManager.Instance.LDAPServer = textBoxServer.Text;
-                    SettingsManager.Instance.LDAPDomain = textBoxDomain.Text;
+                    SettingsManager.Instance.Server = textBoxServer.Text;
+                    SettingsManager.Instance.DistinguishedName = textBoxDomain.Text;
                 }
 
                 // TODO:: move this logic into the rule sets for each

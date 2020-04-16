@@ -32,8 +32,8 @@ namespace IdFix.Settings
             this.ActiveForestList = new string[] { };
 
             // set search defaults
-            this.LDAPDomain = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, Forest.GetCurrentForest().Name)).Name.Replace(".", ",dc=");
-            this.LDAPServer = System.Environment.MachineName;
+            this.DistinguishedName = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, Forest.GetCurrentForest().Name)).Name.Replace(".", ",dc=");
+            this.Server = System.Environment.MachineName;
         }
 
         public static SettingsManager Instance
@@ -74,14 +74,14 @@ namespace IdFix.Settings
         public DirectoryType CurrentDirectoryType { get; set; }
 
         /// <summary>
-        /// For DirectoryType LDAP specifies the search domain
+        /// For DirectoryType LDAP specifies the distinguished name used in the SearchRequest
         /// </summary>
-        public string LDAPDomain { get; set; }
+        public string DistinguishedName { get; set; }
 
         /// <summary>
         /// For DirectoryType LDAP specifies the search server
         /// </summary>
-        public string LDAPServer { get; set; }
+        public string Server { get; set; }
 
         /// <summary>
         /// Specifies the curreny active ruleset, Dedicated or MT
