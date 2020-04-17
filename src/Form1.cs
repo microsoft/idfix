@@ -59,18 +59,13 @@ namespace IdFix
         //Regex      invalidUpnRegEx = new Regex(@"[\s\\%&*+/=?{}|<>()\;\:\,\[\]""]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         Regex invalidUpnRegEx = new Regex(@"[\s\\%&*+/=?{}|<>()\;\:\,\[\]""äëïöüÿÄËÏÖÜŸ]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         DateTime stopwatch;
-        
+
+        RulesRunner runner;
 
         internal bool firstRun = false;
 
         internal const int maxUserNameLength = 64;
         internal const int maxDomainLength = 48;
-
-
-        RulesRunner runner;
-
-
-
 
         #endregion
 
@@ -112,6 +107,15 @@ namespace IdFix
                     this.BeginInvoke((MethodInvoker)delegate
                     {
                         statusDisplay(message);
+                    });
+                };
+                runner.RunWorkerCompleted += (object s, RunWorkerCompletedEventArgs args) => {
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        // this should update the UI grid with all our error results
+                        // also need to check for errors
+                        var errors = (List<ComposedRuleResult>)args.Result;
+                        statusDisplay("We found: " + errors.Count.ToString() + " errors.");
                     });
                 };
             }
@@ -198,26 +202,13 @@ namespace IdFix
                 action.Items.Add(StringLiterals.Remove);
                 action.Items.Add(StringLiterals.Complete);
 
-                var runner = new RulesRunner();
-                runner.OnStatusUpdate += (string message) => this.BeginInvoke((MethodInvoker)delegate
-                {
-                    statusDisplay(message);
-                });
-
                 runner.RunWorkerAsync(new RulesRunnerDoWorkArgs() { Files = files });
-
-                // backgroundWorker1.RunWorkerAsync();
             }
             catch (Exception ex)
             {
                 statusDisplay(StringLiterals.Exception + toolStripStatusLabel1.Text + "  " + ex.Message);
                 throw;
             }
-        }
-
-        private void Runner_OnStatusUpdate(string message)
-        {
-            throw new NotImplementedException();
         }
 
         private void cancelQueryToolStripMenuItem_Click(object sender, EventArgs e)
@@ -228,7 +219,7 @@ namespace IdFix
                 {
                     cancelToolStripMenuItem.Enabled = false;
                 });
-                backgroundWorker1.CancelAsync();
+                runner.CancelAsync();
             }
             catch (Exception ex)
             {

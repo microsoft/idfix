@@ -29,7 +29,7 @@ namespace IdFix.Settings
             var forests = new List<string>();
             forests.Add(Forest.GetCurrentForest().Name);
             this.ForestList = forests.ToArray();
-            this.ActiveForestList = new string[] { };
+            this.ActiveForestList = forests.ToArray();
 
             // set search defaults
             this.DistinguishedName = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, Forest.GetCurrentForest().Name)).Name.Replace(".", ",dc=");

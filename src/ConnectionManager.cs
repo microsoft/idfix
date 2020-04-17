@@ -17,6 +17,10 @@ namespace IdFix.Rules
         public void WithConnections(Action<LdapConnection, string> action)
         {
             var activeForestsCopy = SettingsManager.Instance.ActiveForestList.ToArray();
+            if (activeForestsCopy.Length < 1)
+            {
+                throw new Exception("No active forests selected. Check the settings and ensure at least one forest is selected.");
+            }
             for (var i = 0; i < activeForestsCopy.Length; i++)
             {
                 var activeForest = activeForestsCopy[i];

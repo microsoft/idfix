@@ -18,47 +18,65 @@ namespace IdFix.Rules
     {
         public RulesRunner()
         {
+            this.WorkerSupportsCancellation = true;
             this.DoWork += this.RunRules;
-            this.RunWorkerCompleted += this.Completed;
         }
 
         public event OnStatusUpdateDelegate OnStatusUpdate;
 
         private void RunRules(object sender, DoWorkEventArgs e)
         {
-            var args = e.Argument as RulesRunnerDoWorkArgs;
-            if (args == null)
+            try
             {
-                e.Result = null;
-                throw new ArgumentException("RulesRunner expects arguments of type RulesRunnerDoWorkArgs.");
+                var args = e.Argument as RulesRunnerDoWorkArgs;
+                if (args == null)
+                {
+                    e.Result = null;
+                    throw new ArgumentException("RulesRunner expects arguments of type RulesRunnerDoWorkArgs.");
+                }
+
+                //var entryCount = 0;
+                //var errorCount = 0;
+                //var duplicateCount = 0;
+                var stopwatch = DateTime.Now;
+                //var errDict.Clear();
+                //var dupDict.Clear();
+                //var dupObjDict.Clear();
+
+                // clear out our duplicate tracking each run
+                DuplicateStore.Reset();
+                args.Files.DeleteAll();
+
+                // create the connection manager and bubble up any messages
+                var connections = new ConnectionManager();
+                connections.OnStatusUpdate += (string message) => { this.OnStatusUpdate?.Invoke(message); };
+
+                var allErrors = new List<ComposedRuleResult>();
+
+                connections.WithConnections((LdapConnection connection, string distinguishedName) =>
+                {
+                    var ruleCollection = this.GetRuleCollection(connection, distinguishedName);
+
+                    // here we get all the errors returned by this rulecollection
+                    // need a compound object
+                    // elapsed time
+                    // counts
+                    // errors collection
+                    // more
+                    allErrors.AddRange(ruleCollection.Run());
+                });
+
+                e.Result = allErrors;
             }
-
-            var entryCount = 0;
-            var errorCount = 0;
-            var duplicateCount = 0;
-            var stopwatch = DateTime.Now;
-            //var errDict.Clear();
-            //var dupDict.Clear();
-            //var dupObjDict.Clear();
-            e.Result = StringLiterals.Complete;
-
-            args.Files.DeleteAll();
-
-            // create the connection manager and bubble up any messages
-            var connections = new ConnectionManager();
-            connections.OnStatusUpdate += (string message) => { this.OnStatusUpdate?.Invoke(message); };
-
-            connections.WithConnections((LdapConnection connection, string distinguishedName) =>
+            catch (Exception err)
             {
-                var ruleCollection = this.GetRuleCollection(connection, distinguishedName);
-
-                // TODO:: this needs to do some sort of reporting or output, etc
-                ruleCollection.Run();
-
-
-
-
-            });
+                this.OnStatusUpdate?.Invoke("Error in RulesRunner: " + err.Message);
+                e.Result = err;
+            }
+            finally
+            {
+                DuplicateStore.Reset();
+            }
         }
 
         #region GetRuleCollection
@@ -81,10 +99,5 @@ namespace IdFix.Rules
         }
 
         #endregion
-
-        private void Completed(object sender, RunWorkerCompletedEventArgs e)
-        {
-
-        }
     }
 }

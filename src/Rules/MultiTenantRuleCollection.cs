@@ -1,14 +1,11 @@
-﻿using IdFix.Rules.MultiTentant;
-using IdFix.Rules.Shared;
-using IdFix.Settings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using IdFix.Rules.MultiTentant;
+using IdFix.Rules.Shared;
+using IdFix.Settings;
 
 namespace IdFix.Rules
 {
@@ -35,14 +32,16 @@ namespace IdFix.Rules
 
                     rules.Add(new ComposedRule(StringLiterals.DisplayName,
                         new StringMaxLengthRule(255),
-                        new BlankStringRule((entry, value) => entry.Attributes[StringLiterals.Cn][0].ToString())));
+                        new BlankStringRule((entry, value) => entry.Attributes[StringLiterals.Cn][0].ToString())
+                    ));
 
                     rules.Add(new ComposedRule(StringLiterals.GivenName,
-                        new StringMaxLengthRule(63)));
+                        new StringMaxLengthRule(63)
+                    ));
 
                     rules.Add(new ComposedRule(StringLiterals.Mail,
-                        new StringMaxLengthRule(256)
-                    // duplicate rule here 
+                        new StringMaxLengthRule(256),
+                        new NoDuplicatesRule()
                     ));
 
                     rules.Add(new ComposedRule(StringLiterals.MailNickName,
@@ -51,29 +50,22 @@ namespace IdFix.Rules
                     // duplicate rule here 
                     ));
 
-                    rules.Add(new ProxyAddressComposedRule(new StringMaxLengthRule(256)
-                    // duplicate rule here 
+                    rules.Add(new ProxyAddressComposedRule(
+                        new StringMaxLengthRule(256),
+                        new FixProxyTargetAddressRule(),
+                        new NoDuplicatesRule()
                     ));
 
-                    /**
-                    * 
-                    * if (entry.Attributes.Contains(StringLiterals.SamAccountName) && !IsValidUpn(entry))
-                    {
-                        mtChecks(entry, StringLiterals.SamAccountName, 0,
-                            objectType.Equals("user", StringComparison.CurrentCultureIgnoreCase) ? 20 : 256,
-                            new Regex(@"[\\""|,/\[\]:<>+=;?*]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant), null,
-                            entry.Attributes.Contains(StringLiterals.UserPrincipalName) ? false : true, false, false);
-                    }
-                    * */
                     rules.Add(new ComposedRule(StringLiterals.SamAccountName,
                         new SamAccountNameMaxLengthRule(),
-                        new RegexRule(new Regex(@"[\\""|,/\[\]:<>+=;?*]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
-                    // duplicate rule here based on type as above
+                        new RegexRule(new Regex(@"[\\""|,/\[\]:<>+=;?*]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
+                        new SamAccountNameDuplicateRule()
                     ));
 
                     rules.Add(new TargetAddressComposedRule(
-                        new StringMaxLengthRule(255)
-                    // duplicate rule here
+                        new StringMaxLengthRule(255),
+                        new FixProxyTargetAddressRule(),
+                        new NoDuplicatesRule()
                     ));
 
                     if (!SettingsManager.Instance.UseAlternateLogin)
@@ -81,8 +73,8 @@ namespace IdFix.Rules
                         rules.Add(new ComposedRule(StringLiterals.UserPrincipalName,
                             new StringMaxLengthRule(113),
                             new RegexRule(Constants.InvalidUpnRegExRegex),
-                            new RFC2822Rule()
-                           // duplicate rule here
+                            new RFC2822Rule(),
+                            new NoDuplicatesRule()
                            ));
                     }
 
@@ -210,17 +202,11 @@ namespace IdFix.Rules
                         switch (entry.Attributes[StringLiterals.MsExchRecipientTypeDetails][0].ToString())
                         {
                             case "0x1000":
-                                return true;
                             case "0x2000":
-                                return true;
                             case "0x4000":
-                                return true;
                             case "0x400000":
-                                return true;
                             case "0x800000":
-                                return true;
                             case "0x1000000":
-                                return true;
                             case "0x20000000":
                                 return true;
                         }

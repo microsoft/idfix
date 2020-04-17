@@ -9,6 +9,16 @@ using System.Threading.Tasks;
 
 namespace IdFix.Rules
 {
+    class RuleCollectionError
+    {
+        string DistinguisedName { get; set; }
+        string ObjectClass { get; set; }
+        string AttributeName { get; set; }
+        string Error { get; set; }
+        string OriginalValue { get; set; }
+        string UpdatedValue { get; set; }
+    }
+
     abstract class RuleCollection
     {
         protected RuleCollection(LdapConnection connection, string distinguishedName, int pageSize = 1000)
@@ -28,7 +38,7 @@ namespace IdFix.Rules
         public abstract bool Skip(SearchResultEntry entry);
         public abstract IComposedRule[] Rules { get; }
 
-        public virtual void Run()
+        public virtual List<ComposedRuleResult> Run()
         {
             long entryCount = 0;
             long errorCount = 0;
@@ -37,6 +47,8 @@ namespace IdFix.Rules
 
             this.OnStatusUpdate?.Invoke("Please wait while the LDAP Connection is established.");
             var searchRequest = this.CreateSearchRequest();
+
+            var errors = new List<ComposedRuleResult>();
 
             while (true)
             {
@@ -75,17 +87,24 @@ namespace IdFix.Rules
 
                         if (!result.Success)
                         {
-                            // this.ReportError(entry, result);
+                            // TODO:: transform these error results into a fuller error object with entity information and other details required for reporting
+                            // in the end this collection should be bound to the grid
+                            /*
+                             * dataGridView1.Rows[newRow].Cells[StringLiterals.DistinguishedName].Value = errorPair.Value.distinguishedName;
+                            dataGridView1.Rows[newRow].Cells[StringLiterals.ObjectClass].Value = errorPair.Value.objectClass;
+                            dataGridView1.Rows[newRow].Cells[StringLiterals.Attribute].Value = errorPair.Value.attribute;
+                            dataGridView1.Rows[newRow].Cells[StringLiterals.Error].Value = errorPair.Value.type.Substring(0, errorPair.Value.type.Length - 1);
+                            dataGridView1.Rows[newRow].Cells[StringLiterals.Value].Value = errorPair.Value.value;
+                            dataGridView1.Rows[newRow].Cells[StringLiterals.Update].Value = errorPair.Value.update;
+                             */
+                            errors.Add(result);
                         }
                     }
-
                 }
 
                 this.OnStatusUpdate?.Invoke("Query Count: " + entryCount.ToString(CultureInfo.CurrentCulture)
             + "  Error Count: " + errorCount.ToString(CultureInfo.CurrentCulture)
             + "  Duplicate Check Count: " + duplicateCount.ToString(CultureInfo.CurrentCulture));
-
-
 
                 // handle paging
                 var cookie = searchResponse.Controls.OfType<PageResultResponseControl>().First().Cookie;
@@ -96,7 +115,11 @@ namespace IdFix.Rules
 
                 searchRequest.Controls.OfType<PageResultRequestControl>().First().Cookie = cookie;
             }
+
+            return errors;
         }
+
+        #region CreateSearchRequest
 
         /// <summary>
         /// Creates the search request for this rule collection
@@ -118,6 +141,10 @@ namespace IdFix.Rules
             return searchRequest;
         }
 
+        #endregion
+
+        #region InvokeStatus
+
         /// <summary>
         /// Invokes the OnStatusUpdate event with the supplied message
         /// </summary>
@@ -126,5 +153,7 @@ namespace IdFix.Rules
         {
             this.OnStatusUpdate?.Invoke(message);
         }
+
+        #endregion
     }
 }

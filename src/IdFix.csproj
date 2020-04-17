@@ -169,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Delegates.cs" />
+    <Compile Include="DuplicateStore.cs" />
     <Compile Include="ErrorClass.cs" />
     <Compile Include="Files.cs" />
     <Compile Include="Form1.cs">
@@ -195,11 +196,14 @@
     <Compile Include="ConnectionManager.cs" />
     <Compile Include="Rules\DedicatedRuleCollection.cs" />
     <Compile Include="Rules\MultiTenantRuleCollection.cs" />
+    <Compile Include="Rules\MultiTentant\SamAccountNameDuplicateRule.cs" />
     <Compile Include="Rules\MultiTentant\TargetAddressComposedRule.cs" />
     <Compile Include="Rules\MultiTentant\ProxyAddressComposedRule.cs" />
     <Compile Include="Rules\MultiTentant\RFC2822Rule.cs" />
     <Compile Include="Rules\MultiTentant\SamAccountNameMaxLengthRule.cs" />
     <Compile Include="Rules\Shared\BlankStringRule.cs" />
+    <Compile Include="Rules\Shared\FixProxyTargetAddressRule.cs" />
+    <Compile Include="Rules\Shared\NoDuplicatesRule.cs" />
     <Compile Include="Rules\Shared\RegexRule.cs" />
     <Compile Include="Rules\Rule.cs" />
     <Compile Include="Rules\RuleCollection.cs" />
