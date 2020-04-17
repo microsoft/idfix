@@ -1,33 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdFix.Settings
 {
     class ValidTLDList : List<string>
     {
-        public ValidTLDList() : base()
+        private static List<string> _cachedList = null;
+
+        public ValidTLDList(bool useCached = true) : base()
         {
-            this.Init();
+            this.Init(useCached);
         }
 
-        private void Init()
+        private void Init(bool useCached)
         {
-            using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("IdFix.domains.txt")))
+            if (useCached && ValidTLDList._cachedList != null)
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
+                this.AddRange(ValidTLDList._cachedList);
+            }
+            else
+            {
+                using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("IdFix.domains.txt")))
                 {
-                    var formattedLine = line.Trim().ToLowerInvariant();
-                    if (!this.Contains(formattedLine))
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        this.Add(formattedLine);
+                        var formattedLine = line.Trim().ToLowerInvariant();
+                        if (!this.Contains(formattedLine))
+                        {
+                            this.Add(formattedLine);
+                        }
                     }
+                }
+
+                if (ValidTLDList._cachedList == null)
+                {
+                    ValidTLDList._cachedList = new List<string>();
+                    ValidTLDList._cachedList.AddRange(this);
                 }
             }
         }

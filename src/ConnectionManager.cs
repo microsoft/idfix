@@ -1,20 +1,17 @@
 ﻿using IdFix.Settings;
 using System;
-using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.Protocols;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdFix.Rules
 {
     class ConnectionManager
     {
         /// <summary>
-        /// Creates a connection for each entry in the ActiveForestList and executes the provided action passing that connection.
-        /// Also calculates the distinguishedName based on business logic
+        /// Creates a connection for each entry in the ActiveForestList and executes the provided action passing that connection as param 1
+        /// Also calculates the distinguishedName based on business logic, passed to the action as param 2
         /// </summary>
         /// <param name="action"></param>
         public void WithConnections(Action<LdapConnection, string> action)

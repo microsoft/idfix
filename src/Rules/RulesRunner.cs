@@ -11,8 +11,7 @@ namespace IdFix.Rules
 {
     class RulesRunnerDoWorkArgs
     {
-        public Files files { get; set; }
-        public Action<string> updateStatus { get; set; }
+        public Files Files { get; set; }
     }
 
     class RulesRunner : BackgroundWorker
@@ -43,48 +42,45 @@ namespace IdFix.Rules
             //var dupObjDict.Clear();
             e.Result = StringLiterals.Complete;
 
-            args.files.DeleteAll();
+            args.Files.DeleteAll();
 
-            // create the conneciton manager and bubble up any messages
+            // create the connection manager and bubble up any messages
             var connections = new ConnectionManager();
             connections.OnStatusUpdate += (string message) => { this.OnStatusUpdate?.Invoke(message); };
 
             connections.WithConnections((LdapConnection connection, string distinguishedName) =>
             {
-                int pageSize = 1000;
-                var displayCount = 0;
+                var ruleCollection = this.GetRuleCollection(connection, distinguishedName);
 
-                // here is where we need to call a specific type of searcher
-                // because we begin with the attributes defined within that processor
-                // MT or Dedicated
-
-
-
-
-
-                PageResultRequestControl pageRequest = new PageResultRequestControl(pageSize);
-                SearchRequest searchRequest = new SearchRequest(
-                    distinguishedName,
-                    SettingsManager.Instance.Filter,
-                    SearchScope.Subtree,
-                    new string[] { "nothing" }); // this is the attributes to return
-                searchRequest.Controls.Add(pageRequest);
-                SearchResponse searchResponse;
-
-                this.OnStatusUpdate?.Invoke("Please wait while the LDAP Connection is established.");
-
-
-
-
-
-
-
+                // TODO:: this needs to do some sort of reporting or output, etc
+                ruleCollection.Run();
 
 
 
 
             });
         }
+
+        #region GetRuleCollection
+
+        private RuleCollection GetRuleCollection(LdapConnection connection, string distinguishedName)
+        {
+            RuleCollection collection;
+            if (SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant)
+            {
+                collection = new MultiTenantRuleCollection(connection, distinguishedName);
+            }
+            else
+            {
+                collection = new DedicatedRuleCollection(connection, distinguishedName);
+            }
+
+            collection.OnStatusUpdate += (string message) => { this.OnStatusUpdate?.Invoke(message); };
+
+            return collection;
+        }
+
+        #endregion
 
         private void Completed(object sender, RunWorkerCompletedEventArgs e)
         {

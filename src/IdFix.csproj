@@ -192,11 +192,20 @@
     <Compile Include="Program.cs" />
     <Compile Include="DuplicateClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rules\ConnectionManager.cs" />
+    <Compile Include="ConnectionManager.cs" />
+    <Compile Include="Rules\DedicatedRuleCollection.cs" />
     <Compile Include="Rules\MultiTenantRuleCollection.cs" />
+    <Compile Include="Rules\MultiTentant\TargetAddressComposedRule.cs" />
+    <Compile Include="Rules\MultiTentant\ProxyAddressComposedRule.cs" />
+    <Compile Include="Rules\MultiTentant\RFC2822Rule.cs" />
+    <Compile Include="Rules\MultiTentant\SamAccountNameMaxLengthRule.cs" />
+    <Compile Include="Rules\Shared\BlankStringRule.cs" />
+    <Compile Include="Rules\Shared\RegexRule.cs" />
     <Compile Include="Rules\Rule.cs" />
     <Compile Include="Rules\RuleCollection.cs" />
     <Compile Include="Rules\RulesRunner.cs" />
+    <Compile Include="Rules\Shared\StringMaxLengthRule.cs" />
+    <Compile Include="Settings\Constants.cs" />
     <Compile Include="Settings\Enums.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Settings\ValidTLDList.cs" />
@@ -327,5 +336,7 @@
     <QCustomInput Include="iso3166.xml" />
     <QCustomInput Include="Resources\resources/icons_filter_hover_16x16.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Rules\Dedicated\" />
+  </ItemGroup>
 </Project>

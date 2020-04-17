@@ -151,22 +151,6 @@ namespace IdFix
                     SettingsManager.Instance.DistinguishedName = textBoxDomain.Text;
                 }
 
-                // TODO:: move this logic into the rule sets for each
-                //if (myParent.settingsMT)
-                //{
-                //    myParent.attributesToReturn = new string[] { StringLiterals.Cn, StringLiterals.DistinguishedName,
-                //    StringLiterals.GroupType, StringLiterals.HomeMdb, StringLiterals.IsCriticalSystemObject, StringLiterals.Mail,
-                //    StringLiterals.MailNickName, StringLiterals.MsExchHideFromAddressLists,
-                //    StringLiterals.MsExchRecipientTypeDetails, StringLiterals.ObjectClass, StringLiterals.ProxyAddresses,
-                //    StringLiterals.SamAccountName, StringLiterals.TargetAddress, StringLiterals.UserPrincipalName };
-                //}
-                //else
-                //{
-                //    myParent.attributesToReturn = new string[] { StringLiterals.Cn, StringLiterals.DisplayName, StringLiterals.DistinguishedName, StringLiterals.GivenName,
-                //    StringLiterals.HomeMdb, StringLiterals.Mail, StringLiterals.MailNickName, StringLiterals.ObjectClass, StringLiterals.ProxyAddresses,
-                //    StringLiterals.SamAccountName, StringLiterals.Sn, StringLiterals.TargetAddress };
-                //}
-
                 if (SettingsManager.Instance.CurrentCredentialMode != CredentialMode.CurrentUser)
                 {
                     SettingsManager.Instance.Username = textBoxUser.Text;

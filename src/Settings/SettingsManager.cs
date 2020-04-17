@@ -12,7 +12,7 @@ namespace IdFix.Settings
         private static SettingsManager _instance = null;
 
         public static readonly string DefaultMTFilter = "(|(objectCategory=Person)(objectCategory=Group))";
-        public static readonly string DefaultDedicatedFilter = "(&(mail=*)(|(objectCategory=Person)(objectCategory=Group)))"; 
+        public static readonly string DefaultDedicatedFilter = "(&(mail=*)(|(objectCategory=Person)(objectCategory=Group)))";
 
         private SettingsManager()
         {
