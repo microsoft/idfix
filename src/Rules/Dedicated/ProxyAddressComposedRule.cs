@@ -1,4 +1,5 @@
-﻿using IdFix.Rules.Shared;
+﻿using IdFix.Rules.MultiTentant;
+using IdFix.Rules.Shared;
 using IdFix.Settings;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IdFix.Rules.MultiTentant
+namespace IdFix.Rules.Dedicated
 {
     /// <summary>
     /// Handles the special case logic for ProxyAddresses
@@ -37,12 +38,7 @@ namespace IdFix.Rules.MultiTentant
                 // then need to do special cases to add in the rules based on what is needed
                 if (isSmtp)
                 {
-                    rulesList.Add(new RegexRule(Constants.InvalidProxyAddressSMTPRegex));
                     rulesList.Add(new RFC2822Rule());
-                }
-                else
-                {
-                    rulesList.Add(new RegexRule(Constants.InvalidProxyAddressRegex));
                 }
                                              
                 foreach (var rule in rulesList)

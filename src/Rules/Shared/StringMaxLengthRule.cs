@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IdFix.Settings;
+using System;
 using System.DirectoryServices.Protocols;
 using System.Text.RegularExpressions;
 
@@ -19,7 +20,7 @@ namespace IdFix.Rules.Shared
             if (attributeValue.Length > this.MaxLength)
             {
                 var updatedValue = this.Fixer != null ? this.Fixer(entry, attributeValue) : attributeValue.Substring(0, this.MaxLength);
-                return this.GetErrorResult(StringLiterals.Length, updatedValue);
+                return this.GetErrorResult(ErrorType.Length, updatedValue);
             }
 
             return this.GetSuccessResult();

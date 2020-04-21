@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace IdFix.Rules.MultiTentant
+namespace IdFix.Rules.Shared
 {
     class RFC2822Rule : Rule
     {
@@ -18,7 +18,7 @@ namespace IdFix.Rules.MultiTentant
         {
             var tldList = new ValidTLDList();
             bool success = false;
-            var errors = new List<string>();
+            ErrorType errors = ErrorType.None;
             string validateAttribute = Constants.SMTPRegex.IsMatch(attributeValue) ? attributeValue.Substring(attributeValue.IndexOf(":") + 1) : attributeValue;
 
             if (validateAttribute.LastIndexOf(".") != -1)
@@ -30,7 +30,7 @@ namespace IdFix.Rules.MultiTentant
                     if (!tldList.Contains(tldDomain))
                     {
                         success = false;
-                        errors.Add(StringLiterals.TopLevelDomain);
+                        errors |= ErrorType.TopLevelDomain;
                     }
                 }
             }
@@ -38,7 +38,7 @@ namespace IdFix.Rules.MultiTentant
             if (!Constants.DomainPartRegex.IsMatch(validateAttribute))
             {
                 success = false;
-                errors.Add(StringLiterals.DomainPart);
+                errors |= ErrorType.DomainPart;
                 if (validateAttribute.LastIndexOf("@") != -1)
                 {
                     validateAttribute = validateAttribute.Substring(0, validateAttribute.LastIndexOf("@") + 1)
@@ -49,7 +49,7 @@ namespace IdFix.Rules.MultiTentant
             if (!Constants.LocalPartRegex.IsMatch(validateAttribute) || (validateAttribute.Split('@').Length - 1 > 1))
             {
                 success = false;
-                errors.Add(StringLiterals.LocalPart);
+                errors |= ErrorType.LocalPart;
                 if (validateAttribute.LastIndexOf("@") != -1)
                 {
                     string validateLocal = (new Regex(@"[^a-z0-9.!#$%&'*+/=?^_`{|}~-]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Replace(validateAttribute.Substring(0, validateAttribute.LastIndexOf("@")), "");
@@ -60,7 +60,7 @@ namespace IdFix.Rules.MultiTentant
             if (!Constants.Rfc2822Regex.IsMatch(validateAttribute))
             {
                 success = false;
-                errors.Add(StringLiterals.Format);
+                errors |= ErrorType.Format;
             }
 
             if (success)
@@ -73,7 +73,7 @@ namespace IdFix.Rules.MultiTentant
                     ? attributeValue.Substring(0, attributeValue.IndexOf(":") + 1).Trim() + validateAttribute
                     : validateAttribute;
 
-                return this.GetErrorResult(string.Join(",", errors.ToArray()), attributeValue);
+                return this.GetErrorResult(errors, attributeValue);
             }
         }
     }

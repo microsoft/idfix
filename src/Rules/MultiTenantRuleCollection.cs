@@ -13,7 +13,6 @@ namespace IdFix.Rules
     {
         private IComposedRule[] _rules;
 
-
         public MultiTenantRuleCollection(LdapConnection connection, string distinguishedName, int pageSize = 1000)
             : base(connection, distinguishedName)
         {
@@ -30,44 +29,82 @@ namespace IdFix.Rules
                 {
                     var rules = new List<IComposedRule>();
 
+                    // Additional check for DisplayName. 
+                    //  Value is non-blank if present
+                    //  Max Length = 255. 
+                    // The attribute being present check is done in mtChecks, however, the errorBlank check is done only if the attribute
+                    // is missing, so that has been updated to check for blanks if attribute present.
                     rules.Add(new ComposedRule(StringLiterals.DisplayName,
                         new StringMaxLengthRule(255),
                         new BlankStringRule((entry, value) => entry.Attributes[StringLiterals.Cn][0].ToString())
                     ));
 
+                    // Additional check for GivenName. 
+                    //  Max Length = 63.
                     rules.Add(new ComposedRule(StringLiterals.GivenName,
                         new StringMaxLengthRule(63)
                     ));
 
+                    // New documentation doesn't say anything about mail not being whitespace nor rfc822 format, so pulling that out.
+                    // It should just be unique.
+                    //  Max Length = 256 -- See XL sheet
                     rules.Add(new ComposedRule(StringLiterals.Mail,
                         new StringMaxLengthRule(256),
                         new NoDuplicatesRule()
                     ));
 
+                    // Updated check for MailNickName
+                    //  Cannot start with period (.)
+                    //  Max Length = 64, document doesn't restrict, schema says 64
                     rules.Add(new ComposedRule(StringLiterals.MailNickName,
                         new StringMaxLengthRule(64),
                         new RegexRule(new Regex(@"^[.]+", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
                     // duplicate rule here 
                     ));
 
+                    // ProxyAddresses have additional requirements. 
+                    //  Cannot contain space < > () ; , [ ] 
+                    //  There should be no ":" in the suffix part of ProxyAddresses.
+                    //  SMTP addresses should conform to valid email formats
+                    //
+                    // Considered and discarded. 
+                    // One option is that we do a format check for ProxyAddresses & TargetAddresses to be
+                    // <prefix>:<suffix>. In which case, we could pass in RegEx for the else part of smtp.IsMatch()
+                    // Instead, we'll just special case the check in mtChecks and get rid of the ":" in the suffix. 
+                    // That I think will benefit more customers, than giving a format error which they have to go and fix.
+                    //
                     rules.Add(new ProxyAddressComposedRule(
                         new StringMaxLengthRule(256),
                         new FixProxyTargetAddressRule(),
                         new NoDuplicatesRule()
                     ));
 
+                    // If UPN is valid, and samAccountName is Invalid, sync still works, so we check for invalid
+                    // SamAccountName only if UPN isn't valid
+                    // Max Length = 20
+                    // Invalid Characters [ \ " | , \ : <  > + = ? * ]
                     rules.Add(new ComposedRule(StringLiterals.SamAccountName,
                         new SamAccountNameMaxLengthRule(),
                         new RegexRule(new Regex(@"[\\""|,/\[\]:<>+=;?*]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
                         new SamAccountNameDuplicateRule()
                     ));
 
+                    // Checks for TargetAddress
                     rules.Add(new TargetAddressComposedRule(
                         new StringMaxLengthRule(255),
                         new FixProxyTargetAddressRule(),
                         new NoDuplicatesRule()
                     ));
 
+                    // Updated UPN 
+                    //  Should confirm to rfc2822 -- checked in mtChecks
+                    //  @ needs to be present -- checked in mtChecks as part of rfc2822
+                    //  Length before @ = 48 -- checked in mtChecks Length
+                    //  Length after  @ = 64 -- checked in mtChecks Length
+                    //  Cannot contain space \ % & * + / = ?  { } | < > ( ) ; : , [ ] “ umlaut -- RegEx
+                    //  @ cannot be first character -- RegEx
+                    //  period (.), ampersand (&), space, or at sign (@) cannot be the last character -- RegEx 
+                    //  No duplicates -- checked in mtChecks
                     if (!SettingsManager.Instance.UseAlternateLogin)
                     {
                         rules.Add(new ComposedRule(StringLiterals.UserPrincipalName,

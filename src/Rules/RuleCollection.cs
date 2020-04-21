@@ -1,6 +1,7 @@
 ﻿using IdFix.Settings;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.DirectoryServices.Protocols;
 using System.Globalization;
 using System.Linq;
@@ -17,6 +18,44 @@ namespace IdFix.Rules
         string Error { get; set; }
         string OriginalValue { get; set; }
         string UpdatedValue { get; set; }
+    }
+
+    public class RuleCollectionResult
+    {
+        /// <summary>
+        /// Total number of entities found and processed (skipped, errors, success)
+        /// </summary>
+        public long TotalFound { get; set; }
+
+        /// <summary>
+        /// The number of entities skipped
+        /// </summary>
+        public long TotalSkips { get; set; }
+
+        /// <summary>
+        /// The number of entities processed through rules (not skipped)
+        /// </summary>
+        public long TotalProcessed { get; set; }
+
+        /// <summary>
+        /// The number of entities found to have errors (not the total number of errors as an entity could contain multiple errors)
+        /// </summary>
+        public long TotalErrors { get; set; }
+
+        /// <summary>
+        /// The number of entities found to have duplicates
+        /// </summary>
+        public long TotalDuplicates { get; set; }
+
+        /// <summary>
+        /// Records the time spent running the rules against the connection
+        /// </summary>
+        public TimeSpan Elapsed { get; set; }
+
+        /// <summary>
+        /// The set of all errors found when running rules against the entities
+        /// </summary>
+        public ComposedRuleResult[] Errors { get; set; }
     }
 
     abstract class RuleCollection
@@ -38,12 +77,14 @@ namespace IdFix.Rules
         public abstract bool Skip(SearchResultEntry entry);
         public abstract IComposedRule[] Rules { get; }
 
-        public virtual List<ComposedRuleResult> Run()
+        public virtual RuleCollectionResult Run()
         {
+            // these count all the totals for the connection against which this RuleCollection is being run
+            var stopWatch = new Stopwatch();
+            long skipCount = 0;
             long entryCount = 0;
-            long errorCount = 0;
             long duplicateCount = 0;
-            long displayCount = 0;
+            long errorCount = 0;
 
             this.OnStatusUpdate?.Invoke("Please wait while the LDAP Connection is established.");
             var searchRequest = this.CreateSearchRequest();
@@ -75,36 +116,31 @@ namespace IdFix.Rules
 
                     if (this.Skip(entry))
                     {
+                        skipCount++;
                         continue;
                     }
 
+                    // this tracks the number of entries we have processed and not skipped
                     entryCount++;
 
                     foreach (var composedRule in this.Rules)
                     {
-                        // this needs to do reporting and output, etc
+                        // run each composed rule 
                         var result = composedRule.Execute(entry);
 
                         if (!result.Success)
                         {
-                            // TODO:: transform these error results into a fuller error object with entity information and other details required for reporting
-                            // in the end this collection should be bound to the grid
-                            /*
-                             * dataGridView1.Rows[newRow].Cells[StringLiterals.DistinguishedName].Value = errorPair.Value.distinguishedName;
-                            dataGridView1.Rows[newRow].Cells[StringLiterals.ObjectClass].Value = errorPair.Value.objectClass;
-                            dataGridView1.Rows[newRow].Cells[StringLiterals.Attribute].Value = errorPair.Value.attribute;
-                            dataGridView1.Rows[newRow].Cells[StringLiterals.Error].Value = errorPair.Value.type.Substring(0, errorPair.Value.type.Length - 1);
-                            dataGridView1.Rows[newRow].Cells[StringLiterals.Value].Value = errorPair.Value.value;
-                            dataGridView1.Rows[newRow].Cells[StringLiterals.Update].Value = errorPair.Value.update;
-                             */
+                            errorCount++;
+
+                            if (result.Results.Any(r => (r.ErrorTypeFlags & ErrorType.Duplicate) != 0))
+                            {
+                                duplicateCount++;
+                            }
+
                             errors.Add(result);
                         }
                     }
                 }
-
-                this.OnStatusUpdate?.Invoke("Query Count: " + entryCount.ToString(CultureInfo.CurrentCulture)
-            + "  Error Count: " + errorCount.ToString(CultureInfo.CurrentCulture)
-            + "  Duplicate Check Count: " + duplicateCount.ToString(CultureInfo.CurrentCulture));
 
                 // handle paging
                 var cookie = searchResponse.Controls.OfType<PageResultResponseControl>().First().Cookie;
@@ -116,7 +152,19 @@ namespace IdFix.Rules
                 searchRequest.Controls.OfType<PageResultRequestControl>().First().Cookie = cookie;
             }
 
-            return errors;
+            // we are all done, stop tracking time
+            stopWatch.Stop();
+
+            return new RuleCollectionResult
+            {
+                TotalDuplicates = duplicateCount,
+                TotalErrors = errorCount,
+                TotalFound = skipCount + entryCount,
+                TotalSkips = skipCount,
+                TotalProcessed = entryCount,
+                Elapsed = stopWatch.Elapsed,
+                Errors = errors.ToArray()
+            };
         }
 
         #region CreateSearchRequest

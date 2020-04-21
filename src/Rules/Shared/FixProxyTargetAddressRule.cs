@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IdFix.Settings;
+using System;
 using System.DirectoryServices.Protocols;
 
 namespace IdFix.Rules.Shared
@@ -15,8 +16,7 @@ namespace IdFix.Rules.Shared
                 string suffix = attributeValue.Substring(colonPosn + 1);
                 if (suffix.Contains(":"))
                 {
-                    return this.GetErrorResult(StringLiterals.Character, attributeValue.Substring(0, colonPosn) + ":" + suffix.Replace(":", ""));
-
+                    return this.GetErrorResult(ErrorType.Character, attributeValue.Substring(0, colonPosn) + ":" + suffix.Replace(":", ""));
                 }
             }
 

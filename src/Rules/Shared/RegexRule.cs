@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IdFix.Settings;
+using System;
 using System.DirectoryServices.Protocols;
 using System.Text.RegularExpressions;
 
@@ -29,7 +30,7 @@ namespace IdFix.Rules.Shared
                     updated = this.Fixer(entry, attributeValue);
                 }
 
-                return this.GetErrorResult(StringLiterals.Character, updated);
+                return this.GetErrorResult(ErrorType.Character, updated);
             }
 
             return this.GetSuccessResult();

@@ -1,4 +1,5 @@
-﻿using IdFix.Rules.Shared;
+﻿using IdFix.Rules.MultiTentant;
+using IdFix.Rules.Shared;
 using IdFix.Settings;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IdFix.Rules.MultiTentant
+namespace IdFix.Rules.Dedicated
 {
     /// <summary>
     /// Handles the special case logic for ProxyAddresses
@@ -19,29 +20,25 @@ namespace IdFix.Rules.MultiTentant
 
         public override ComposedRuleResult Execute(SearchResultEntry entry)
         {
+            if (!entry.Attributes.Contains(StringLiterals.TargetAddress))
+            {
+                // base already handles the case of attribute not present and check for existing
+                // blank rule so we return that result
+                return base.Execute(entry);
+            }
+
             var result = new ComposedRuleResult();
             var resultsCollector = new List<RuleResult>();
-
-            if (!entry.Attributes.Contains(StringLiterals.ProxyAddresses))
-            {
-                result.Success = true;
-                return result;
-            }
 
             var attributeValue = entry.Attributes[StringLiterals.ProxyAddresses][0].ToString();
             bool isSmtp = Constants.SMTPRegex.IsMatch(attributeValue);
 
-            // reset rule list
             var rulesList = this.Rules.ToList();
+
             // then need to do special cases to add in the rules based on what is needed
             if (isSmtp)
             {
-                rulesList.Add(new RegexRule(Constants.InvalidTargetAddressSMTPRegEx));
                 rulesList.Add(new RFC2822Rule());
-            }
-            else
-            {
-                rulesList.Add(new RegexRule(Constants.InvalidTargetAddressRegEx));
             }
 
             foreach (var rule in rulesList)

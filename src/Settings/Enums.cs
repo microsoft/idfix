@@ -1,26 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdFix.Settings
 {
-    enum RuleMode
+    public enum RuleMode
     {
         MultiTenant,
         Dedicated
     }
 
-    enum DirectoryType
+    public enum DirectoryType
     {
         ActiveDirectory,
         LDAP
     }
 
-    enum CredentialMode
+    public enum CredentialMode
     {
         CurrentUser,
         Specified
+    }
+
+    [Flags]
+    public enum ErrorType : uint
+    {
+        None = 0,
+        Format = 1,
+        Blank = 2,
+        Duplicate = 4,
+        Character = 8,
+        TopLevelDomain = 16,
+        DomainPart = 32,
+        LocalPart = 64,
+        Length = 128
     }
 }
