@@ -115,6 +115,7 @@ namespace IdFix.Rules
 
                 // clear out our duplicate tracking each run
                 DuplicateStore.Reset();
+                // TODO:: do we need to delete files? need files at all? just the log?
                 args.Files.DeleteAll();
 
                 // create the connection manager and bubble up any messages
@@ -125,8 +126,15 @@ namespace IdFix.Rules
 
                 connections.WithConnections((LdapConnection connection, string distinguishedName) =>
                 {
+                    // we try and create a key from the queried directory and fail to random guid
+                    var servers = ((LdapDirectoryIdentifier)connection.Directory).Servers;
+                    var identifier = servers.Length > 0 ? servers.First() : Guid.NewGuid().ToString("D");
+
+                    // get the rule collection to run
                     var ruleCollection = this.GetRuleCollection(connection, distinguishedName);
-                    results.Add(connection.SessionOptions.DomainName, ruleCollection.Run());
+
+                    // run that collection and add the results into the collection
+                    results.Add(identifier, ruleCollection.Run());
                 });
 
                 // we pass back the collection of all results for processing into the UI grid
@@ -145,6 +153,12 @@ namespace IdFix.Rules
 
         #region GetRuleCollection
 
+        /// <summary>
+        /// Gets the correct rule collection, MultiTenant or Dedicated, based on the current application settings
+        /// </summary>
+        /// <param name="connection">LdapConnection used to make the requests</param>
+        /// <param name="distinguishedName">Distinguised name calculated while constructing the connection</param>
+        /// <returns>A rule collection to run against the supplied connection</returns>
         private RuleCollection GetRuleCollection(LdapConnection connection, string distinguishedName)
         {
             RuleCollection collection;

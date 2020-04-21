@@ -39,7 +39,8 @@ namespace IdFix
                         MessageBoxIcon.Exclamation,
                         MessageBoxDefaultButton.Button1);
                 this.Text = StringLiterals.IdFixVersion;
-              
+
+
             }
             catch (Exception ex)
             {
@@ -55,15 +56,16 @@ namespace IdFix
             try
             {
                 // setup the grid to display results
-                this.grid = new IdFixGrid();
-                this.grid.OnStatusUpdate += (string message) =>
+                if (firstRun)
                 {
-                    this.BeginInvoke((MethodInvoker)delegate
+                    this.grid.OnStatusUpdate += (string message) =>
                     {
-                        statusDisplay(message);
-                    });
-                };
-
+                        this.BeginInvoke((MethodInvoker)delegate
+                        {
+                            statusDisplay(message);
+                        });
+                    };
+                }
 
                 // setup the background worker
                 runner = new RulesRunner();

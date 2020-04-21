@@ -19,8 +19,11 @@ namespace IdFix.Controls
 
         public IdFixGrid() : base()
         {
+            this._results = null;
             this.CurrentPage = 1;
             this.PageSize = 50000;
+            this._totalResults = 0;
+            this._pageCount = 0;
         }
 
         public event OnStatusUpdateDelegate OnStatusUpdate;
@@ -74,7 +77,10 @@ namespace IdFix.Controls
         {
             this.Rows.Clear();
             this.Refresh();
-            this.Columns[StringLiterals.Update].ReadOnly = false;
+            if (this.Columns.Contains(StringLiterals.Update))
+            {
+                this.Columns[StringLiterals.Update].ReadOnly = false;
+            }            
         }
 
         private void FillGrid()
@@ -85,17 +91,20 @@ namespace IdFix.Controls
                 timer.Start();
                 this.OnStatusUpdate?.Invoke("Populating DataGrid");
                 this.Reset();
-                var displaySet = this._results.Skip(this._currentPage * this.PageSize).Take(this.PageSize);
-                foreach (var errorData in displaySet)
+                if (this._results != null)
                 {
-                    var rowIndex = this.Rows.Add();
-                    var row = this.Rows[rowIndex];
-                    row.Cells[StringLiterals.DistinguishedName].Value = errorData.EntityDistinguishedName;
-                    row.Cells[StringLiterals.ObjectClass].Value = errorData.ObjectType;
-                    row.Cells[StringLiterals.Attribute].Value = errorData.AttributeName;
-                    row.Cells[StringLiterals.Error].Value = errorData.ErrorsToString();
-                    row.Cells[StringLiterals.Value].Value = errorData.OriginalValue;
-                    row.Cells[StringLiterals.Update].Value = errorData.ProposedValue;
+                    var displaySet = this._results.Skip(this._currentPage * this.PageSize).Take(this.PageSize);
+                    foreach (var errorData in displaySet)
+                    {
+                        var rowIndex = this.Rows.Add();
+                        var row = this.Rows[rowIndex];
+                        row.Cells[StringLiterals.DistinguishedName].Value = errorData.EntityDistinguishedName;
+                        row.Cells[StringLiterals.ObjectClass].Value = errorData.ObjectType;
+                        row.Cells[StringLiterals.Attribute].Value = errorData.AttributeName;
+                        row.Cells[StringLiterals.Error].Value = errorData.ErrorsToString();
+                        row.Cells[StringLiterals.Value].Value = errorData.OriginalValue;
+                        row.Cells[StringLiterals.Update].Value = errorData.ProposedValue;
+                    }
                 }
 
                 if (this.RowCount > 0)
