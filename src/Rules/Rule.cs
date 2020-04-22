@@ -13,11 +13,13 @@ namespace IdFix.Rules
         {
             this.Success = success;
             this.ErrorTypeFlags = ErrorType.None;
+            this.ProposedAction = ActionType.None;
             this.UpdatedValue = string.Empty;
         }
 
         public bool Success { get; set; }
         public ErrorType ErrorTypeFlags { get; set; }
+        public ActionType ProposedAction { get; set; }
         public string UpdatedValue { get; set; }
     }
 
@@ -37,11 +39,12 @@ namespace IdFix.Rules
             return new RuleResult();
         }
 
-        protected RuleResult GetErrorResult(ErrorType errType, string updatedValue)
+        protected RuleResult GetErrorResult(ErrorType errType, string updatedValue, ActionType proposedAction = ActionType.Edit)
         {
             return new RuleResult(false)
             {
                 ErrorTypeFlags = errType,
+                ProposedAction = proposedAction,
                 UpdatedValue = updatedValue
             };
         }

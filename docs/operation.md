@@ -14,6 +14,7 @@
     - In the event multiple errors are associated with a single attribute, errors are combined into a single line item.
     - If a blank datagrid is displayed after execution, then no errors were returned.  This is a good thing.
 - To correct the object attribute values, select one of the following ACTION options from the drop down list:
+
 |||
 |-|-|
 |COMPLETE|The original value is acceptable and should not be changed despite being identified as being in an error state.  For example, two users may have a proxyAddress identified as duplicate.  Only one can use the value for mail delivery.  The user with the correct value should be marked as COMPLETE, while the other user is marked as REMOVE.|

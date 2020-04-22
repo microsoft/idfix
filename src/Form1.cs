@@ -87,7 +87,7 @@ namespace IdFix
                         else
                         {
                             MessageBox.Show(args.Error.Message);
-                        }                        
+                        }
                     }
                     else if (args.Cancelled)
                     {
@@ -205,7 +205,9 @@ namespace IdFix
                 action.Items.Add(StringLiterals.Remove);
                 action.Items.Add(StringLiterals.Complete);
 
-                runner.RunWorkerAsync(new RulesRunnerDoWorkArgs() { Files = files });
+                // clear the log file ahead of running the scan
+                files.DeleteByType(FileTypes.Verbose);
+                runner.RunWorkerAsync(new RulesRunnerDoWorkArgs());
             }
             catch (Exception ex)
             {
@@ -222,7 +224,9 @@ namespace IdFix
                 {
                     cancelToolStripMenuItem.Enabled = false;
                 });
+                statusDisplay("Canceling...");
                 runner.CancelAsync();
+                statusDisplay("Canceled");
             }
             catch (Exception ex)
             {
@@ -242,33 +246,27 @@ namespace IdFix
                     MessageBoxDefaultButton.Button2);
                 if (result == DialogResult.Yes)
                 {
-                    foreach (DataGridViewRow rowError in grid.Rows)
+                    foreach (DataGridViewRow row in grid.Rows)
                     {
-                        if (rowError.Cells[StringLiterals.Action].Value == null
-                            && !String.IsNullOrEmpty(rowError.Cells[StringLiterals.Update].Value.ToString()))
+                        if (!Enum.TryParse(row.Cells[StringLiterals.ProposedAction].Value.ToString(), true, out ActionType proposedAction))
                         {
-                            if (rowError.Cells[StringLiterals.Update].Value.ToString().Length > 3)
-                            {
-                                switch (rowError.Cells[StringLiterals.Update].Value.ToString().Substring(0, 3))
-                                {
-                                    case "[C]":
-                                        rowError.Cells[StringLiterals.Action].Value = StringLiterals.Complete;
-                                        break;
-                                    case "[E]":
-                                        rowError.Cells[StringLiterals.Action].Value = StringLiterals.Edit;
-                                        break;
-                                    case "[R]":
-                                        rowError.Cells[StringLiterals.Action].Value = StringLiterals.Remove;
-                                        break;
-                                    default:
-                                        rowError.Cells[StringLiterals.Action].Value = StringLiterals.Edit;
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                rowError.Cells[StringLiterals.Action].Value = StringLiterals.Edit;
-                            }
+                            proposedAction = ActionType.Edit;
+                        }
+
+                        switch (proposedAction)
+                        {
+                            case ActionType.Complete:
+                                row.Cells[StringLiterals.Action].Value = StringLiterals.Complete;
+                                break;
+                            case ActionType.Edit:
+                                row.Cells[StringLiterals.Action].Value = StringLiterals.Edit;
+                                break;
+                            case ActionType.Remove:
+                                row.Cells[StringLiterals.Action].Value = StringLiterals.Remove;
+                                break;
+                            default:
+                                row.Cells[StringLiterals.Action].Value = StringLiterals.Edit;
+                                break;
                         }
                     }
                 }
@@ -282,125 +280,128 @@ namespace IdFix
 
         private void applyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    #region display confirmation and create update file
-            //    DialogResult result = MessageBox.Show(StringLiterals.ApplyPendingBody,
-            //        StringLiterals.ApplyPending,
-            //        MessageBoxButtons.YesNo,
-            //        MessageBoxIcon.Question,
-            //        MessageBoxDefaultButton.Button2);
-            //    if (result != DialogResult.Yes)
-            //    {
-            //        return;
-            //    }
-            //    else
-            //    {
-            //        if (grid.Rows.Count < 1)
-            //        {
-            //            return;
-            //        }
-            //    }
+            // TODO:: can we improve this or break the code out somehow?
 
-            //    statusDisplay(StringLiterals.ApplyPending);
-            //    if (grid.Rows.Count > 0)
-            //    {
-            //        grid.CurrentCell = grid.Rows[0].Cells[StringLiterals.DistinguishedName];
-            //    }
+            DialogResult result = MessageBox.Show(StringLiterals.ApplyPendingBody,
+                StringLiterals.ApplyPending,
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button2);
 
-            //    string attributeString;
-            //    string updateString;
-            //    string valueString;
-            //    string actionString;
-            //    #endregion
+            if (result != DialogResult.Yes || grid.Rows.Count < 1)
+            {
+                return;
+            }
 
-            //    foreach (DataGridViewRow rowError in grid.Rows)
-            //    {
-            //        if (rowError.Cells[StringLiterals.Action].Value != null)
-            //        {
-            //            #region nothing to do 
-            //            actionString = rowError.Cells[StringLiterals.Action].Value.ToString();
-            //            if (actionString == StringLiterals.Complete || actionString == StringLiterals.Fail)
-            //            {
-            //                continue;
-            //            }
-            //            #endregion
+            statusDisplay(StringLiterals.ApplyPending);
+            grid.CurrentCell = grid.Rows[0].Cells[StringLiterals.DistinguishedName];
 
-            //            #region get Update, & Value strings
-            //            attributeString = rowError.Cells[StringLiterals.Attribute].Value.ToString();
-            //            updateString = (rowError.Cells[StringLiterals.Update].Value != null ? rowError.Cells[StringLiterals.Update].Value.ToString() : String.Empty);
-            //            if (updateString.Length > 3)
-            //            {
-            //                switch (updateString.Substring(0, 3))
-            //                {
-            //                    case "[C]":
-            //                        updateString = updateString.Substring(3);
-            //                        break;
-            //                    case "[E]":
-            //                        updateString = updateString.Substring(3);
-            //                        break;
-            //                    case "[R]":
-            //                        updateString = updateString.Substring(3);
-            //                        break;
-            //                }
-            //            }
-            //            valueString = (rowError.Cells[StringLiterals.Value].Value != null ? rowError.Cells[StringLiterals.Value].Value.ToString() : String.Empty);
-            //            #endregion
+            // remove an existing apply file??
+            // TODO:: files.DeleteByType(FileTypes.Apply);
 
-            //            # region server, target, port
-            //            string dnMod = rowError.Cells[StringLiterals.DistinguishedName].Value.ToString();
-            //            string domainMod = dnMod.Substring(dnMod.IndexOf("dc=", StringComparison.CurrentCultureIgnoreCase));
-            //            string domainModName = domainMod.ToLowerInvariant().Replace(",dc=", ".").Replace("dc=", "");
+            var connectionManager = new ConnectionManager();
+            var connectionCache = new Dictionary<string, LdapConnection>();
 
-            //            string serverName = string.Empty;
+            try
+            {
+                foreach (DataGridViewRow row in this.grid.Rows)
+                {
+                    // let's convert the action string into one of our known action types
+                    if (!Enum.TryParse(row.Cells[StringLiterals.Action].Value.ToString(), true, out ActionType updateAction))
+                    {
+                        // fail to no action, safest choice
+                        updateAction = ActionType.None;
+                    }
 
-            //            if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
-            //            {
-            //                serverName = Domain.GetDomain(new DirectoryContext(DirectoryContextType.Domain, domainModName)).FindDomainController().Name;
-            //                statusDisplay(String.Format("Using server {0} for updating", serverName));
-            //            }
+                    if (updateAction == ActionType.Complete || updateAction == ActionType.None || updateAction == ActionType.Fail)
+                    {
+                        // there is nothing to do or we already failed on this row so don't try again
+                        continue;
+                    }
 
-            //            if (SettingsManager.Instance.Port == 3268)
-            //            {
-            //                // TODO:: not sure we want to do this, maybe need a local port number
-            //                SettingsManager.Instance.Port = 389;
-            //            }
-            //            #endregion
+                    // this is the current value for this entity and attribute at the time the scan was done
+                    var currentValue = row.Cells[StringLiterals.Value].Value != null ? row.Cells[StringLiterals.Value].Value.ToString() : String.Empty;
 
-            //            #region connection
-            //            using (LdapConnection connection = new LdapConnection(serverName + ":" + SettingsManager.Instance.Port))
-            //            {
-            //                #region connection parameters
-            //                if (SettingsManager.Instance.Port == 636)
-            //                {
-            //                    connection.SessionOptions.ProtocolVersion = 3;
-            //                    connection.SessionOptions.SecureSocketLayer = true;
-            //                    connection.AuthType = AuthType.Negotiate;
-            //                }
-            //                if (SettingsManager.Instance.CurrentCredentialMode == CredentialMode.Specified)
-            //                {
-            //                    NetworkCredential credential = new NetworkCredential(SettingsManager.Instance.Username, SettingsManager.Instance.Password);
-            //                    connection.Credential = credential;
-            //                }
-            //                connection.Timeout = TimeSpan.FromSeconds(120);
-            //                #endregion
+                    // this is the value, either proposed by us or edited by the user, that we will use to update the attribute for the given entity
+                    var updateValue = row.Cells[StringLiterals.Update].Value != null ? row.Cells[StringLiterals.Update].Value.ToString() : String.Empty;
+
+                    // this is the attribute name tied to this value
+                    var updateAttribute = row.Cells[StringLiterals.Attribute].Value.ToString();
+
+                    // calculate the server & port combination we need to conduct the update
+                    string distinguishedName = row.Cells[StringLiterals.DistinguishedName].Value.ToString();
+                    string domain = distinguishedName.Substring(distinguishedName.IndexOf("dc=", StringComparison.CurrentCultureIgnoreCase));
+                    string modificationDomainName = distinguishedName.ToLowerInvariant().Replace(",dc=", ".").Replace("dc=", "");
+                    string serverName = string.Empty;
+
+                    if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
+                    {
+                        serverName = Domain.GetDomain(new DirectoryContext(DirectoryContextType.Domain, modificationDomainName)).FindDomainController().Name;
+                        statusDisplay(String.Format("Using server {0} for updating", serverName));
+                    }
+
+                    // logic from original application
+                    var updatePort = SettingsManager.Instance.Port == 3268 ? 389 : SettingsManager.Instance.Port;
+
+                    // this is the full name used to create the connection
+                    var fullServerName = string.Format("{0}:{1}", serverName, updatePort);
+
+                    // let's see if we already have one of these connections available, or else we create one
+                    LdapConnection connection;
+                    if (connectionCache.ContainsKey(fullServerName))
+                    {
+                        connection = connectionCache[fullServerName];
+                    }
+                    else
+                    {
+                        connection = connectionManager.CreateConnection(fullServerName);
+                        connectionCache.Add(fullServerName, connection);
+                    }
+
+                    var findObject = new SearchRequest();
+                    findObject.DistinguishedName = distinguishedName;
+                    findObject.Filter = SettingsManager.Instance.Filter;
+                    findObject.Scope = System.DirectoryServices.Protocols.SearchScope.Base;
+                    var entries = ((SearchResponse)connection.SendRequest(findObject))?.Entries;
+                    if (entries == null || entries.Count != 1)
+                    {
+                        var count = entries != null ? entries.Count : 0;
+                        statusDisplay(StringLiterals.Exception + "Found " + count + " entries when searching for " + distinguishedName + ", expected to find 1. Skipping update operation.");
+                        continue;
+                    }
+
+                    switch(updateAction)
+                    {
+                        case ActionType.Edit:
+                            break;
+                        case ActionType.Remove:
+                            break;
+                        case ActionType.Undo:
+                            break;
+                    }
+
+
+
+
+
+
+
+                }
+            }
+            catch(Exception err)
+            {
+
+            }
+            finally
+            {
+                foreach (var connPair in connectionCache)
+                {
+                    connPair.Value.Dispose();
+                }
+            }
 
             //                #region get the object
-            //                SearchRequest findme = new SearchRequest();
-            //                findme.DistinguishedName = dnMod;
-            //                findme.Filter = SettingsManager.Instance.Filter;
-            //                findme.Scope = System.DirectoryServices.Protocols.SearchScope.Base;
-            //                SearchResponse results = (SearchResponse)connection.SendRequest(findme);
-            //                SearchResultEntryCollection entries = results.Entries;
-            //                SearchResultEntry entry;
-            //                if (results.Entries.Count != 1)
-            //                {
-            //                    statusDisplay(StringLiterals.Exception + "Found " + results.Entries.Count.ToString() + " entries when searching for " + dnMod);
-            //                }
-            //                else
-            //                {
-            //                    entry = entries[0];
-            //                }
+            //                
             //                #endregion
 
             //                #region apply updates

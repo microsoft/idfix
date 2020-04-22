@@ -1,4 +1,5 @@
 ﻿using IdFix.Rules.Shared;
+using IdFix.Settings;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
@@ -34,6 +35,11 @@ namespace IdFix.Rules
         /// The original value found for the attribute covered by this composed rule
         /// </summary>
         public string OriginalValue { get; set; }
+
+        /// <summary>
+        /// Updated value from any fixes run by the rules
+        /// </summary>
+        public ActionType ProposedAction { get; set; }
 
         /// <summary>
         /// Updated value from any fixes run by the rules
@@ -87,7 +93,8 @@ namespace IdFix.Rules
                 AttributeName = this.AttributeName,
                 EntityDistinguishedName = entry.Attributes[StringLiterals.DistinguishedName][0].ToString(),
                 ObjectType = entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString(),
-                OriginalValue = null                
+                OriginalValue = null,
+                ProposedAction = ActionType.None
             };
 
             var resultsCollector = new List<RuleResult>();
@@ -121,6 +128,8 @@ namespace IdFix.Rules
                         // we need to mimic the previous logic that updated value as
                         // the entry was processed
                         attributeValue = r.UpdatedValue;
+                        // update the proposed action to edit for all errors by default
+                        result.ProposedAction = ActionType.Edit;
                     }
 
                     // add our result to the collector

@@ -1,5 +1,6 @@
 ﻿using IdFix.Settings;
 using System;
+using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.Protocols;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace IdFix.Rules
             {
                 throw new Exception("No active forests selected. Check the settings and ensure at least one forest is selected.");
             }
+
             for (var i = 0; i < activeForestsCopy.Length; i++)
             {
                 var activeForest = activeForestsCopy[i];
@@ -53,22 +55,8 @@ namespace IdFix.Rules
                     }
                 }
 
-                using (LdapConnection connection = new LdapConnection(serverName + ":" + SettingsManager.Instance.Port))
+                using (var connection = this.CreateConnection(serverName + ":" + SettingsManager.Instance.Port))
                 {
-                    if (SettingsManager.Instance.Port == 636)
-                    {
-                        connection.SessionOptions.ProtocolVersion = 3;
-                        connection.SessionOptions.SecureSocketLayer = true;
-                        connection.AuthType = AuthType.Negotiate;
-                    }
-
-                    if (SettingsManager.Instance.CurrentCredentialMode == CredentialMode.Specified)
-                    {
-                        NetworkCredential credential = new NetworkCredential(SettingsManager.Instance.Username, SettingsManager.Instance.Password);
-                        connection.Credential = credential;
-                    }
-
-                    connection.Timeout = TimeSpan.FromSeconds(120);
                     this.OnStatusUpdate?.Invoke("RULES:" + SettingsManager.Instance.CurrentRuleMode.ToString() + " SERVER:" + serverName + " PORT:" + SettingsManager.Instance.Port + " FILTER:" + SettingsManager.Instance.Filter);
 
                     action(connection, distinguishedName);
@@ -77,5 +65,32 @@ namespace IdFix.Rules
         }
 
         public event OnStatusUpdateDelegate OnStatusUpdate;
+
+        /// <summary>
+        /// Creates an LdapConnection using the given server using application settings
+        /// </summary>
+        /// <param name="server"></param>
+        /// <returns>LdapConnection</returns>
+        public LdapConnection CreateConnection(string server)
+        {
+            var connection = new LdapConnection(server);
+
+            if (SettingsManager.Instance.Port == 636)
+            {
+                connection.SessionOptions.ProtocolVersion = 3;
+                connection.SessionOptions.SecureSocketLayer = true;
+                connection.AuthType = AuthType.Negotiate;
+            }
+
+            if (SettingsManager.Instance.CurrentCredentialMode == CredentialMode.Specified)
+            {
+                NetworkCredential credential = new NetworkCredential(SettingsManager.Instance.Username, SettingsManager.Instance.Password);
+                connection.Credential = credential;
+            }
+
+            connection.Timeout = TimeSpan.FromSeconds(120);
+
+            return connection;
+        }
     }
 }

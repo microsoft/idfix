@@ -438,4 +438,7 @@
   <data name="MenuMultipleAD" xml:space="preserve">
     <value>Multiple Active Directories</value>
   </data>
+  <data name="ProposedAction" xml:space="preserve">
+    <value>proposedAction</value>
+  </data>
 </root>

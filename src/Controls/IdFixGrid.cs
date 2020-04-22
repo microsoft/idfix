@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace IdFix.Controls
@@ -27,6 +25,8 @@ namespace IdFix.Controls
         }
 
         public event OnStatusUpdateDelegate OnStatusUpdate;
+
+        #region props
 
         public int PageSize
         {
@@ -73,6 +73,10 @@ namespace IdFix.Controls
             }
         }
 
+        #endregion
+
+        #region Reset
+
         public void Reset()
         {
             this.Rows.Clear();
@@ -82,6 +86,10 @@ namespace IdFix.Controls
                 this.Columns[StringLiterals.Update].ReadOnly = false;
             }            
         }
+
+        #endregion
+
+        #region FillGrid
 
         private void FillGrid()
         {
@@ -103,6 +111,7 @@ namespace IdFix.Controls
                         row.Cells[StringLiterals.Attribute].Value = errorData.AttributeName;
                         row.Cells[StringLiterals.Error].Value = errorData.ErrorsToString();
                         row.Cells[StringLiterals.Value].Value = errorData.OriginalValue;
+                        row.Cells[StringLiterals.ProposedAction].Value = errorData.ProposedAction.ToString();
                         row.Cells[StringLiterals.Update].Value = errorData.ProposedValue;
                     }
                 }
@@ -131,6 +140,10 @@ namespace IdFix.Controls
             }            
         }
 
+        #endregion
+
+        #region SetResults
+
         public void SetResults(RulesRunnerResult results)
         {
             this._results = results.ToDataset();
@@ -138,5 +151,7 @@ namespace IdFix.Controls
             this._pageCount = (results.Count + this.PageSize - 1) / this.PageSize;
             this.FillGrid();
         }
+
+        #endregion
     }
 }

@@ -33,4 +33,14 @@ namespace IdFix.Settings
         LocalPart = 64,
         Length = 128
     }
+
+    public enum ActionType
+    {
+        None,
+        Complete,
+        Edit,
+        Remove,
+        Fail,
+        Undo
+    }
 }

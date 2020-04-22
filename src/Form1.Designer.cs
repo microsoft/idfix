@@ -54,13 +54,6 @@ namespace IdFix
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.grid = new IdFix.Controls.IdFixGrid();
-            this.distinguishedName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.objectClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.attribute = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.error = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.update = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.action = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
@@ -69,6 +62,14 @@ namespace IdFix
             this.removeActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.undoActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.completeActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.distinguishedName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.objectClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.attribute = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.error = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.update = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.proposedAction = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.action = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
@@ -221,8 +222,8 @@ namespace IdFix
             // 
             this.grid.AllowUserToAddRows = false;
             this.grid.AllowUserToDeleteRows = false;
-            this.grid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.grid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.grid.BackgroundColor = System.Drawing.SystemColors.Window;
@@ -245,15 +246,79 @@ namespace IdFix
             this.error,
             this.value,
             this.update,
+            this.proposedAction,
             this.action});
+            this.grid.CurrentPage = 0;
             this.grid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.grid.Location = new System.Drawing.Point(22, 47);
             this.grid.Name = "grid";
+            this.grid.PageSize = 50000;
             this.grid.RowHeadersVisible = false;
             this.grid.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.grid.Size = new System.Drawing.Size(739, 480);
             this.grid.TabIndex = 1;
             this.grid.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dataGridView1_MouseClick);
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.Highlight;
+            this.panel1.Controls.Add(this.pictureBox1);
+            this.panel1.Controls.Add(this.menuStrip1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(784, 29);
+            this.panel1.TabIndex = 2;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.pictureBox1.Image = global::IdFix.Properties.Resources.office365_logo;
+            this.pictureBox1.InitialImage = null;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(120, 30);
+            this.pictureBox1.TabIndex = 1;
+            this.pictureBox1.TabStop = false;
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editActionToolStripMenuItem,
+            this.removeActionToolStripMenuItem,
+            this.undoActionToolStripMenuItem,
+            this.completeActionToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(134, 92);
+            // 
+            // editActionToolStripMenuItem
+            // 
+            this.editActionToolStripMenuItem.Name = "editActionToolStripMenuItem";
+            this.editActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.editActionToolStripMenuItem.Text = "EDIT";
+            this.editActionToolStripMenuItem.Click += new System.EventHandler(this.editActionToolStripMenuItem_Click);
+            // 
+            // removeActionToolStripMenuItem
+            // 
+            this.removeActionToolStripMenuItem.Name = "removeActionToolStripMenuItem";
+            this.removeActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.removeActionToolStripMenuItem.Text = "REMOVE";
+            this.removeActionToolStripMenuItem.Click += new System.EventHandler(this.removeActionToolStripMenuItem_Click);
+            // 
+            // undoActionToolStripMenuItem
+            // 
+            this.undoActionToolStripMenuItem.Name = "undoActionToolStripMenuItem";
+            this.undoActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.undoActionToolStripMenuItem.Text = "UNDO";
+            this.undoActionToolStripMenuItem.Visible = false;
+            this.undoActionToolStripMenuItem.Click += new System.EventHandler(this.undoActionToolStripMenuItem_Click);
+            // 
+            // completeActionToolStripMenuItem
+            // 
+            this.completeActionToolStripMenuItem.Name = "completeActionToolStripMenuItem";
+            this.completeActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.completeActionToolStripMenuItem.Text = "COMPLETE";
+            this.completeActionToolStripMenuItem.Click += new System.EventHandler(this.completeActionToolStripMenuItem_Click);
             // 
             // distinguishedName
             // 
@@ -324,6 +389,12 @@ namespace IdFix
             this.update.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.update.ToolTipText = "click to sort";
             // 
+            // proposedAction
+            // 
+            this.proposedAction.HeaderText = "PROPOSED";
+            this.proposedAction.Name = "proposedAction";
+            this.proposedAction.Visible = false;
+            // 
             // action
             // 
             this.action.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
@@ -333,67 +404,6 @@ namespace IdFix
             this.action.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.action.ToolTipText = "click to sort";
             this.action.Width = 72;
-            // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.SystemColors.Highlight;
-            this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Controls.Add(this.menuStrip1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(784, 29);
-            this.panel1.TabIndex = 2;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.MenuHighlight;
-            this.pictureBox1.Image = global::IdFix.Properties.Resources.office365_logo;
-            this.pictureBox1.InitialImage = null;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(120, 30);
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.editActionToolStripMenuItem,
-            this.removeActionToolStripMenuItem,
-            this.undoActionToolStripMenuItem,
-            this.completeActionToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(134, 92);
-            // 
-            // editActionToolStripMenuItem
-            // 
-            this.editActionToolStripMenuItem.Name = "editActionToolStripMenuItem";
-            this.editActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
-            this.editActionToolStripMenuItem.Text = "EDIT";
-            this.editActionToolStripMenuItem.Click += new System.EventHandler(this.editActionToolStripMenuItem_Click);
-            // 
-            // removeActionToolStripMenuItem
-            // 
-            this.removeActionToolStripMenuItem.Name = "removeActionToolStripMenuItem";
-            this.removeActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
-            this.removeActionToolStripMenuItem.Text = "REMOVE";
-            this.removeActionToolStripMenuItem.Click += new System.EventHandler(this.removeActionToolStripMenuItem_Click);
-            // 
-            // undoActionToolStripMenuItem
-            // 
-            this.undoActionToolStripMenuItem.Name = "undoActionToolStripMenuItem";
-            this.undoActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
-            this.undoActionToolStripMenuItem.Text = "UNDO";
-            this.undoActionToolStripMenuItem.Visible = false;
-            this.undoActionToolStripMenuItem.Click += new System.EventHandler(this.undoActionToolStripMenuItem_Click);
-            // 
-            // completeActionToolStripMenuItem
-            // 
-            this.completeActionToolStripMenuItem.Name = "completeActionToolStripMenuItem";
-            this.completeActionToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
-            this.completeActionToolStripMenuItem.Text = "COMPLETE";
-            this.completeActionToolStripMenuItem.Click += new System.EventHandler(this.completeActionToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -458,6 +468,7 @@ namespace IdFix
         private System.Windows.Forms.DataGridViewTextBoxColumn error;
         private System.Windows.Forms.DataGridViewTextBoxColumn value;
         private System.Windows.Forms.DataGridViewTextBoxColumn update;
+        private System.Windows.Forms.DataGridViewTextBoxColumn proposedAction;
         private System.Windows.Forms.DataGridViewComboBoxColumn action;
     }
 }

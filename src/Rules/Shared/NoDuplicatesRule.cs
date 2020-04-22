@@ -4,6 +4,10 @@ using System.DirectoryServices.Protocols;
 
 namespace IdFix.Rules.Shared
 {
+    /// <summary>
+    /// Checks to see if this value is a duplicate
+    /// </summary>
+    /// <remarks>This rule MUST always appear last in a set of composed rules</remarks>
     class NoDuplicatesRule : Rule
     {
         public NoDuplicatesRule(Func<SearchResultEntry, string, string> fixer = null)
@@ -16,7 +20,61 @@ namespace IdFix.Rules.Shared
             // record in memory the entry details with a list of the attributes that end up needing to be checked
             if (DuplicateStore.IsDuplicate(parent.AttributeName, attributeValue))
             {
-                return this.GetErrorResult(ErrorType.Duplicate, attributeValue);
+                // we now need to execute some complicated logic from the original application depending
+                // settings, etc. this isn't pretty but it follows the original for now
+
+                var actionType = ActionType.Edit;
+                var originalValue = entry.Attributes[parent.AttributeName][0].ToString();
+
+                // if nothing else has changed the value prior to this (which is why no duplicate rule needs to be run last)
+                if (originalValue == attributeValue)
+                {
+                    switch (parent.AttributeName.ToLowerInvariant())
+                    {
+                        case "proxyaddresses":
+                            if (Constants.SMTPRegex.IsMatch(attributeValue))
+                            {
+                                if (entry.Attributes.Contains(StringLiterals.MailNickName))
+                                {
+                                    if (attributeValue.Substring(0, 5) == "SMTP:")
+                                    {
+                                        actionType = ActionType.Complete;
+                                    }
+                                }
+                                else
+                                {
+                                    actionType = ActionType.Remove;
+                                }
+                            }
+                            break;
+                        case "userprincipalname":
+                            if (entry.Attributes.Contains(StringLiterals.MailNickName))
+                            {
+                                actionType = ActionType.Complete;
+                            }
+                            break;
+                        case "mail":
+                            if (entry.Attributes.Contains(StringLiterals.MailNickName))
+                            {
+                                actionType = ActionType.Complete;
+                            }
+                            break;
+                        case "mailnickname":
+                            if (entry.Attributes.Contains(StringLiterals.HomeMdb))
+                            {
+                                actionType = ActionType.Complete;
+                            }
+                            break;
+                        case "samaccountname":
+                            if (entry.Attributes.Contains(StringLiterals.MailNickName))
+                            {
+                                actionType = ActionType.Complete;
+                            }
+                            break;
+                    }
+                }
+
+                return this.GetErrorResult(ErrorType.Duplicate, attributeValue, actionType);
             }
 
             return this.GetSuccessResult();

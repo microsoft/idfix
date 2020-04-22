@@ -7,10 +7,7 @@ using System.Linq;
 
 namespace IdFix.Rules
 {
-    class RulesRunnerDoWorkArgs
-    {
-        public Files Files { get; set; }
-    }
+    class RulesRunnerDoWorkArgs { }
 
     public class RulesRunnerResult : Dictionary<string, RuleCollectionResult>
     {
@@ -115,8 +112,6 @@ namespace IdFix.Rules
 
                 // clear out our duplicate tracking each run
                 DuplicateStore.Reset();
-                // TODO:: do we need to delete files? need files at all? just the log?
-                args.Files.DeleteAll();
 
                 // create the connection manager and bubble up any messages
                 var connections = new ConnectionManager();
@@ -126,6 +121,12 @@ namespace IdFix.Rules
 
                 connections.WithConnections((LdapConnection connection, string distinguishedName) =>
                 {
+                    if (this.CancellationPending)
+                    {
+                        e.Result = null;
+                        return;
+                    }
+
                     // we try and create a key from the queried directory and fail to random guid
                     var servers = ((LdapDirectoryIdentifier)connection.Directory).Servers;
                     var identifier = servers.Length > 0 ? servers.First() : Guid.NewGuid().ToString("D");

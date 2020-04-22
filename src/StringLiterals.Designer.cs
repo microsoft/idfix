@@ -826,6 +826,15 @@ namespace IdFix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to proposedAction.
+        /// </summary>
+        internal static string ProposedAction {
+            get {
+                return ResourceManager.GetString("ProposedAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to proxyAddresses.
         /// </summary>
         internal static string ProxyAddresses {

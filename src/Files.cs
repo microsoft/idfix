@@ -26,7 +26,7 @@ namespace IdFix
         {
             if (string.IsNullOrEmpty(seed))
             {
-                seed = new Regex(@"[/:]").Replace(DateTime.Now.ToString(), "-");
+                seed = new Regex(@"[/:]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant).Replace(DateTime.Now.ToString(), "-");
             }
             this._fileBase = seed;
         }
