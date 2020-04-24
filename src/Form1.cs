@@ -8,6 +8,7 @@ using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.Protocols;
 using System.Globalization;
+using System.Linq;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -296,8 +297,7 @@ namespace IdFix
             statusDisplay(StringLiterals.ApplyPending);
             grid.CurrentCell = grid.Rows[0].Cells[StringLiterals.DistinguishedName];
 
-            // remove an existing apply file??
-            // TODO:: files.DeleteByType(FileTypes.Apply);
+            files.DeleteByType(FileTypes.Apply);
 
             var connectionManager = new ConnectionManager();
             var connectionCache = new Dictionary<string, LdapConnection>();
@@ -370,27 +370,135 @@ namespace IdFix
                         continue;
                     }
 
-                    switch(updateAction)
+                    // this are the requests sent to execute the modify operation
+                    List<ModifyRequest> modifyRequest = new List<ModifyRequest>();
+
+                    switch (updateAction)
                     {
                         case ActionType.Edit:
+                            if (updateAttribute.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                if (String.IsNullOrEmpty(updateValue))
+                                {
+                                    updateValue = String.Empty;
+                                    modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Delete, updateAttribute, new string[] { currentValue }));
+                                }
+                                else
+                                {
+                                    modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Delete, updateAttribute, new string[] { currentValue }));
+                                    modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Add, updateAttribute, new string[] { updateValue }));
+                                }
+                            }
+                            else
+                            {
+                                if (String.IsNullOrEmpty(updateValue))
+                                {
+                                    modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Delete, updateAttribute, null));
+                                }
+                                else
+                                {
+                                    modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Replace, updateAttribute, updateValue));
+                                }
+                            }
                             break;
                         case ActionType.Remove:
+                            row.Cells[StringLiterals.Update].Value = String.Empty;
+                            if (updateAttribute.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Delete, updateAttribute, new string[] { currentValue }));
+                            }
+                            else
+                            {
+                                modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Delete, updateAttribute, null));
+                            }
                             break;
                         case ActionType.Undo:
+                            if (updateAttribute.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                if (!String.IsNullOrEmpty(row.Cells[StringLiterals.Update].Value.ToString()))
+                                {
+                                    modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Delete, updateAttribute, new string[] { updateValue }));
+                                }
+                                modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Add, updateAttribute, new string[] { currentValue }));
+                            }
+                            else
+                            {
+                                if (String.IsNullOrEmpty(updateValue))
+                                {
+                                    modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Delete, updateAttribute, null));
+                                }
+                                else
+                                {
+                                    modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Replace, updateAttribute, currentValue));
+                                }
+                            }
                             break;
                     }
 
+                    try
+                    {
+                        // now we execute all of our collected modify requests (1 or 2) here so an error in one allows processing to continue
+                        foreach (var request in modifyRequest)
+                        {
+                            connection.SendRequest(request);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!action.Items.Contains("FAIL"))
+                        {
+                            action.Items.Add("FAIL");
+                        }
+                        // mark this row as failed
+                        row.Cells[StringLiterals.Action].Value = StringLiterals.Fail;
 
+                        // show a status
+                        statusDisplay(string.Format("{0}Update Failed: {1} with error: {2}.", StringLiterals.Exception, distinguishedName, ex.Message));
+                    }
 
+                    // we need to write to the apply file
+                    if (!row.Cells[StringLiterals.Action].Value.ToString().Equals(StringLiterals.Fail, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        // mark this row as now complete
+                        row.Cells[StringLiterals.Action].Value = StringLiterals.Complete;
 
+                        // show a status (which also logs this to the verbose file)
+                        statusDisplay(string.Format("Update: [{0}] [{1}] [{2}] [{3}] [{4}] [{5}] [{6}]",
+                            distinguishedName,
+                            row.Cells[StringLiterals.ObjectClass].Value.ToString(),
+                            updateAttribute,
+                            row.Cells[StringLiterals.Error].Value.ToString(),
+                            currentValue,
+                            updateValue,
+                            updateAction.ToString()));
 
-
-
+                        try
+                        {
+                            files.AppendTo(FileTypes.Apply, (writer) =>
+                            {
+                                writer.WriteLine("distinguishedName: " + distinguishedName);
+                                writer.WriteLine("objectClass: " + row.Cells[StringLiterals.ObjectClass].Value.ToString());
+                                writer.WriteLine("attribute: " + updateAttribute);
+                                writer.WriteLine("error: " + row.Cells[StringLiterals.Error].Value.ToString());
+                                writer.WriteLine("value: " + currentValue);
+                                writer.WriteLine("update: " + updateValue);
+                                writer.WriteLine("action: " + updateAction.ToString());
+                                writer.WriteLine("-");
+                                writer.WriteLine();
+                            });
+                        }
+                        catch (Exception err)
+                        {
+                            statusDisplay(StringLiterals.Exception + StringLiterals.WriteUpdate + "  " + err.Message);
+                            throw;
+                        }
+                    }
                 }
             }
-            catch(Exception err)
+            catch (Exception err)
             {
-
+                statusDisplay(string.Format("{0}{1} {2}", StringLiterals.Exception, toolStripStatusLabel1.Text, err.Message));
+                throw;
             }
             finally
             {
@@ -400,135 +508,7 @@ namespace IdFix
                 }
             }
 
-            //                #region get the object
-            //                
-            //                #endregion
-
-            //                #region apply updates
-            //                switch (rowError.Cells[StringLiterals.Action].Value.ToString())
-            //                {
-            //                    case "REMOVE":
-            //                        #region Remove
-            //                        rowError.Cells[StringLiterals.Update].Value = String.Empty;
-            //                        updateString = String.Empty;
-            //                        if (attributeString.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase))
-            //                        {
-            //                            modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Delete, attributeString, new string[] { valueString });
-            //                        }
-            //                        else
-            //                        {
-            //                            modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Delete, attributeString, null);
-            //                        }
-            //                        break;
-            //                    #endregion
-            //                    case "EDIT":
-            //                        #region Edit
-            //                        if (attributeString.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase))
-            //                        {
-            //                            if (String.IsNullOrEmpty(updateString))
-            //                            {
-            //                                updateString = String.Empty;
-            //                                modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Delete, attributeString, new string[] { valueString });
-            //                            }
-            //                            else
-            //                            {
-            //                                modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Delete, attributeString, new string[] { valueString });
-            //                                directoryResponse = connection.SendRequest(modifyRequest);
-            //                                modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Add, attributeString, new string[] { updateString });
-            //                            }
-            //                        }
-            //                        else
-            //                        {
-            //                            if (String.IsNullOrEmpty(updateString))
-            //                            {
-            //                                modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Delete, attributeString, null);
-            //                            }
-            //                            else
-            //                            {
-            //                                modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Replace, attributeString, updateString);
-            //                            }
-            //                        }
-            //                        break;
-            //                    #endregion
-            //                    case "UNDO":
-            //                        #region Undo
-            //                        if (attributeString.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase))
-            //                        {
-            //                            if (!String.IsNullOrEmpty(rowError.Cells[StringLiterals.Update].Value.ToString()))
-            //                            {
-            //                                modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Delete, attributeString, new string[] { updateString });
-            //                                directoryResponse = connection.SendRequest(modifyRequest);
-            //                            }
-            //                            modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Add, attributeString, new string[] { valueString });
-            //                        }
-            //                        else
-            //                        {
-            //                            if (String.IsNullOrEmpty(valueString))
-            //                            {
-            //                                modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Delete, attributeString, null);
-            //                            }
-            //                            else
-            //                            {
-            //                                modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Replace, attributeString, valueString);
-            //                            }
-            //                        }
-            //                        break;
-            //                        #endregion
-            //                }
-            //                #endregion
-
-            //                #region modifyRequest
-            //                try
-            //                {
-            //                    //DirectoryAttributeModification modifyAttribute = new DirectoryAttributeModification();
-            //                    //modifyAttribute.Operation = DirectoryAttributeOperation.Replace;
-            //                    //modifyAttribute.Name = "description";
-            //                    //modifyAttribute.Add("modified");
-
-            //                    //ModifyRequest modifyRequest = new ModifyRequest(dnMod, modifyAttribute);
-            //                    //DirectoryResponse response = connection.SendRequest(modifyRequest);
-
-            //                    //ModifyRequest modifyRequest = new ModifyRequest(dnMod, DirectoryAttributeOperation.Delete, "proxyAddresses", new string[] {"smtp:modified@e2k10.com"});
-            //                    directoryResponse = connection.SendRequest(modifyRequest);
-            //                }
-            //                catch (Exception ex)
-            //                {
-            //                    if (!action.Items.Contains("FAIL"))
-            //                    {
-            //                        action.Items.Add("FAIL");
-            //                    }
-            //                    statusDisplay(StringLiterals.Exception + "Update Failed: "
-            //                        + rowError.Cells[StringLiterals.DistinguishedName].Value.ToString()
-            //                        + "  " + ex.Message);
-            //                    rowError.Cells[StringLiterals.Action].Value = StringLiterals.Fail;
-            //                }
-            //                #endregion
-
-            //                #region write update
-            //                if (!rowError.Cells[StringLiterals.Action].Value.ToString().Equals(StringLiterals.Fail, StringComparison.CurrentCultureIgnoreCase))
-            //                {
-            //                    writeUpdate(rowError.Cells[StringLiterals.DistinguishedName].Value.ToString(),
-            //                        rowError.Cells[StringLiterals.ObjectClass].Value.ToString(),
-            //                        rowError.Cells[StringLiterals.Attribute].Value.ToString(),
-            //                        rowError.Cells[StringLiterals.Error].Value.ToString(),
-            //                        valueString,
-            //                        updateString,
-            //                        actionString);
-
-            //                    rowError.Cells[StringLiterals.Action].Value = StringLiterals.Complete;
-            //                }
-            //                #endregion
-            //            }
-            //            #endregion
-            //        }
-            //    }
-            //    statusDisplay(StringLiterals.Complete);
-            //}
-            //catch (Exception ex)
-            //{
-            //    statusDisplay(StringLiterals.Exception + toolStripStatusLabel1.Text + "  " + ex.Message);
-            //    throw;
-            //}
+            statusDisplay(StringLiterals.Complete);
         }
 
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)
@@ -536,106 +516,24 @@ namespace IdFix
             try
             {
                 statusDisplay(StringLiterals.ExportFile);
-                using (SaveFileDialog saveFileDialog1 = new SaveFileDialog())
+                using (SaveFileDialog dialog = new SaveFileDialog())
                 {
-                    saveFileDialog1.Filter = StringLiterals.ExportFileFilter;
-                    saveFileDialog1.Title = StringLiterals.ExportFile;
-                    saveFileDialog1.ShowDialog();
-                    string fileNameValue = saveFileDialog1.FileName;
-                    if (!String.IsNullOrEmpty(fileNameValue))
+                    dialog.Filter = StringLiterals.ExportFileFilter;
+                    dialog.Title = StringLiterals.ExportFile;
+                    dialog.ShowDialog();
+
+                    if (!String.IsNullOrEmpty(dialog.FileName))
                     {
-                        using (StreamWriter saveFile = new StreamWriter(saveFileDialog1.FileName))
+                        using (StreamWriter saveFile = new StreamWriter(dialog.FileName))
                         {
-                            switch (saveFileDialog1.FilterIndex)
+                            switch (dialog.FilterIndex)
                             {
                                 case 1:
-                                    #region save to CSV
-                                    int cols = grid.Columns.Count;
-                                    for (int i = 0; i < cols; i++)
-                                    {
-                                        saveFile.Write(grid.Columns[i].Name.ToString().ToUpper(CultureInfo.CurrentCulture));
-                                        if (i < cols - 1)
-                                        {
-                                            saveFile.Write(",");
-                                        }
-                                    }
-                                    saveFile.WriteLine();
-
-                                    for (int i = 0; i < grid.Rows.Count; i++)
-                                    {
-                                        for (int j = 0; j < cols; j++)
-                                        {
-                                            if (grid.Rows[i].Cells[j].Value != null)
-                                            {
-                                                if (grid.Rows[i].Cells[j].Value.ToString().IndexOf(",") == -1)
-                                                {
-                                                    saveFile.Write(grid.Rows[i].Cells[j].Value.ToString());
-                                                }
-                                                else
-                                                {
-                                                    saveFile.Write("\"" + grid.Rows[i].Cells[j].Value.ToString());
-                                                }
-                                            }
-                                            if (j < cols - 1)
-                                            {
-                                                if (grid.Rows[i].Cells[j].Value.ToString().IndexOf(",") == -1)
-                                                {
-                                                    saveFile.Write(",");
-                                                }
-                                                else
-                                                {
-                                                    saveFile.Write("\",");
-                                                }
-                                            }
-                                        }
-
-                                        saveFile.WriteLine();
-                                    }
+                                    this.grid.ToCsv(saveFile);
                                     break;
-                                #endregion
                                 case 2:
-                                    #region save to LDF
-                                    string vl;
-                                    string up;
-                                    string at;
-                                    foreach (DataGridViewRow rowError in grid.Rows)
-                                    {
-                                        vl = rowError.Cells[StringLiterals.Value].Value.ToString();
-                                        up = rowError.Cells[StringLiterals.Update].Value.ToString();
-                                        at = rowError.Cells[StringLiterals.Attribute].Value.ToString();
-
-                                        saveFile.WriteLine("dn: " + rowError.Cells[StringLiterals.DistinguishedName].Value.ToString());
-                                        saveFile.WriteLine("changetype: modify");
-
-                                        if (at.ToUpperInvariant() == StringLiterals.ProxyAddresses.ToUpperInvariant())
-                                        {
-                                            saveFile.WriteLine("delete: " + at);
-                                            saveFile.WriteLine(at + ": " + vl);
-                                            saveFile.WriteLine("-");
-                                            saveFile.WriteLine();
-                                            saveFile.WriteLine("dn: " + rowError.Cells[StringLiterals.DistinguishedName].Value.ToString());
-                                            saveFile.WriteLine("changetype: modify");
-                                            saveFile.WriteLine("add: " + at);
-                                        }
-                                        else
-                                        {
-                                            saveFile.WriteLine("replace: " + at);
-                                        }
-
-                                        //if (update != String.Empty)
-                                        if (!String.IsNullOrEmpty(up))
-                                        {
-                                            saveFile.WriteLine(at + ": " + up);
-                                        }
-                                        else
-                                        {
-                                            saveFile.WriteLine(at + ": " + vl);
-                                        }
-                                        saveFile.WriteLine("-");
-                                        saveFile.WriteLine();
-                                    }
+                                    this.grid.ToLdf(saveFile);
                                     break;
-                                    #endregion
                             }
                         }
                     }
@@ -650,312 +548,124 @@ namespace IdFix
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    statusDisplay(StringLiterals.ImportFile);
-            //    SettingsManager.Instance.DistinguishedName = string.Empty;
-            //    if (SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant)
-            //    {
-            //        this.Text = StringLiterals.IdFixVersion + StringLiterals.MultiTenant + " - Import";
-            //    }
-            //    else
-            //    {
-            //        this.Text = StringLiterals.IdFixVersion + StringLiterals.Dedicated + " - Import";
-            //    }
-            //    grid.Rows.Clear();
-            //    grid.Refresh();
-            //    grid.Columns[StringLiterals.Update].ReadOnly = false;
+            statusDisplay(StringLiterals.ImportFile);
+            SettingsManager.Instance.DistinguishedName = string.Empty;
 
-            //    action.Items.Clear();
-            //    action.Items.Add(StringLiterals.Edit);
-            //    action.Items.Add(StringLiterals.Remove);
-            //    action.Items.Add(StringLiterals.Complete);
-            //    editActionToolStripMenuItem.Visible = true;
-            //    removeActionToolStripMenuItem.Visible = true;
-            //    undoActionToolStripMenuItem.Visible = false;
-            //    errDict.Clear();
+            if (SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant)
+            {
+                this.Text = StringLiterals.IdFixVersion + StringLiterals.MultiTenant + " - Import";
+            }
+            else
+            {
+                this.Text = StringLiterals.IdFixVersion + StringLiterals.Dedicated + " - Import";
+            }
 
-            //    using (OpenFileDialog openFileDialog1 = new OpenFileDialog())
-            //    {
-            //        openFileDialog1.Filter = StringLiterals.ImportFileFilter;
-            //        openFileDialog1.Title = StringLiterals.ImportFile;
-            //        openFileDialog1.ShowDialog();
-            //        string fileNameValue = openFileDialog1.FileName;
-            //        if (!String.IsNullOrEmpty(fileNameValue))
-            //        {
-            //            //First reset firstRun
-            //            firstRun = false;
-            //            EnableButtons();
-            //            statusDisplay(StringLiterals.ImportFile);
-            //            using (StreamReader reader = new StreamReader(openFileDialog1.FileName))
-            //            {
-            //                int newRow = 0;
-            //                string line;
-            //                string col;
-            //                String[] cols;
-            //                Regex csvParser = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            action.Items.Clear();
+            action.Items.Add(StringLiterals.Edit);
+            action.Items.Add(StringLiterals.Remove);
+            action.Items.Add(StringLiterals.Complete);
+            editActionToolStripMenuItem.Visible = true;
+            removeActionToolStripMenuItem.Visible = true;
+            undoActionToolStripMenuItem.Visible = false;
 
-            //                #region Import CSV lines
-            //                while ((line = reader.ReadLine()) != null)
-            //                {
-            //                    try
-            //                    {
-            //                        if (newRow == 0)
-            //                        {
-            //                            line = reader.ReadLine();
-            //                        }
-            //                        grid.Rows.Add();
+            try
+            {
+                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                {
+                    openFileDialog.Filter = StringLiterals.ImportFileFilter;
+                    openFileDialog.Title = StringLiterals.ImportFile;
+                    openFileDialog.ShowDialog();
 
-            //                        cols = csvParser.Split(line);
-            //                        for (int i = 0; i < 7; i++)
-            //                        {
-            //                            col = doubleQuotes.Replace(cols[i], "");
-            //                            col = col.Replace("\"\"", "\"");
-            //                            if (i == 6)
-            //                            {
-            //                                switch (cols[i])
-            //                                {
-            //                                    case "EDIT":
-            //                                        grid.Rows[newRow].Cells[i].Value = col;
-            //                                        break;
-            //                                    case "REMOVE":
-            //                                        grid.Rows[newRow].Cells[i].Value = col;
-            //                                        break;
-            //                                    case "COMPLETE":
-            //                                        grid.Rows[newRow].Cells[i].Value = col;
-            //                                        break;
-            //                                    case "UNDO":
-            //                                        grid.Rows[newRow].Cells[i].Value = col;
-            //                                        break;
-            //                                    case "FAIL":
-            //                                        grid.Rows[newRow].Cells[i].Value = col;
-            //                                        break;
-            //                                        //default:
-            //                                        //    dataGridView1.Rows[newRow].Cells[i].Value = String.Empty;
-            //                                        //    break;
-            //                                }
-            //                            }
-            //                            else
-            //                            {
-            //                                if (!String.IsNullOrEmpty(cols[i]))
-            //                                {
-            //                                    grid.Rows[newRow].Cells[i].Value = col;
-            //                                }
-            //                            }
+                    if (!String.IsNullOrEmpty(openFileDialog.FileName))
+                    {
+                        //First reset firstRun
+                        firstRun = false;
+                        EnableButtons();
 
-            //                        }
-            //                        newRow++;
-            //                    }
-            //                    catch (Exception exLine)
-            //                    {
-            //                        statusDisplay(StringLiterals.Exception + "Import CSV Line: [" + line + "] " + exLine.Message);
-            //                    }
-            //                }
-            //                #endregion
+                        using (var reader = new StreamReader(openFileDialog.FileName))
+                        {
+                            this.grid.SetFromCsv(reader);
+                        }
 
-            //                grid.Sort(grid.Columns[StringLiterals.DistinguishedName], ListSortDirection.Ascending);
-            //                if (grid.RowCount >= 1)
-            //                {
-            //                    grid.CurrentCell = grid.Rows[0].Cells[StringLiterals.DistinguishedName];
-            //                }
-            //            }
-            //            statusDisplay(StringLiterals.ActionSelection);
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    statusDisplay(StringLiterals.Exception + "Import CSV - " + ex.Message);
-            //    throw;
-            //}
+                        statusDisplay(StringLiterals.ActionSelection);
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                statusDisplay(StringLiterals.Exception + "Import CSV - " + err.Message);
+                throw;
+            }
         }
 
         private void undoUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    using (OpenFileDialog openFileDialog1 = new OpenFileDialog())
-            //    {
-            //        openFileDialog1.Filter = StringLiterals.UpdateFileFilter;
-            //        openFileDialog1.Title = StringLiterals.UndoUpdates;
-            //        openFileDialog1.ShowDialog();
-            //        string fileNameValue = openFileDialog1.FileName;
+            try
+            {
+                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                {
+                    openFileDialog.Filter = StringLiterals.UpdateFileFilter;
+                    openFileDialog.Title = StringLiterals.UndoUpdates;
+                    openFileDialog.ShowDialog();
 
-            //        #region select Undo
-            //        if (!String.IsNullOrEmpty(fileNameValue))
-            //        {
-            //            //First reset firstRun
-            //            firstRun = false;
-            //            EnableButtons();
-            //            statusDisplay(StringLiterals.LoadingUpdates);
-            //            grid.Columns[StringLiterals.Update].ReadOnly = true;
-            //            grid.Rows.Clear();
-            //            action.Items.Clear();
-            //            action.Items.Add(StringLiterals.Undo);
-            //            action.Items.Add(StringLiterals.Complete);
-            //            editActionToolStripMenuItem.Visible = false;
-            //            removeActionToolStripMenuItem.Visible = false;
-            //            undoActionToolStripMenuItem.Visible = true;
-            //            errDict.Clear();
+                    if (!String.IsNullOrEmpty(openFileDialog.FileName))
+                    {
+                        //First reset firstRun
+                        firstRun = false;
+                        EnableButtons();
+                        statusDisplay(StringLiterals.LoadingUpdates);
+                        grid.Columns[StringLiterals.Update].ReadOnly = true;
+                        grid.Rows.Clear();
+                        action.Items.Clear();
+                        action.Items.Add(StringLiterals.Undo);
+                        action.Items.Add(StringLiterals.Complete);
+                        editActionToolStripMenuItem.Visible = false;
+                        removeActionToolStripMenuItem.Visible = false;
+                        undoActionToolStripMenuItem.Visible = true;
 
-            //            using (StreamReader reader = new StreamReader(openFileDialog1.FileName))
-            //            {
-            //                int newRow = 0;
-            //                string line;
-            //                while ((line = reader.ReadLine()) != null)
-            //                {
-            //                    if (line.IndexOf(": ", StringComparison.CurrentCulture) > -1)
-            //                    {
-            //                        switch (line.Substring(0, line.IndexOf(": ", StringComparison.CurrentCulture)))
-            //                        {
-            //                            case "distinguishedName":
-            //                                grid.Rows.Add();
-            //                                grid.Rows[newRow].Cells[StringLiterals.DistinguishedName].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);
-            //                                break;
-            //                            case "objectClass":
-            //                                grid.Rows[newRow].Cells[StringLiterals.ObjectClass].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);
-            //                                break;
-            //                            case "attribute":
-            //                                grid.Rows[newRow].Cells[StringLiterals.Attribute].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);
-            //                                break;
-            //                            case "error":
-            //                                grid.Rows[newRow].Cells[StringLiterals.Error].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);
-            //                                break;
-            //                            case "value":
-            //                                grid.Rows[newRow].Cells[StringLiterals.Value].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);
-            //                                break;
-            //                            case "update":
-            //                                grid.Rows[newRow].Cells[StringLiterals.Update].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);
-            //                                newRow++;
-            //                                break;
-            //                        }
-            //                    }
-            //                }
-            //                grid.Sort(grid.Columns[StringLiterals.DistinguishedName], ListSortDirection.Ascending);
-            //                if (grid.RowCount >= 1)
-            //                {
-            //                    grid.CurrentCell = grid.Rows[0].Cells[StringLiterals.DistinguishedName];
-            //                }
-            //            }
-            //            statusDisplay(StringLiterals.ActionSelection);
-            //        }
-            //        #endregion
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    statusDisplay(StringLiterals.Exception + toolStripStatusLabel1.Text + "  " + ex.Message);
-            //    throw;
-            //}
+                        using (StreamReader reader = new StreamReader(openFileDialog.FileName))
+                        {
+                            this.grid.SetFromLdf(reader);
+                        }
+
+                        statusDisplay(StringLiterals.ActionSelection);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                statusDisplay(StringLiterals.Exception + toolStripStatusLabel1.Text + "  " + ex.Message);
+                throw;
+            }
         }
 
         private void nextToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    if (displayCount >= errDict.Count)
-            //    {
-            //        statusDisplay("No more errors");
-            //        return;
-            //    }
-
-            //    grid.Rows.Clear();
-            //    int newRow = 0;
-            //    int dictCount = 0;
-            //    foreach (KeyValuePair<string, ErrorClass> errorPair in errDict)
-            //    {
-            //        if (dictCount++ < displayCount)
-            //        {
-            //            //dictCount++;
-            //            continue;
-            //        }
-            //        grid.Rows.Add();
-            //        grid.Rows[newRow].Cells[StringLiterals.DistinguishedName].Value = errorPair.Value.distinguishedName;
-            //        grid.Rows[newRow].Cells[StringLiterals.ObjectClass].Value = errorPair.Value.objectClass;
-            //        grid.Rows[newRow].Cells[StringLiterals.Attribute].Value = errorPair.Value.attribute;
-            //        grid.Rows[newRow].Cells[StringLiterals.Error].Value = errorPair.Value.type.Substring(0, errorPair.Value.type.Length - 1);
-            //        grid.Rows[newRow].Cells[StringLiterals.Value].Value = errorPair.Value.value;
-            //        grid.Rows[newRow].Cells[StringLiterals.Update].Value = errorPair.Value.update;
-            //        newRow++;
-
-            //        if (dictCount >= blockSize + displayCount)
-            //        {
-            //            displayCount = dictCount;
-            //            break;
-            //        }
-            //    }
-            //    grid.Sort(grid.Columns[StringLiterals.DistinguishedName], ListSortDirection.Ascending);
-            //    if (grid.RowCount >= 1)
-            //    {
-            //        grid.CurrentCell = grid.Rows[0].Cells[StringLiterals.DistinguishedName];
-            //    }
-            //    statusDisplay(StringLiterals.ElapsedTimePopulateDataGridView + (DateTime.Now - stopwatch).ToString());
-            //    statusDisplay("Query Count: " + entryCount.ToString(CultureInfo.CurrentCulture)
-            //        + "  Error Count: " + errorCount.ToString(CultureInfo.CurrentCulture)
-            //        + "  Displayed Count: " + grid.Rows.Count.ToString(CultureInfo.CurrentCulture));
-            //}
-            //catch (Exception ex)
-            //{
-            //    statusDisplay(StringLiterals.Exception + StringLiterals.MenuNext + "  " + ex.Message);
-            //    throw;
-            //}
+            try
+            {
+                this.grid.CurrentPage = this.grid.CurrentPage + 1;                
+            }
+            catch (Exception ex)
+            {
+                statusDisplay(StringLiterals.Exception + StringLiterals.MenuNext + "  " + ex.Message);
+                throw;
+            }
         }
 
         private void previousToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    if (displayCount - blockSize > 0)
-            //    {
-            //        statusDisplay("Loading errors");
-            //    }
-            //    else
-            //    {
-            //        statusDisplay("No more errors");
-            //        return;
-            //    }
-
-            //    long startCount = displayCount - blockSize - grid.Rows.Count > 0 ? displayCount - blockSize - grid.Rows.Count : 0;
-            //    displayCount = startCount;
-            //    grid.Rows.Clear();
-            //    int newRow = 0;
-            //    int dictCount = 0;
-            //    foreach (KeyValuePair<string, ErrorClass> errorPair in errDict)
-            //    {
-            //        if (dictCount < startCount)
-            //        {
-            //            dictCount++;
-            //            continue;
-            //        }
-            //        grid.Rows.Add();
-            //        grid.Rows[newRow].Cells[StringLiterals.DistinguishedName].Value = errorPair.Value.distinguishedName;
-            //        grid.Rows[newRow].Cells[StringLiterals.ObjectClass].Value = errorPair.Value.objectClass;
-            //        grid.Rows[newRow].Cells[StringLiterals.Attribute].Value = errorPair.Value.attribute;
-            //        grid.Rows[newRow].Cells[StringLiterals.Error].Value = errorPair.Value.type.Substring(0, errorPair.Value.type.Length - 1);
-            //        grid.Rows[newRow].Cells[StringLiterals.Value].Value = errorPair.Value.value;
-            //        grid.Rows[newRow].Cells[StringLiterals.Update].Value = errorPair.Value.update;
-            //        newRow++;
-            //        displayCount++;
-            //        if (newRow >= blockSize)
-            //        {
-            //            break;
-            //        }
-            //    }
-            //    grid.Sort(grid.Columns[StringLiterals.DistinguishedName], ListSortDirection.Ascending);
-            //    if (grid.RowCount >= 1)
-            //    {
-            //        grid.CurrentCell = grid.Rows[0].Cells[StringLiterals.DistinguishedName];
-            //    }
-            //    statusDisplay(StringLiterals.ElapsedTimePopulateDataGridView + (DateTime.Now - stopwatch).ToString());
-            //    statusDisplay("Query Count: " + entryCount.ToString(CultureInfo.CurrentCulture)
-            //        + "  Error Count: " + errorCount.ToString(CultureInfo.CurrentCulture)
-            //        + "  Displayed Count: " + grid.Rows.Count.ToString(CultureInfo.CurrentCulture));
-            //}
-            //catch (Exception ex)
-            //{
-            //    statusDisplay(StringLiterals.Exception + StringLiterals.MenuPrevious + "  " + ex.Message);
-            //    throw;
-            //}
+            try
+            {
+                if (this.grid.CurrentPage > 1)
+                {
+                    this.grid.CurrentPage = this.grid.CurrentPage - 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                statusDisplay(StringLiterals.Exception + StringLiterals.MenuPrevious + "  " + ex.Message);
+                throw;
+            }
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -987,7 +697,6 @@ namespace IdFix
         }
         #endregion
 
-        #region file actions
         public void statusDisplay(string display)
         {
             try
@@ -1005,42 +714,6 @@ namespace IdFix
                 throw;
             }
         }
-
-        private void writeUpdate(string wuDistinguishedName, string wuObjectClass, string wuAttribute, string wuError, string wuValue, string wuUpdate, string wuAction)
-        {
-            try
-            {
-                statusDisplay("Update: [" + wuDistinguishedName + "]"
-                    + "[" + wuObjectClass + "]"
-                    + "[" + wuAttribute + "]"
-                    + "[" + wuError + "]"
-                    + "[" + wuValue + "]"
-                    + "[" + wuUpdate + "]"
-                    + "[" + wuAction + "]");
-
-                if (wuAction == StringLiterals.Remove || wuAction == StringLiterals.Edit || wuAction == StringLiterals.Undo)
-                {
-                    files.AppendTo(FileTypes.Apply, (writer) =>
-                    {
-                        writer.WriteLine("distinguishedName: " + wuDistinguishedName);
-                        writer.WriteLine("objectClass: " + wuObjectClass);
-                        writer.WriteLine("attribute: " + wuAttribute);
-                        writer.WriteLine("error: " + wuError);
-                        writer.WriteLine("value: " + wuValue);
-                        writer.WriteLine("update: " + wuUpdate);
-                        writer.WriteLine("action: " + wuAction);
-                        writer.WriteLine("-");
-                        writer.WriteLine();
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                statusDisplay(StringLiterals.Exception + StringLiterals.WriteUpdate + "  " + ex.Message);
-                throw;
-            }
-        }
-        #endregion
 
         #region contextMenu
         private void dataGridView1_MouseClick(object sender, MouseEventArgs e)
