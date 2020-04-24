@@ -9,6 +9,8 @@ namespace IdFix.Rules
 {
     class RulesRunnerDoWorkArgs { }
 
+    #region RulesRunnerResult
+
     public class RulesRunnerResult : Dictionary<string, RuleCollectionResult>
     {
         private IEnumerable<ComposedRuleResult> _dataSet = null;
@@ -86,6 +88,8 @@ namespace IdFix.Rules
             return this._dataSet.OrderBy(s => s.EntityDistinguishedName, StringComparer.CurrentCultureIgnoreCase);
         }
     }
+
+    #endregion
 
     class RulesRunner : BackgroundWorker
     {

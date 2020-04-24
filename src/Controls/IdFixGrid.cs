@@ -10,6 +10,9 @@ using System.Windows.Forms;
 
 namespace IdFix.Controls
 {
+    /// <summary>
+    /// Defines the IdFix grid
+    /// </summary>
     public class IdFixGrid : DataGridView
     {
         private IEnumerable<ComposedRuleResult> _results;
@@ -22,8 +25,9 @@ namespace IdFix.Controls
         public IdFixGrid() : base()
         {
             this._results = null;
-            this.CurrentPage = 1;
-            this.PageSize = 50000;
+            this._currentPage = 0;
+            this._pageSize = 50000;
+            this._pageSize = 1;
             this._totalResults = 0;
             this._pageCount = 0;
             this._filledFromResults = false;
@@ -36,7 +40,9 @@ namespace IdFix.Controls
         public int PageSize
         {
             get
-            { return this._pageSize; }
+            {
+                return this._pageSize;
+            }
             set
             {
                 if (value < 1)
@@ -63,24 +69,39 @@ namespace IdFix.Controls
             }
             set
             {
-                if (value != this._currentPage)
+                var realPage = this._currentPage + 1;
+                if (value != realPage)
                 {
                     if (value < 1)
                     {
                         throw new ArgumentOutOfRangeException("PageSize", value, "Pages start at 1.");
                     }
 
-                    if (value > this._pageCount)
+                    if (value <= this._pageCount)
                     {
-                        throw new ArgumentOutOfRangeException("PageSize", value, string.Format("This grid has {0} pages.", this._pageCount));
+                        // allow them to set the first page as 1
+                        this._currentPage = value - 1;
+
+                        // redraw the grid using the new page
+                        this.FillGrid();
                     }
-
-                    // allow them to set the first page as 1
-                    this._currentPage = value - 1;
-
-                    // redraw the grid using the new page
-                    this.FillGrid();
                 }
+            }
+        }
+
+        public bool HasPrev
+        {
+            get
+            {
+                return this.CurrentPage > 1;
+            }
+        }
+
+        public bool HasNext
+        {
+            get
+            {
+                return this.CurrentPage < this._pageCount;
             }
         }
 
@@ -119,7 +140,7 @@ namespace IdFix.Controls
                 if (this._results != null)
                 {
                     // calculate the results to show based on page size and current page
-                    var displaySet = this._results.Skip(this._currentPage * this.PageSize).Take(this.PageSize);
+                    var displaySet = this._results.Skip(this._currentPage * this._pageSize).Take(this._pageSize);
 
                     // show those results
                     foreach (var errorData in displaySet)
@@ -170,7 +191,7 @@ namespace IdFix.Controls
             this.Reset();
             this._results = results.ToDataset();
             this._totalResults = this._results.Count();
-            this._pageCount = (results.Count + this.PageSize - 1) / this.PageSize;
+            this._pageCount = (this._results.Count() + this.PageSize - 1) / this.PageSize;
             this.FillGrid();
         }
 
@@ -201,37 +222,38 @@ namespace IdFix.Controls
                 // the first line is expected to have headers so we clear it
                 var headers = parser.ReadFields().Select(f => f.ToUpper()).ToArray();
                 var mappers = new List<Action<DataGridViewRow, string>>(headers.Length);
+                Func<string, Action<DataGridViewRow, string>> mappingBinder = (string field) => (row, value) => row.Cells[field].Value = value;
 
                 for (var i = 0; i < headers.Length; i++)
                 {
                     switch (headers[i])
                     {
                         case "DISTINGUISHEDNAME":
-                            mappers[i] = (DataGridViewRow row, string value) => row.Cells[StringLiterals.DistinguishedName].Value = value;
+                            mappers.Add(mappingBinder(StringLiterals.DistinguishedName));
                             break;
                         case "OBJECTCLASS":
-                            mappers[i] = (DataGridViewRow row, string value) => row.Cells[StringLiterals.ObjectClass].Value = value;
+                            mappers.Add(mappingBinder(StringLiterals.ObjectClass));
                             break;
                         case "ATTRIBUTE":
-                            mappers[i] = (DataGridViewRow row, string value) => row.Cells[StringLiterals.Attribute].Value = value;
+                            mappers.Add(mappingBinder(StringLiterals.Attribute));
                             break;
                         case "ERROR":
-                            mappers[i] = (DataGridViewRow row, string value) => row.Cells[StringLiterals.Error].Value = value;
+                            mappers.Add(mappingBinder(StringLiterals.Error));
                             break;
                         case "VALUE":
-                            mappers[i] = (DataGridViewRow row, string value) => row.Cells[StringLiterals.Value].Value = value;
+                            mappers.Add(mappingBinder(StringLiterals.Value));
                             break;
                         case "UPDATE":
-                            mappers[i] = (DataGridViewRow row, string value) => row.Cells[StringLiterals.Update].Value = value;
+                            mappers.Add(mappingBinder(StringLiterals.Update));
                             break;
-                        case "PROPOSED":
-                            mappers[i] = (DataGridViewRow row, string value) => row.Cells[StringLiterals.ProposedAction].Value = value;
+                        case "PROPOSEDACTION":
+                            mappers.Add(mappingBinder(StringLiterals.ProposedAction));
                             break;
                         case "ACTION":
-                            mappers[i] = (DataGridViewRow row, string value) =>
+                            mappers.Add((DataGridViewRow row, string value) =>
                             {
-                                row.Cells[StringLiterals.DistinguishedName].Value = new string[] { "EDIT", "REMOVE", "COMPLETE", "UNDO", "FAIL" }.Contains(value) ? value : string.Empty;
-                            };
+                                row.Cells[StringLiterals.Action].Value = new string[] { "EDIT", "REMOVE", "COMPLETE", "UNDO", "FAIL" }.Contains(value) ? value : string.Empty;
+                            });
                             break;
                     }
                 }

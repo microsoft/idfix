@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace IdFix
 {
@@ -13,9 +9,6 @@ namespace IdFix
         Verbose,
         Apply,
         Error,
-        Duplicate,
-        Filtered,
-        Merge,
     }
 
     class Files
@@ -47,35 +40,11 @@ namespace IdFix
             }
         }
 
-        public string DuplicateFileName
-        {
-            get
-            {
-                return string.Format("Duplicate {0}.txt", this._fileBase);
-            }
-        }
-
         public string ErrorFileName
         {
             get
             {
                 return string.Format("Error {0}.txt", this._fileBase);
-            }
-        }
-
-        public string MergeFileName
-        {
-            get
-            {
-                return string.Format("Merge {0}.txt", this._fileBase);
-            }
-        }
-
-        public string FilteredFileName
-        {
-            get
-            {
-                return string.Format("Filtered {0}.txt", this._fileBase);
             }
         }
 
@@ -111,10 +80,7 @@ namespace IdFix
         public void DeleteAll()
         {
             this.DeleteByType(FileTypes.Apply);
-            this.DeleteByType(FileTypes.Duplicate);
             this.DeleteByType(FileTypes.Error);
-            this.DeleteByType(FileTypes.Filtered);
-            this.DeleteByType(FileTypes.Merge);
             this.DeleteByType(FileTypes.Verbose);
         }
 
@@ -129,17 +95,8 @@ namespace IdFix
                 case FileTypes.Verbose:
                     fileName = this.VerboseFileName;
                     break;
-                case FileTypes.Duplicate:
-                    fileName = this.DuplicateFileName;
-                    break;
                 case FileTypes.Error:
                     fileName = this.ErrorFileName;
-                    break;
-                case FileTypes.Filtered:
-                    fileName = this.FilteredFileName;
-                    break;
-                case FileTypes.Merge:
-                    fileName = this.MergeFileName;
                     break;
                 default:
                     fileName = this.VerboseFileName;

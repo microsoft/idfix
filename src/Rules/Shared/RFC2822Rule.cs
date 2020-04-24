@@ -1,12 +1,6 @@
-﻿using IdFix.Rules.Shared;
-using IdFix.Settings;
-using System;
-using System.Collections.Generic;
+﻿using IdFix.Settings;
 using System.DirectoryServices.Protocols;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace IdFix.Rules.Shared
 {
@@ -17,7 +11,7 @@ namespace IdFix.Rules.Shared
         public override RuleResult Execute(ComposedRule parent, SearchResultEntry entry, string attributeValue)
         {
             var tldList = new ValidTLDList();
-            bool success = false;
+            bool success = true;
             ErrorType errors = ErrorType.None;
             string validateAttribute = Constants.SMTPRegex.IsMatch(attributeValue) ? attributeValue.Substring(attributeValue.IndexOf(":") + 1) : attributeValue;
 
@@ -26,7 +20,6 @@ namespace IdFix.Rules.Shared
                 string tldDomain = validateAttribute.ToLowerInvariant().Substring(validateAttribute.LastIndexOf("."));
                 if (tldDomain.Length > 1)
                 {
-                    tldDomain = tldDomain.Substring(tldDomain.IndexOf(".") + 1);
                     if (!tldList.Contains(tldDomain))
                     {
                         success = false;

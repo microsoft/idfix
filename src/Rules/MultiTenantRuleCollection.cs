@@ -126,10 +126,13 @@ namespace IdFix.Rules
 
         public override string[] AttributesToQuery => new string[] {
             StringLiterals.Cn,
+            StringLiterals.DisplayName,
             StringLiterals.DistinguishedName,
+            StringLiterals.GivenName,
             StringLiterals.GroupType,
             StringLiterals.HomeMdb,
             StringLiterals.IsCriticalSystemObject,
+            StringLiterals.Mail,
             StringLiterals.MailNickName,
             StringLiterals.MsExchHideFromAddressLists,
             StringLiterals.MsExchRecipientTypeDetails,

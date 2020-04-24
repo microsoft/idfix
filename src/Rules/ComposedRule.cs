@@ -1,11 +1,8 @@
 ﻿using IdFix.Rules.Shared;
 using IdFix.Settings;
-using System;
 using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdFix.Rules
 {
@@ -72,6 +69,7 @@ namespace IdFix.Rules
 
     interface IComposedRule
     {
+        string AttributeName { get; }
         ComposedRuleResult Execute(SearchResultEntry entry);
     }
 

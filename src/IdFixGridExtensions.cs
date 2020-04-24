@@ -1,8 +1,5 @@
 ﻿using IdFix.Controls;
-using IdFix.Rules;
-using Microsoft.VisualBasic.FileIO;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,9 +11,16 @@ namespace IdFix
     {
         public static void ToCsv(this IdFixGrid grid, StreamWriter writer)
         {
-            Func<string, string> csvEscape = (string str) =>
+            Func<object, string> csvEscape = (object obj) =>
             {
-                return str.IndexOf(",") > -1 ? string.Format("\"{0}\"", str) : str;
+                if (obj == null)
+                {
+                    return string.Empty;
+                }
+
+                var str = obj.ToString();
+
+                return string.IsNullOrEmpty(str) ? string.Empty : str.IndexOf(",") > -1 ? string.Format("\"{0}\"", str) : str;
             };
 
             // write the headers
@@ -25,7 +29,7 @@ namespace IdFix
             // now we write all the rows from the grid
             foreach (DataGridViewRow row in grid.Rows)
             {
-                writer.WriteLine(string.Join(",", row.Cells.Cast<DataGridViewCell>().Select(c => csvEscape(c.Value.ToString()))));
+                writer.WriteLine(string.Join(",", row.Cells.Cast<DataGridViewCell>().Select(c => csvEscape(c.Value))));
             }
         }
 
@@ -36,11 +40,11 @@ namespace IdFix
             string at;
             foreach (DataGridViewRow row in grid.Rows)
             {
-                vl = row.Cells[StringLiterals.Value].Value.ToString();
-                up = row.Cells[StringLiterals.Update].Value.ToString();
-                at = row.Cells[StringLiterals.Attribute].Value.ToString();
+                vl = row.GetCellString(StringLiterals.Value);
+                up = row.GetCellString(StringLiterals.Update);
+                at = row.GetCellString(StringLiterals.Attribute);
 
-                writer.WriteLine("dn: " + row.Cells[StringLiterals.DistinguishedName].Value.ToString());
+                writer.WriteLine("dn: " + row.GetCellString(StringLiterals.DistinguishedName));
                 writer.WriteLine("changetype: modify");
 
                 if (at.ToUpperInvariant() == StringLiterals.ProxyAddresses.ToUpperInvariant())
@@ -49,7 +53,7 @@ namespace IdFix
                     writer.WriteLine(at + ": " + vl);
                     writer.WriteLine("-");
                     writer.WriteLine();
-                    writer.WriteLine("dn: " + row.Cells[StringLiterals.DistinguishedName].Value.ToString());
+                    writer.WriteLine("dn: " + row.GetCellString(StringLiterals.DistinguishedName));
                     writer.WriteLine("changetype: modify");
                     writer.WriteLine("add: " + at);
                 }
@@ -70,6 +74,16 @@ namespace IdFix
                 writer.WriteLine("-");
                 writer.WriteLine();
             }
+        }
+
+        public static string GetCellString(this DataGridViewRow row, string cellName, string @default = "")
+        {
+            if (row.Cells[cellName] == null || row.Cells[cellName].Value == null)
+            {
+                return @default;
+            }
+
+            return row.Cells[cellName].Value.ToString();
         }
     }
 }

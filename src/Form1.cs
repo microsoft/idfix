@@ -40,8 +40,6 @@ namespace IdFix
                         MessageBoxIcon.Exclamation,
                         MessageBoxDefaultButton.Button1);
                 this.Text = StringLiterals.IdFixVersion;
-
-
             }
             catch (Exception ex)
             {
@@ -118,6 +116,7 @@ namespace IdFix
 
                             // set the results on our grid which will handle filling itself
                             this.grid.SetResults(results);
+                            this.SetPagingVisibility();
                         });
                     }
                 };
@@ -161,7 +160,11 @@ namespace IdFix
 
         }
 
-        #region Form1_FormClosed
+        private void SetPagingVisibility()
+        {
+            previousToolStripMenuItem.Visible = this.grid.HasPrev;
+            nextToolStripMenuItem.Visible = this.grid.HasNext;
+        }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
@@ -175,7 +178,6 @@ namespace IdFix
                 throw;
             }
         }
-        #endregion
 
         #region menu
         private void queryToolStripMenuItem_Click(object sender, EventArgs e)
@@ -306,8 +308,13 @@ namespace IdFix
             {
                 foreach (DataGridViewRow row in this.grid.Rows)
                 {
+                    if (row.Cells[StringLiterals.Action].Value == null)
+                    {
+                        continue;
+                    }
+
                     // let's convert the action string into one of our known action types
-                    if (!Enum.TryParse(row.Cells[StringLiterals.Action].Value.ToString(), true, out ActionType updateAction))
+                    if (!Enum.TryParse(row.GetCellString(StringLiterals.Action), true, out ActionType updateAction))
                     {
                         // fail to no action, safest choice
                         updateAction = ActionType.None;
@@ -320,19 +327,19 @@ namespace IdFix
                     }
 
                     // this is the current value for this entity and attribute at the time the scan was done
-                    var currentValue = row.Cells[StringLiterals.Value].Value != null ? row.Cells[StringLiterals.Value].Value.ToString() : String.Empty;
+                    var currentValue = row.GetCellString(StringLiterals.Value);
 
                     // this is the value, either proposed by us or edited by the user, that we will use to update the attribute for the given entity
-                    var updateValue = row.Cells[StringLiterals.Update].Value != null ? row.Cells[StringLiterals.Update].Value.ToString() : String.Empty;
+                    var updateValue = row.GetCellString(StringLiterals.Update);
 
                     // this is the attribute name tied to this value
-                    var updateAttribute = row.Cells[StringLiterals.Attribute].Value.ToString();
+                    var updateAttribute = row.GetCellString(StringLiterals.Attribute);
 
                     // calculate the server & port combination we need to conduct the update
-                    string distinguishedName = row.Cells[StringLiterals.DistinguishedName].Value.ToString();
+                    string distinguishedName = row.GetCellString(StringLiterals.DistinguishedName);
                     string domain = distinguishedName.Substring(distinguishedName.IndexOf("dc=", StringComparison.CurrentCultureIgnoreCase));
-                    string modificationDomainName = distinguishedName.ToLowerInvariant().Replace(",dc=", ".").Replace("dc=", "");
-                    string serverName = string.Empty;
+                    string modificationDomainName = domain.ToLowerInvariant().Replace(",dc=", ".").Replace("dc=", "");
+                    string serverName = modificationDomainName;
 
                     if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
                     {
@@ -415,7 +422,7 @@ namespace IdFix
                         case ActionType.Undo:
                             if (updateAttribute.Equals(StringLiterals.ProxyAddresses, StringComparison.CurrentCultureIgnoreCase))
                             {
-                                if (!String.IsNullOrEmpty(row.Cells[StringLiterals.Update].Value.ToString()))
+                                if (!String.IsNullOrEmpty(row.GetCellString(StringLiterals.Update)))
                                 {
                                     modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Delete, updateAttribute, new string[] { updateValue }));
                                 }
@@ -423,7 +430,7 @@ namespace IdFix
                             }
                             else
                             {
-                                if (String.IsNullOrEmpty(updateValue))
+                                if (String.IsNullOrEmpty(currentValue))
                                 {
                                     modifyRequest.Add(new ModifyRequest(distinguishedName, DirectoryAttributeOperation.Delete, updateAttribute, null));
                                 }
@@ -457,7 +464,7 @@ namespace IdFix
                     }
 
                     // we need to write to the apply file
-                    if (!row.Cells[StringLiterals.Action].Value.ToString().Equals(StringLiterals.Fail, StringComparison.CurrentCultureIgnoreCase))
+                    if (!row.GetCellString(StringLiterals.Action).Equals(StringLiterals.Fail, StringComparison.CurrentCultureIgnoreCase))
                     {
                         // mark this row as now complete
                         row.Cells[StringLiterals.Action].Value = StringLiterals.Complete;
@@ -465,9 +472,9 @@ namespace IdFix
                         // show a status (which also logs this to the verbose file)
                         statusDisplay(string.Format("Update: [{0}] [{1}] [{2}] [{3}] [{4}] [{5}] [{6}]",
                             distinguishedName,
-                            row.Cells[StringLiterals.ObjectClass].Value.ToString(),
+                            row.GetCellString(StringLiterals.ObjectClass),
                             updateAttribute,
-                            row.Cells[StringLiterals.Error].Value.ToString(),
+                            row.GetCellString(StringLiterals.Error),
                             currentValue,
                             updateValue,
                             updateAction.ToString()));
@@ -477,9 +484,9 @@ namespace IdFix
                             files.AppendTo(FileTypes.Apply, (writer) =>
                             {
                                 writer.WriteLine("distinguishedName: " + distinguishedName);
-                                writer.WriteLine("objectClass: " + row.Cells[StringLiterals.ObjectClass].Value.ToString());
+                                writer.WriteLine("objectClass: " + row.GetCellString(StringLiterals.ObjectClass));
                                 writer.WriteLine("attribute: " + updateAttribute);
-                                writer.WriteLine("error: " + row.Cells[StringLiterals.Error].Value.ToString());
+                                writer.WriteLine("error: " + row.GetCellString(StringLiterals.Error));
                                 writer.WriteLine("value: " + currentValue);
                                 writer.WriteLine("update: " + updateValue);
                                 writer.WriteLine("action: " + updateAction.ToString());
@@ -643,7 +650,8 @@ namespace IdFix
         {
             try
             {
-                this.grid.CurrentPage = this.grid.CurrentPage + 1;                
+                this.grid.CurrentPage = this.grid.CurrentPage + 1;
+                this.SetPagingVisibility();
             }
             catch (Exception ex)
             {
@@ -659,6 +667,7 @@ namespace IdFix
                 if (this.grid.CurrentPage > 1)
                 {
                     this.grid.CurrentPage = this.grid.CurrentPage - 1;
+                    this.SetPagingVisibility();
                 }
             }
             catch (Exception ex)

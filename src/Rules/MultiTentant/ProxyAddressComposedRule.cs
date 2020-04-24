@@ -22,14 +22,14 @@ namespace IdFix.Rules.MultiTentant
             var result = new ComposedRuleResult();
             var resultsCollector = new List<RuleResult>();
 
-            if (!entry.Attributes.Contains(StringLiterals.ProxyAddresses)) {
+            if (!entry.Attributes.Contains(this.AttributeName)) {
                 result.Success = true;
                 return result;
             }
 
-            for (int i = 0; i <= entry.Attributes[StringLiterals.ProxyAddresses].Count - 1; i++)
+            for (int i = 0; i <= entry.Attributes[this.AttributeName].Count - 1; i++)
             {
-                var attributeValue = entry.Attributes[StringLiterals.ProxyAddresses][i].ToString();
+                var attributeValue = entry.Attributes[this.AttributeName][i].ToString();
                 bool isSmtp = Constants.SMTPRegex.IsMatch(attributeValue);
 
                 // reset rule list

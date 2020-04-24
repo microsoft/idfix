@@ -248,7 +248,7 @@ namespace IdFix
             this.update,
             this.proposedAction,
             this.action});
-            this.grid.CurrentPage = 0;
+            this.grid.CurrentPage = 1;
             this.grid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.grid.Location = new System.Drawing.Point(22, 47);
             this.grid.Name = "grid";
