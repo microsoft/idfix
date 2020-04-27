@@ -125,19 +125,22 @@ namespace IdFix.Rules
 
                     foreach (var composedRule in this.Rules)
                     {
-                        // run each composed rule 
-                        var result = composedRule.Execute(entry);
+                        // run each composed rule which can produce multiple results
+                        var results = composedRule.Execute(entry);
 
-                        if (!result.Success)
+                        for (var i = 0; i < results.Length;i++)
                         {
-                            errorCount++;
-
-                            if (result.Results.Any(r => (r.ErrorTypeFlags & ErrorType.Duplicate) != 0))
+                            if (!results[i].Success)
                             {
-                                duplicateCount++;
-                            }
+                                errorCount++;
 
-                            errors.Add(result);
+                                if (results[i].Results.Any(r => (r.ErrorTypeFlags & ErrorType.Duplicate) != 0))
+                                {
+                                    duplicateCount++;
+                                }
+
+                                errors.Add(results[i]);
+                            }
                         }
                     }
                 }

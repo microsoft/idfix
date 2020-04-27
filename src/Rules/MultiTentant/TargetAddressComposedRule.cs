@@ -17,24 +17,25 @@ namespace IdFix.Rules.MultiTentant
         public TargetAddressComposedRule(params Rule[] additionalRules)
             : base(StringLiterals.TargetAddress, additionalRules) { }
 
-        public override ComposedRuleResult Execute(SearchResultEntry entry)
+        public override ComposedRuleResult[] Execute(SearchResultEntry entry)
         {
-            var result = new ComposedRuleResult();
-            var resultsCollector = new List<RuleResult>();
+            var result = this.InitResult(entry, out bool isValuePresent);
 
-            if (!entry.Attributes.Contains(StringLiterals.ProxyAddresses))
+            if (!isValuePresent)
             {
-                result.Success = true;
-                return result;
+                // base already handles the case of attribute not present and check for existing
+                // blank rule so we return that result
+                return base.Execute(entry);
             }
 
-            var attributeValue = entry.Attributes[StringLiterals.ProxyAddresses][0].ToString();
-            bool isSmtp = Constants.SMTPRegex.IsMatch(attributeValue);
+            var composedResultCollector = new List<ComposedRuleResult>();
+
+            var attributeValue = result.OriginalValue;
 
             // reset rule list
             var rulesList = this.Rules.ToList();
             // then need to do special cases to add in the rules based on what is needed
-            if (isSmtp)
+            if (Constants.SMTPRegex.IsMatch(attributeValue))
             {
                 rulesList.Add(new RegexRule(Constants.InvalidTargetAddressSMTPRegEx));
                 rulesList.Add(new RFC2822Rule());
@@ -44,6 +45,8 @@ namespace IdFix.Rules.MultiTentant
                 rulesList.Add(new RegexRule(Constants.InvalidTargetAddressRegEx));
             }
 
+            var resultsCollector = new List<RuleResult>();
+
             foreach (var rule in rulesList)
             {
                 var r = rule.Execute(this, entry, attributeValue);
@@ -52,14 +55,15 @@ namespace IdFix.Rules.MultiTentant
                     // we need to mimic the previous logic that updated value as
                     // the entry was processed
                     attributeValue = r.UpdatedValue;
+
+                    result.ProposedAction = ActionType.Edit;
                 }
                 resultsCollector.Add(r);
             }
 
-            // account for success if an entry doesn't have a given field
-            result.Success = resultsCollector.Count < 1 || resultsCollector.All(r => r.Success);
-            result.Results = resultsCollector.ToArray();
-            return result;
+            composedResultCollector.Add(this.FinalizeResult(result, resultsCollector));
+
+            return composedResultCollector.ToArray();
         }
     }
 }

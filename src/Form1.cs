@@ -115,7 +115,7 @@ namespace IdFix
                             statusDisplay(string.Format("Total Elapsed Time: {0}s", results.TotalElapsed.TotalSeconds));
 
                             // set the results on our grid which will handle filling itself
-                            this.grid.SetResults(results);
+                            this.grid.SetFromResults(results);
                             this.SetPagingVisibility();
                         });
                     }

@@ -18,28 +18,28 @@ namespace IdFix.Rules.Dedicated
         public TargetAddressComposedRule(params Rule[] additionalRules)
             : base(StringLiterals.TargetAddress, additionalRules) { }
 
-        public override ComposedRuleResult Execute(SearchResultEntry entry)
+        public override ComposedRuleResult[] Execute(SearchResultEntry entry)
         {
-            if (!entry.Attributes.Contains(StringLiterals.TargetAddress))
+            var result = this.InitResult(entry, out bool isValuePresent);
+
+            if (!isValuePresent)
             {
                 // base already handles the case of attribute not present and check for existing
                 // blank rule so we return that result
                 return base.Execute(entry);
             }
 
-            var result = new ComposedRuleResult();
-            var resultsCollector = new List<RuleResult>();
-
-            var attributeValue = entry.Attributes[StringLiterals.ProxyAddresses][0].ToString();
-            bool isSmtp = Constants.SMTPRegex.IsMatch(attributeValue);
-
+            var attributeValue = result.OriginalValue;
             var rulesList = this.Rules.ToList();
 
             // then need to do special cases to add in the rules based on what is needed
-            if (isSmtp)
+            if (Constants.SMTPRegex.IsMatch(attributeValue))
             {
                 rulesList.Add(new RFC2822Rule());
             }
+
+            var composedResultCollector = new List<ComposedRuleResult>();
+            var resultsCollector = new List<RuleResult>();
 
             foreach (var rule in rulesList)
             {
@@ -49,14 +49,15 @@ namespace IdFix.Rules.Dedicated
                     // we need to mimic the previous logic that updated value as
                     // the entry was processed
                     attributeValue = r.UpdatedValue;
+
+                    result.ProposedAction = ActionType.Edit;
                 }
                 resultsCollector.Add(r);
             }
 
-            // account for success if an entry doesn't have a given field
-            result.Success = resultsCollector.Count < 1 || resultsCollector.All(r => r.Success);
-            result.Results = resultsCollector.ToArray();
-            return result;
+            composedResultCollector.Add(this.FinalizeResult(result, resultsCollector));
+
+            return composedResultCollector.ToArray();
         }
     }
 }

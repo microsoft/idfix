@@ -172,7 +172,7 @@
     <Compile Include="Controls\IdFixGrid.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="IdFixGridExtensions.cs" />
+    <Compile Include="DataGridViewRowExtensions.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="DuplicateStore.cs" />
     <Compile Include="ErrorClass.cs" />

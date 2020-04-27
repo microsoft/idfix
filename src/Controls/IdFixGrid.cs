@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -15,11 +16,34 @@ namespace IdFix.Controls
     /// </summary>
     public class IdFixGrid : DataGridView
     {
+        /// <summary>
+        /// Used to hold the set of results when this grid is populated through <see cref="SetFromResults"/>  
+        /// </summary>
         private IEnumerable<ComposedRuleResult> _results;
+
+        /// <summary>
+        /// Internally records the current display page as a zero-based index. User page 1 == _currentPage 0
+        /// </summary>
         private int _currentPage;
+
+        /// <summary>
+        /// Size of the display page for results (default: 50,000)
+        /// </summary>
         private int _pageSize;
+
+        /// <summary>
+        /// The number of pages available, populated through <see cref="SetFromResults"/>
+        /// </summary>
         private int _pageCount;
+
+        /// <summary>
+        /// The total number of results
+        /// </summary>
         private int _totalResults;
+
+        /// <summary>
+        /// Tracks if the currently displayed results were filled from query results - or another souce such as CSV or LDF import
+        /// </summary>
         private bool _filledFromResults;
 
         public IdFixGrid() : base()
@@ -27,16 +51,21 @@ namespace IdFix.Controls
             this._results = null;
             this._currentPage = 0;
             this._pageSize = 50000;
-            this._pageSize = 1;
             this._totalResults = 0;
             this._pageCount = 0;
             this._filledFromResults = false;
         }
 
+        /// <summary>
+        /// Used to send status messages to the hosting form
+        /// </summary>
         public event OnStatusUpdateDelegate OnStatusUpdate;
 
         #region props
 
+        /// <summary>
+        /// Gets or sets the current size of the page to display
+        /// </summary>
         public int PageSize
         {
             get
@@ -53,13 +82,16 @@ namespace IdFix.Controls
                 if (value != this._pageSize)
                 {
                     this._pageSize = value;
-
                     // redraw the grid using the new page
                     this.FillGrid();
                 }
             }
         }
 
+        /// <summary>
+        /// Gets or sets the current page to display starting with first page = 1
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">If the size provided is less that 1</exception>
         public int CurrentPage
         {
             get
@@ -89,6 +121,9 @@ namespace IdFix.Controls
             }
         }
 
+        /// <summary>
+        /// Indicates if the grid has previous pages
+        /// </summary>
         public bool HasPrev
         {
             get
@@ -97,6 +132,9 @@ namespace IdFix.Controls
             }
         }
 
+        /// <summary>
+        /// Indicates if the grid has more pages available
+        /// </summary>
         public bool HasNext
         {
             get
@@ -109,6 +147,9 @@ namespace IdFix.Controls
 
         #region Reset
 
+        /// <summary>
+        /// Resets the grid's state to empty and resets internal counters
+        /// </summary>
         public void Reset()
         {
             this.Rows.Clear();
@@ -118,15 +159,26 @@ namespace IdFix.Controls
                 this.Columns[StringLiterals.Update].ReadOnly = false;
             }
             this._filledFromResults = true;
+            this._results = null;
+            this._currentPage = 0;
+            this._totalResults = 0;
+            this._pageCount = 0;
         }
 
         #endregion
 
         #region FillGrid
 
+        /// <summary>
+        /// Fills the grid using the current page and page size values from the available this._results
+        /// </summary>
         private void FillGrid()
         {
-            if (!this._filledFromResults)
+            this.OnStatusUpdate?.Invoke("Clearing Grid");
+            this.Rows.Clear();
+            this.OnStatusUpdate?.Invoke("Cleared Grid");
+
+            if (!this._filledFromResults || this._results == null || this._results.Count() < 1)
             {
                 return;
             }
@@ -136,25 +188,22 @@ namespace IdFix.Controls
                 var timer = new Stopwatch();
                 timer.Start();
                 this.OnStatusUpdate?.Invoke("Populating DataGrid");
-                this.Reset();
-                if (this._results != null)
-                {
-                    // calculate the results to show based on page size and current page
-                    var displaySet = this._results.Skip(this._currentPage * this._pageSize).Take(this._pageSize);
 
-                    // show those results
-                    foreach (var errorData in displaySet)
-                    {
-                        var rowIndex = this.Rows.Add();
-                        var row = this.Rows[rowIndex];
-                        row.Cells[StringLiterals.DistinguishedName].Value = errorData.EntityDistinguishedName;
-                        row.Cells[StringLiterals.ObjectClass].Value = errorData.ObjectType;
-                        row.Cells[StringLiterals.Attribute].Value = errorData.AttributeName;
-                        row.Cells[StringLiterals.Error].Value = errorData.ErrorsToString();
-                        row.Cells[StringLiterals.Value].Value = errorData.OriginalValue;
-                        row.Cells[StringLiterals.ProposedAction].Value = errorData.ProposedAction.ToString();
-                        row.Cells[StringLiterals.Update].Value = errorData.ProposedValue;
-                    }
+                // calculate the results to show based on page size and current page
+                var displaySet = this._results.Skip(this._currentPage * this.PageSize).Take(this.PageSize);
+
+                // show those results
+                foreach (var item in displaySet)
+                {
+                    var rowIndex = this.Rows.Add();
+                    var row = this.Rows[rowIndex];
+                    row.Cells[StringLiterals.DistinguishedName].Value = item.EntityDistinguishedName;
+                    row.Cells[StringLiterals.ObjectClass].Value = item.ObjectType;
+                    row.Cells[StringLiterals.Attribute].Value = item.AttributeName;
+                    row.Cells[StringLiterals.Error].Value = item.ErrorsToString();
+                    row.Cells[StringLiterals.Value].Value = item.OriginalValue;
+                    row.Cells[StringLiterals.ProposedAction].Value = item.ProposedAction.ToString();
+                    row.Cells[StringLiterals.Update].Value = item.ProposedValue;
                 }
 
                 if (this.RowCount > 0)
@@ -167,7 +216,7 @@ namespace IdFix.Controls
 
                 if (this._pageCount > 1)
                 {
-                    this.OnStatusUpdate?.Invoke(string.Format("Total Error Count: {0} Displayed Count: {1}", this._totalResults, this.Rows.Count));
+                    this.OnStatusUpdate?.Invoke(string.Format("Total Error Count: {0} Displayed Count: {1} Page {2} of {3}", this._totalResults, this.Rows.Count, this.CurrentPage, this._pageCount));
                 }
                 else
                 {
@@ -185,20 +234,61 @@ namespace IdFix.Controls
 
         #region SetResults
 
-        public void SetResults(RulesRunnerResult results)
+        /// <summary>
+        /// Set the grid display from the parsed results of a search query
+        /// </summary>
+        /// <param name="results"><seealso cref="RulesRunnerResult"/> from an LDAP query</param>
+        public void SetFromResults(RulesRunnerResult results)
         {
             this._filledFromResults = true;
             this.Reset();
             this._results = results.ToDataset();
             this._totalResults = this._results.Count();
-            this._pageCount = (this._results.Count() + this.PageSize - 1) / this.PageSize;
+            this._pageCount = (this._totalResults + this.PageSize - 1) / this.PageSize;
             this.FillGrid();
+        }
+
+        #endregion
+
+        #region ToCsv
+
+        /// <summary>
+        /// Writes this grid to a stream as a CSV file
+        /// </summary>
+        /// <param name="grid"></param>
+        /// <param name="writer"></param>
+        public void ToCsv(StreamWriter writer)
+        {
+            Func<object, string> csvEscape = (object obj) =>
+            {
+                if (obj == null)
+                {
+                    return string.Empty;
+                }
+
+                var str = obj.ToString();
+
+                return string.IsNullOrEmpty(str) ? string.Empty : str.IndexOf(",") > -1 ? string.Format("\"{0}\"", str) : str;
+            };
+
+            // write the headers
+            writer.WriteLine(string.Join(",", this.Columns.Cast<DataGridViewColumn>().Select(c => c.Name.ToUpper(CultureInfo.CurrentCulture))));
+
+            // now we write all the rows from the grid
+            foreach (DataGridViewRow row in this.Rows)
+            {
+                writer.WriteLine(string.Join(",", row.Cells.Cast<DataGridViewCell>().Select(c => csvEscape(c.Value))));
+            }
         }
 
         #endregion
 
         #region SetFromCsv
 
+        /// <summary>
+        /// Sets the results from a stream reader represeting a csv file previously exported by this webpart
+        /// </summary>
+        /// <param name="reader"></param>
         public void SetFromCsv(StreamReader reader)
         {
             this.Reset();
@@ -285,6 +375,59 @@ namespace IdFix.Controls
                 this.Sort(this.Columns[StringLiterals.DistinguishedName], ListSortDirection.Ascending);
                 this.CurrentCell = this.Rows[0].Cells[StringLiterals.DistinguishedName];
             }
+
+            this._totalResults = this.RowCount;
+        }
+
+        #endregion
+
+        #region ToLdf
+
+        /// <summary>
+        /// Writes this grid's contents to a stream as an LDF file <seealso cref="SetFromLdf"/>
+        /// </summary>
+        /// <param name="writer"></param>
+        public void ToLdf(StreamWriter writer)
+        {
+            string vl;
+            string up;
+            string at;
+            foreach (DataGridViewRow row in this.Rows)
+            {
+                vl = row.GetCellString(StringLiterals.Value);
+                up = row.GetCellString(StringLiterals.Update);
+                at = row.GetCellString(StringLiterals.Attribute);
+
+                writer.WriteLine("dn: " + row.GetCellString(StringLiterals.DistinguishedName));
+                writer.WriteLine("changetype: modify");
+
+                if (at.ToUpperInvariant() == StringLiterals.ProxyAddresses.ToUpperInvariant())
+                {
+                    writer.WriteLine("delete: " + at);
+                    writer.WriteLine(at + ": " + vl);
+                    writer.WriteLine("-");
+                    writer.WriteLine();
+                    writer.WriteLine("dn: " + row.GetCellString(StringLiterals.DistinguishedName));
+                    writer.WriteLine("changetype: modify");
+                    writer.WriteLine("add: " + at);
+                }
+                else
+                {
+                    writer.WriteLine("replace: " + at);
+                }
+
+                //if (update != String.Empty)
+                if (!String.IsNullOrEmpty(up))
+                {
+                    writer.WriteLine(at + ": " + up);
+                }
+                else
+                {
+                    writer.WriteLine(at + ": " + vl);
+                }
+                writer.WriteLine("-");
+                writer.WriteLine();
+            }
         }
 
         #endregion
@@ -292,7 +435,7 @@ namespace IdFix.Controls
         #region SetFromLdf
 
         /// <summary>
-        /// Enables filling from the ldf file written
+        /// Enables filling from the ldf file written by <seealso cref="ToLdf"/>
         /// </summary>
         /// <param name="reader"></param>
         public void SetFromLdf(StreamReader reader)
@@ -337,6 +480,9 @@ namespace IdFix.Controls
             {
                 this.CurrentCell = this.Rows[0].Cells[StringLiterals.DistinguishedName];
             }
+
+            // record the total number of rows added
+            this._totalResults = lineIndex + 1;
         }
 
         #endregion

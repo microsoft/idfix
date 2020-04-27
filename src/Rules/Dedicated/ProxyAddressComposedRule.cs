@@ -18,29 +18,34 @@ namespace IdFix.Rules.Dedicated
         public ProxyAddressComposedRule(params Rule[] additionalRules)
             : base(StringLiterals.ProxyAddresses, additionalRules) { }
 
-        public override ComposedRuleResult Execute(SearchResultEntry entry)
+        public override ComposedRuleResult[] Execute(SearchResultEntry entry)
         {
-            var result = new ComposedRuleResult();
-            var resultsCollector = new List<RuleResult>();
+            var result = this.InitResult(entry, out bool isValuePresent);
 
-            if (!entry.Attributes.Contains(StringLiterals.ProxyAddresses)) {
+            if (!isValuePresent)
+            {
                 result.Success = true;
-                return result;
+                return new ComposedRuleResult[] { result };
             }
 
-            for (int i = 0; i <= entry.Attributes[StringLiterals.ProxyAddresses].Count - 1; i++)
+            var composedResultCollector = new List<ComposedRuleResult>();
+
+            for (int i = 0; i <= entry.Attributes[this.AttributeName].Count - 1; i++)
             {
-                var attributeValue = entry.Attributes[StringLiterals.ProxyAddresses][i].ToString();
-                bool isSmtp = Constants.SMTPRegex.IsMatch(attributeValue);
+                result = this.InitResult(entry, out isValuePresent);
+                var resultsCollector = new List<RuleResult>();
+
+                var attributeValue = entry.Attributes[this.AttributeName][i].ToString();
+                result.OriginalValue = attributeValue;
 
                 // reset rule list
                 var rulesList = this.Rules.ToList();
                 // then need to do special cases to add in the rules based on what is needed
-                if (isSmtp)
+                if (Constants.SMTPRegex.IsMatch(attributeValue))
                 {
                     rulesList.Add(new RFC2822Rule());
                 }
-                                             
+
                 foreach (var rule in rulesList)
                 {
                     var r = rule.Execute(this, entry, attributeValue);
@@ -49,15 +54,16 @@ namespace IdFix.Rules.Dedicated
                         // we need to mimic the previous logic that updated value as
                         // the entry was processed
                         attributeValue = r.UpdatedValue;
+
+                        result.ProposedAction = ActionType.Edit;
                     }
                     resultsCollector.Add(r);
                 }
+
+                composedResultCollector.Add(this.FinalizeResult(result, resultsCollector));
             }
 
-            // account for success if an entry doesn't have a given field
-            result.Success = resultsCollector.Count < 1 || resultsCollector.All(r => r.Success);
-            result.Results = resultsCollector.ToArray();
-            return result;
+            return composedResultCollector.ToArray();
         }
     }
 }

@@ -70,7 +70,7 @@ namespace IdFix.Rules
     interface IComposedRule
     {
         string AttributeName { get; }
-        ComposedRuleResult Execute(SearchResultEntry entry);
+        ComposedRuleResult[] Execute(SearchResultEntry entry);
     }
 
     class ComposedRule : IComposedRule
@@ -84,38 +84,27 @@ namespace IdFix.Rules
         public string AttributeName { get; private set; }
         public Rule[] Rules { get; private set; }
 
-        public virtual ComposedRuleResult Execute(SearchResultEntry entry)
+        public virtual ComposedRuleResult[] Execute(SearchResultEntry entry)
         {
-            var result = new ComposedRuleResult()
-            {
-                AttributeName = this.AttributeName,
-                EntityDistinguishedName = entry.Attributes[StringLiterals.DistinguishedName][0].ToString(),
-                ObjectType = entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString(),
-                OriginalValue = null,
-                ProposedAction = ActionType.None
-            };
+            var result = this.InitResult(entry, out bool isValuePresent);
 
             var resultsCollector = new List<RuleResult>();
 
             // need to handle the case where entry doesn't have attribute named but does
             // have a no blanks rule
-            if (!entry.Attributes.Contains(this.AttributeName))
+            if (!isValuePresent)
             {
-                var rules = this.Rules.OfType<BlankStringRule>();
-                if (rules.Any())
+                var rs = this.Rules.OfType<BlankStringRule>();
+                if (rs.Any())
                 {
-                    var rule = rules.First();
                     // we do not allow blanks so include just that error and done
-                    resultsCollector.Add(rule.Execute(this, entry, null));
+                    resultsCollector.Add(rs.First().Execute(this, entry, null));
                 }
             }
             else
             {
                 // get the value of the attribute for this composed rule
-                var attributeValue = entry.Attributes[this.AttributeName][0].ToString();
-
-                // we need the original value for display later in the grid
-                result.OriginalValue = attributeValue;
+                var attributeValue = result.OriginalValue;
 
                 // now we process each of the rules contained within this compound rule
                 foreach (var rule in this.Rules)
@@ -126,8 +115,6 @@ namespace IdFix.Rules
                         // we need to mimic the previous logic that updated value as
                         // the entry was processed
                         attributeValue = r.UpdatedValue;
-                        // update the proposed action to edit for all errors by default
-                        result.ProposedAction = ActionType.Edit;
                     }
 
                     // add our result to the collector
@@ -135,11 +122,47 @@ namespace IdFix.Rules
                 }
             }
 
+            return new ComposedRuleResult[] { this.FinalizeResult(result, resultsCollector) };
+        }
+
+        protected ComposedRuleResult InitResult(SearchResultEntry entry, out bool isValuePresent)
+        {
+            isValuePresent = false;
+
+            var result = new ComposedRuleResult()
+            {
+                AttributeName = this.AttributeName,
+                EntityDistinguishedName = entry.Attributes[StringLiterals.DistinguishedName][0].ToString(),
+                ObjectType = entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString(),
+                OriginalValue = null,
+                ProposedAction = ActionType.None
+            };
+
+            if (entry.Attributes.Contains(this.AttributeName))
+            {
+                isValuePresent = true;
+                result.OriginalValue = entry.Attributes[this.AttributeName][0].ToString();
+            }
+
+            return result;
+        }
+
+        protected ComposedRuleResult FinalizeResult(ComposedRuleResult result, List<RuleResult> resultsCollector)
+        {
+            // set all the rule results on the compound result
+            result.Results = resultsCollector.ToArray();
+
             // account for success if an entry doesn't have a given field
             result.Success = resultsCollector.Count < 1 || resultsCollector.All(r => r.Success);
 
-            // set all the rule results on the compound result
-            result.Results = resultsCollector.ToArray();
+            if (!result.Success)
+            {
+                // update the proposed action to edit for all errors by default
+                result.ProposedAction = ActionType.Edit;
+
+                // we propose the final result's updated value where success is false, matching the original logic
+                result.ProposedValue = result.Results.Where(r => !r.Success).Last().UpdatedValue;
+            }
 
             return result;
         }
