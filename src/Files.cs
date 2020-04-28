@@ -11,6 +11,12 @@ namespace IdFix
         Error,
     }
 
+    // TODO:: how is this used
+    // TODO:: ensure we are usign all these, writing error files? apply files?
+
+    /// <summary>
+    /// Files helper to write to various logging files
+    /// </summary>
     class Files
     {
         private string _fileBase;

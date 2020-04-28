@@ -1,12 +1,9 @@
 ﻿using IdFix.Rules.Shared;
 using IdFix.Settings;
-using System;
 using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace IdFix.Rules.MultiTentant
 {
@@ -15,9 +12,18 @@ namespace IdFix.Rules.MultiTentant
     /// </summary>
     class ProxyAddressComposedRule : ComposedRule
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="ProxyAddressComposedRule"/> class
+        /// </summary>
+        /// <param name="additionalRules">Any additional rules to include within this special compound rule</param>
         public ProxyAddressComposedRule(params Rule[] additionalRules)
             : base(StringLiterals.ProxyAddresses, additionalRules) { }
 
+        /// <summary>
+        /// Executes implementation for this rule
+        /// </summary>
+        /// <param name="entry">The search result we are checking</param>
+        /// <returns>Either a success or error result</returns>
         public override ComposedRuleResult[] Execute(SearchResultEntry entry)
         {
             var result = this.InitResult(entry, out bool isValuePresent);
@@ -37,8 +43,6 @@ namespace IdFix.Rules.MultiTentant
 
                 var attributeValue = entry.Attributes[this.AttributeName][i].ToString();
                 result.OriginalValue = attributeValue;
-
-
 
                 // reset rule list
                 var rulesList = this.Rules.ToList();

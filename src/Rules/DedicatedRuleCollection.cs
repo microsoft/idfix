@@ -6,74 +6,94 @@ using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace IdFix.Rules
 {
+    /// <summary>
+    /// Represents the collection of rules to run for dedicated mode
+    /// </summary>
     class DedicatedRuleCollection : RuleCollection
     {
+        /// <summary>
+        /// Holds all the compound rules in this collection
+        /// </summary>
         private IComposedRule[] _rules;
 
-        public DedicatedRuleCollection(LdapConnection connection, string distinguishedName, int pageSize = 1000)
+        /// <summary>
+        /// Creates a new instance of the <see cref="DedicatedRuleCollection"/> class
+        /// </summary>
+        /// <param name="connection">Configured <see cref="LdapConnection"/> used to make queries</param>
+        /// <param name="distinguishedName"></param>
+        /// <param name="pageSize"></param>
+        public DedicatedRuleCollection(LdapConnection connection, string distinguishedName)
             : base(connection, distinguishedName)
         {
         }
 
-        //TODO:: document original order of checks as that matters for behavior
-
+        /// <summary>
+        /// Defines the set of rules for this rule collection
+        /// </summary>
         public override IComposedRule[] Rules
         {
             get
             {
                 if (this._rules == null)
                 {
-                    var rules = new List<IComposedRule>();
+                    /*
+                     * ** NOTE **
+                     * Based on the original design it matters the order rules are added into a composed rule because the eventual proposed value
+                     * is passed through the chain of rules and potentially could be updated multiple times. The original order of the code is
+                     * preserved here for each composed rule
+                     * 
+                     * */
 
-                    rules.Add(new ComposedRule(StringLiterals.DisplayName,
-                        new StringMaxLengthRule(256),
-                        new RegexRule(new Regex(@"^[\s]+|[\s]+$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
-                        new DisplayNameBlankRule()
-                    ));
+                    var rules = new List<IComposedRule>
+                    {
+                        new ComposedRule(StringLiterals.DisplayName,
+                            new StringMaxLengthRule(256),
+                            new RegexRule(new Regex(@"^[\s]+|[\s]+$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
+                            new DisplayNameBlankRule()
+                        ),
 
-                    rules.Add(new ComposedRule(StringLiterals.Mail,
-                        new StringMaxLengthRule(256),
-                        new RegexRule(new Regex(@"[\s]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
-                        new RFC2822Rule(),
-                        new NoDuplicatesRule()
-                    ));
+                        new ComposedRule(StringLiterals.Mail,
+                            new StringMaxLengthRule(256),
+                            new RegexRule(new Regex(@"[\s]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
+                            new RFC2822Rule(),
+                            new NoDuplicatesRule()
+                        ),
 
-                    rules.Add(new ComposedRule(StringLiterals.MailNickName,
-                        new StringMaxLengthRule(64),
-                        new RegexRule(new Regex(@"[\s\\!#$%&*+/=?^`{}|~<>()'\;\:\,\[\]""@]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
-                        new NoDuplicatesRule(),
-                        new MailNicknameBlankRule(),
-                        new MailNickNamePeriodsRule()
-                    ));
+                        new ComposedRule(StringLiterals.MailNickName,
+                            new StringMaxLengthRule(64),
+                            new RegexRule(new Regex(@"[\s\\!#$%&*+/=?^`{}|~<>()'\;\:\,\[\]""@]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
+                            new NoDuplicatesRule(),
+                            new MailNicknameBlankRule(),
+                            new MailNickNamePeriodsRule()
+                        ),
 
-                    rules.Add(new ProxyAddressComposedRule(
-                        new StringMaxLengthRule(256),
-                        new FixProxyTargetAddressRule(),
-                        new NoDuplicatesRule()
-                    ));
+                        new ProxyAddressComposedRule(
+                            new StringMaxLengthRule(256),
+                            new FixProxyTargetAddressRule(),
+                            new NoDuplicatesRule()
+                        ),
 
-                    rules.Add(new TargetAddressComposedRule(
-                        new StringMaxLengthRule(256),
-                        new BlankStringRule((entry, value) =>
-                        {
-
-                            var objectType = entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString();
-                            // the orginal code doesn't provide a fix if the type isn't "contact"
-                            if (objectType.Equals("contact", StringComparison.CurrentCultureIgnoreCase))
+                        new TargetAddressComposedRule(
+                            new StringMaxLengthRule(256),
+                            new BlankStringRule((entry, value) =>
                             {
-                                value = "SMTP:" + entry.Attributes[StringLiterals.Mail][0].ToString();
-                                return value.Length > 256 ? value.Substring(0, 256) : value;
-                            }
 
-                            return value;
-                        })
-                    ));
+                                var objectType = ComposedRule.GetObjectType(entry);
+                                // the orginal code doesn't provide a fix if the type isn't "contact"
+                                if (objectType.Equals("contact", StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    value = "SMTP:" + entry.Attributes[StringLiterals.Mail][0].ToString();
+                                    return value.Length > 256 ? value.Substring(0, 256) : value;
+                                }
+
+                                return value;
+                            })
+                        )
+                    };
 
                     this._rules = rules.ToArray();
                 }
@@ -84,6 +104,9 @@ namespace IdFix.Rules
 
         #region AttributesToQuery
 
+        /// <summary>
+        /// Set of attributes to return for this collection's queries
+        /// </summary>
         public override string[] AttributesToQuery => new string[] {
             StringLiterals.Cn,
             StringLiterals.DisplayName,
@@ -103,6 +126,11 @@ namespace IdFix.Rules
 
         #region Skip
 
+        /// <summary>
+        /// Logic to determine if a given <see cref="SearchResultEntry"/> is skipped for processing
+        /// </summary>
+        /// <param name="entry"><see cref="SearchResultEntry"/> to check</param>
+        /// <returns>True if <paramref name="entry"/> should be skipped, false if it should be processed</returns>
         public override bool Skip(SearchResultEntry entry)
         {
             string objectDn = String.Empty;

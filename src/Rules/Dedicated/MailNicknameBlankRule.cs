@@ -4,10 +4,15 @@ using System.DirectoryServices.Protocols;
 
 namespace IdFix.Rules.Dedicated
 {
+    /// <summary>
+    /// Enforces that mail nickname can't be blank with a custom fixer method
+    /// </summary>
     class MailNicknameBlankRule : BlankStringRule
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="MailNicknameBlankRule"/>
+        /// </summary>
         public MailNicknameBlankRule(): base((entry, attributeValue) => {
-
 
             if (entry.Attributes.Contains(StringLiterals.GivenName))
             {
@@ -40,9 +45,16 @@ namespace IdFix.Rules.Dedicated
 
         }) { }
 
+        /// <summary>
+        /// Executes implementation for this rule
+        /// </summary>
+        /// <param name="parent">The composed rule containing this rule</param>
+        /// <param name="entry">The search result we are checking</param>
+        /// <param name="attributeValue">The current attribute value as pass through the chain</param>
+        /// <returns>Either a success or error result</returns>
         public override RuleResult Execute(ComposedRule parent, SearchResultEntry entry, string attributeValue)
         {
-            string objectType = entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString();
+            string objectType = this.GetObjectType(entry);
 
             if (objectType.Equals("contact", StringComparison.CurrentCultureIgnoreCase) && parent.AttributeName == StringLiterals.MailNickName)
             {

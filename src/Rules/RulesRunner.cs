@@ -11,6 +11,9 @@ namespace IdFix.Rules
 
     #region RulesRunnerResult
 
+    /// <summary>
+    /// Defines the result of executing this rules runner
+    /// </summary>
     public class RulesRunnerResult : Dictionary<string, RuleCollectionResult>
     {
         private IEnumerable<ComposedRuleResult> _dataSet = null;
@@ -91,22 +94,37 @@ namespace IdFix.Rules
 
     #endregion
 
+    /// <summary>
+    /// A <see cref="BackgroundWorker"/> that runs one or more RuleCollections against one or more connections based on settings
+    /// </summary>
     class RulesRunner : BackgroundWorker
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="RulesRunner"/> class
+        /// </summary>
         public RulesRunner()
         {
             this.WorkerSupportsCancellation = true;
             this.DoWork += this.RunRules;
         }
 
+        /// <summary>
+        /// Event to bubble status update messages to the containing form
+        /// </summary>
         public event OnStatusUpdateDelegate OnStatusUpdate;
 
+        #region RunRules
+
+        /// <summary>
+        /// Runs the rules
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">args</param>
         private void RunRules(object sender, DoWorkEventArgs e)
         {
             try
             {
-                var args = e.Argument as RulesRunnerDoWorkArgs;
-                if (args == null)
+                if (!(e.Argument is RulesRunnerDoWorkArgs args))
                 {
                     e.Result = null;
                     throw new ArgumentException("RulesRunner expects arguments of type RulesRunnerDoWorkArgs.");
@@ -121,6 +139,7 @@ namespace IdFix.Rules
                 var connections = new ConnectionManager();
                 connections.OnStatusUpdate += (string message) => { this.OnStatusUpdate?.Invoke(message); };
 
+                // used to collect the results as we process rule collections
                 var results = new RulesRunnerResult();
 
                 connections.WithConnections((LdapConnection connection, string distinguishedName) =>
@@ -138,7 +157,7 @@ namespace IdFix.Rules
                     // get the rule collection to run
                     var ruleCollection = this.GetRuleCollection(connection, distinguishedName);
 
-                    // run that collection and add the results into the collection
+                    // run that collection and add the results into the collector
                     results.Add(identifier, ruleCollection.Run());
                 });
 
@@ -155,6 +174,8 @@ namespace IdFix.Rules
                 DuplicateStore.Reset();
             }
         }
+
+        #endregion
 
         #region GetRuleCollection
 

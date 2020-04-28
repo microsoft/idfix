@@ -10,11 +10,22 @@ namespace IdFix.Rules.Shared
     /// <remarks>This rule MUST always appear last in a set of composed rules</remarks>
     class NoDuplicatesRule : Rule
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="NoDuplicatesRule"/> class
+        /// </summary>
+        /// <param name="fixer"></param>
         public NoDuplicatesRule(Func<SearchResultEntry, string, string> fixer = null)
             : base(fixer)
         {
         }
 
+        /// <summary>
+        /// Executes implementation for this rule
+        /// </summary>
+        /// <param name="parent">The composed rule containing this rule</param>
+        /// <param name="entry">The search result we are checking</param>
+        /// <param name="attributeValue">The current attribute value as pass through the chain</param>
+        /// <returns>Either a success or error result</returns>
         public override RuleResult Execute(ComposedRule parent, SearchResultEntry entry, string attributeValue)
         {
             // record in memory the entry details with a list of the attributes that end up needing to be checked

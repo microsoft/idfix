@@ -6,6 +6,11 @@ using System.Linq;
 
 namespace IdFix.Rules
 {
+    #region ComposedRuleResult
+
+    /// <summary>
+    /// Contains the results of executing a composed rule
+    /// </summary>
     public class ComposedRuleResult
     {
         public ComposedRuleResult()
@@ -67,27 +72,81 @@ namespace IdFix.Rules
         }
     }
 
+    #endregion
+
+    #region IComposedRule
+
+    /// <summary>
+    /// Interface representing the methods and properties a composed rule must implement
+    /// </summary>
     interface IComposedRule
     {
+        /// <summary>
+        /// Gets the name of the <see cref="SearchResultEntry"/> attribute this rule checks
+        /// </summary>
         string AttributeName { get; }
+
+        /// <summary>
+        /// Executes this composed rule
+        /// </summary>
+        /// <param name="entry">The <see cref="SearchResultEntry"/> to check</param>
+        /// <returns>A set of composed rule results</returns>
         ComposedRuleResult[] Execute(SearchResultEntry entry);
     }
 
+    #endregion
+
+    /// <summary>
+    /// A composed rule contains one of more <see cref="Rule"/> instances and is bound to an attribute name.
+    /// It runs all of the contained rules against the given attribute producing one or more composed rule results
+    /// </summary>
     class ComposedRule : IComposedRule
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="ComposedRule"/> class
+        /// </summary>
+        /// <param name="attributeName">The name of the attribute this compound rule is set to check</param>
+        /// <param name="rules">Set of rules comprising the checks done against the value of the <paramref name="attributeName"/> attribute</param>
         public ComposedRule(string attributeName, params Rule[] rules)
         {
             this.AttributeName = attributeName;
             this.Rules = rules;
         }
 
+        /// <summary>
+        /// Gets the object type for a given <see cref="SearchResultEntry"/>
+        /// </summary>
+        /// <param name="entry">The <see cref="SearchResultEntry"/> whose object type we want</param>
+        /// <returns>The object type represented as a string</returns>
+        public static string GetObjectType(SearchResultEntry entry)
+        {
+            return entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString();
+        }
+
+        #region props
+
+        /// <summary>
+        /// Gets the name of the <see cref="SearchResultEntry"/> attribute this rule checks
+        /// </summary>
         public string AttributeName { get; private set; }
+
+        /// <summary>
+        /// The set of rules contained within this compound rule
+        /// </summary>
         public Rule[] Rules { get; private set; }
 
+        #endregion
+
+        #region Execute
+
+        /// <summary>
+        /// Executes this composed rule
+        /// </summary>
+        /// <param name="entry">The <see cref="SearchResultEntry"/> to check</param>
+        /// <returns>A set of composed rule results</returns>
         public virtual ComposedRuleResult[] Execute(SearchResultEntry entry)
         {
             var result = this.InitResult(entry, out bool isValuePresent);
-
             var resultsCollector = new List<RuleResult>();
 
             // need to handle the case where entry doesn't have attribute named but does
@@ -125,6 +184,16 @@ namespace IdFix.Rules
             return new ComposedRuleResult[] { this.FinalizeResult(result, resultsCollector) };
         }
 
+        #endregion
+
+        #region InitResult
+
+        /// <summary>
+        /// Creates a consistent base <see cref="ComposedRuleResult"/> instance with default values
+        /// </summary>
+        /// <param name="entry">The entry for which we are creating a result</param>
+        /// <param name="isValuePresent">Allows calling code to know if the <paramref name="entry"/> has a value for the given <see cref="AttributeName"/></param>
+        /// <returns></returns>
         protected ComposedRuleResult InitResult(SearchResultEntry entry, out bool isValuePresent)
         {
             isValuePresent = false;
@@ -133,7 +202,7 @@ namespace IdFix.Rules
             {
                 AttributeName = this.AttributeName,
                 EntityDistinguishedName = entry.Attributes[StringLiterals.DistinguishedName][0].ToString(),
-                ObjectType = entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString(),
+                ObjectType = ComposedRule.GetObjectType(entry),
                 OriginalValue = null,
                 ProposedAction = ActionType.None
             };
@@ -147,6 +216,16 @@ namespace IdFix.Rules
             return result;
         }
 
+        #endregion
+
+        #region FinalizeResult
+
+        /// <summary>
+        /// Finalizes the <paramref name="result"/> based on the individual <see cref="RuleResult"/> values contained in <paramref name="resultsCollector"/>
+        /// </summary>
+        /// <param name="result">The result to update</param>
+        /// <param name="resultsCollector">The set of <see cref="RuleResult"/> values used to determine the compound outcome</param>
+        /// <returns></returns>
         protected ComposedRuleResult FinalizeResult(ComposedRuleResult result, List<RuleResult> resultsCollector)
         {
             // set all the rule results on the compound result
@@ -157,8 +236,8 @@ namespace IdFix.Rules
 
             if (!result.Success)
             {
-                // update the proposed action to edit for all errors by default
-                result.ProposedAction = ActionType.Edit;
+                // we propose the last proposed action, matching the original logic
+                result.ProposedAction = result.Results.Where(r => !r.Success).Last().ProposedAction;
 
                 // we propose the final result's updated value where success is false, matching the original logic
                 result.ProposedValue = result.Results.Where(r => !r.Success).Last().UpdatedValue;
@@ -166,5 +245,7 @@ namespace IdFix.Rules
 
             return result;
         }
+
+        #endregion
     }
 }

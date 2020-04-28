@@ -15,9 +15,18 @@ namespace IdFix.Rules.Dedicated
     /// </summary>
     class ProxyAddressComposedRule : ComposedRule
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="ProxyAddressComposedRule"/> class
+        /// </summary>
+        /// <param name="additionalRules">Any additional rules to include within this special compound rule</param>
         public ProxyAddressComposedRule(params Rule[] additionalRules)
             : base(StringLiterals.ProxyAddresses, additionalRules) { }
 
+        /// <summary>
+        /// Executes implementation for this rule
+        /// </summary>
+        /// <param name="entry">The search result we are checking</param>
+        /// <returns>Either a success or error result</returns>
         public override ComposedRuleResult[] Execute(SearchResultEntry entry)
         {
             var result = this.InitResult(entry, out bool isValuePresent);
@@ -60,6 +69,7 @@ namespace IdFix.Rules.Dedicated
                     resultsCollector.Add(r);
                 }
 
+                // this allows us to report on errors with multiple proxyaddresses for a single entry in the grid
                 composedResultCollector.Add(this.FinalizeResult(result, resultsCollector));
             }
 

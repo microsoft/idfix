@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace IdFix
 {
-    public partial class Form1 : Form
+    public partial class FormApp : Form
     {
         Files files = new Files();
 
@@ -27,7 +27,7 @@ namespace IdFix
         internal const int maxUserNameLength = 64;
         internal const int maxDomainLength = 48;
 
-        public Form1()
+        public FormApp()
         {
             try
             {

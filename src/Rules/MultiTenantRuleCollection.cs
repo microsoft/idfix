@@ -9,92 +9,115 @@ using IdFix.Settings;
 
 namespace IdFix.Rules
 {
+    /// <summary>
+    /// Represents the collection of rules to run for multi-tenant mode
+    /// </summary>
     class MultiTenantRuleCollection : RuleCollection
     {
+        /// <summary>
+        /// Holds all the compound rules in this collection
+        /// </summary>
         private IComposedRule[] _rules;
 
-        public MultiTenantRuleCollection(LdapConnection connection, string distinguishedName, int pageSize = 1000)
+        /// <summary>
+        /// Creates a new instance of the <see cref="MultiTenantRuleCollection"/> class
+        /// </summary>
+        /// <param name="connection">Configured <see cref="LdapConnection"/> used to make queries</param>
+        /// <param name="distinguishedName"></param>
+        /// <param name="pageSize"></param>
+        public MultiTenantRuleCollection(LdapConnection connection, string distinguishedName)
             : base(connection, distinguishedName)
         {
             this._rules = null;
         }
 
-        //TODO:: document original order of checks as that matters for behavior
-
+        /// <summary>
+        /// Defines the set of rules for this rule collection
+        /// </summary>
         public override IComposedRule[] Rules
         {
             get
             {
                 if (this._rules == null)
                 {
-                    var rules = new List<IComposedRule>();
+                    /*
+                     * ** NOTE **
+                     * Based on the original design it matters the order rules are added into a composed rule because the eventual proposed value
+                     * is passed through the chain of rules and potentially could be updated multiple times. The original order of the code is
+                     * preserved here for each composed rule
+                     * 
+                     * */
 
-                    // Additional check for DisplayName. 
-                    //  Value is non-blank if present
-                    //  Max Length = 255. 
-                    // The attribute being present check is done in mtChecks, however, the errorBlank check is done only if the attribute
-                    // is missing, so that has been updated to check for blanks if attribute present.
-                    rules.Add(new ComposedRule(StringLiterals.DisplayName,
-                        new StringMaxLengthRule(255),
-                        new BlankStringRule((entry, value) => entry.Attributes[StringLiterals.Cn][0].ToString())
-                    ));
+                    var rules = new List<IComposedRule>
+                    {
 
-                    // Additional check for GivenName. 
-                    //  Max Length = 63.
-                    rules.Add(new ComposedRule(StringLiterals.GivenName,
-                        new StringMaxLengthRule(63)
-                    ));
+                        // Additional check for DisplayName. 
+                        //  Value is non-blank if present
+                        //  Max Length = 255. 
+                        // The attribute being present check is done in mtChecks, however, the errorBlank check is done only if the attribute
+                        // is missing, so that has been updated to check for blanks if attribute present.
+                        new ComposedRule(StringLiterals.DisplayName,
+                            new StringMaxLengthRule(255),
+                            new BlankStringRule((entry, value) => entry.Attributes[StringLiterals.Cn][0].ToString())
+                        ),
 
-                    // New documentation doesn't say anything about mail not being whitespace nor rfc822 format, so pulling that out.
-                    // It should just be unique.
-                    //  Max Length = 256 -- See XL sheet
-                    rules.Add(new ComposedRule(StringLiterals.Mail,
-                        new StringMaxLengthRule(256),
-                        new NoDuplicatesRule()
-                    ));
+                        // Additional check for GivenName. 
+                        //  Max Length = 63.
+                        new ComposedRule(StringLiterals.GivenName,
+                            new StringMaxLengthRule(63)
+                        ),
 
-                    // Updated check for MailNickName
-                    //  Cannot start with period (.)
-                    //  Max Length = 64, document doesn't restrict, schema says 64
-                    rules.Add(new ComposedRule(StringLiterals.MailNickName,
-                        new StringMaxLengthRule(64),
-                        new RegexRule(new Regex(@"^[.]+", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
-                    // duplicate rule here 
-                    ));
+                        // New documentation doesn't say anything about mail not being whitespace nor rfc822 format, so pulling that out.
+                        // It should just be unique.
+                        //  Max Length = 256 -- See XL sheet
+                        new ComposedRule(StringLiterals.Mail,
+                            new StringMaxLengthRule(256),
+                            new NoDuplicatesRule()
+                        ),
 
-                    // ProxyAddresses have additional requirements. 
-                    //  Cannot contain space < > () ; , [ ] 
-                    //  There should be no ":" in the suffix part of ProxyAddresses.
-                    //  SMTP addresses should conform to valid email formats
-                    //
-                    // Considered and discarded. 
-                    // One option is that we do a format check for ProxyAddresses & TargetAddresses to be
-                    // <prefix>:<suffix>. In which case, we could pass in RegEx for the else part of smtp.IsMatch()
-                    // Instead, we'll just special case the check in mtChecks and get rid of the ":" in the suffix. 
-                    // That I think will benefit more customers, than giving a format error which they have to go and fix.
-                    //
-                    rules.Add(new ProxyAddressComposedRule(
-                        new StringMaxLengthRule(256),
-                        new FixProxyTargetAddressRule(),
-                        new NoDuplicatesRule()
-                    ));
+                        // Updated check for MailNickName
+                        //  Cannot start with period (.)
+                        //  Max Length = 64, document doesn't restrict, schema says 64
+                        new ComposedRule(StringLiterals.MailNickName,
+                            new StringMaxLengthRule(64),
+                            new RegexRule(new Regex(@"^[.]+", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
+                            new NoDuplicatesRule()
+                        ),
 
-                    // If UPN is valid, and samAccountName is Invalid, sync still works, so we check for invalid
-                    // SamAccountName only if UPN isn't valid
-                    // Max Length = 20
-                    // Invalid Characters [ \ " | , \ : <  > + = ? * ]
-                    rules.Add(new ComposedRule(StringLiterals.SamAccountName,
-                        new SamAccountNameMaxLengthRule(),
-                        new RegexRule(new Regex(@"[\\""|,/\[\]:<>+=;?*]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
-                        new SamAccountNameDuplicateRule()
-                    ));
+                        // ProxyAddresses have additional requirements. 
+                        //  Cannot contain space < > () ; , [ ] 
+                        //  There should be no ":" in the suffix part of ProxyAddresses.
+                        //  SMTP addresses should conform to valid email formats
+                        //
+                        // Considered and discarded. 
+                        // One option is that we do a format check for ProxyAddresses & TargetAddresses to be
+                        // <prefix>:<suffix>. In which case, we could pass in RegEx for the else part of smtp.IsMatch()
+                        // Instead, we'll just special case the check in mtChecks and get rid of the ":" in the suffix. 
+                        // That I think will benefit more customers, than giving a format error which they have to go and fix.
+                        //
+                        new ProxyAddressComposedRule(
+                            new StringMaxLengthRule(256),
+                            new FixProxyTargetAddressRule(),
+                            new NoDuplicatesRule()
+                        ),
 
-                    // Checks for TargetAddress
-                    rules.Add(new TargetAddressComposedRule(
-                        new StringMaxLengthRule(255),
-                        new FixProxyTargetAddressRule(),
-                        new NoDuplicatesRule()
-                    ));
+                        // If UPN is valid, and samAccountName is Invalid, sync still works, so we check for invalid
+                        // SamAccountName only if UPN isn't valid
+                        // Max Length = 20
+                        // Invalid Characters [ \ " | , \ : <  > + = ? * ]
+                        new ComposedRule(StringLiterals.SamAccountName,
+                            new SamAccountNameMaxLengthRule(),
+                            new RegexRule(new Regex(@"[\\""|,/\[\]:<>+=;?*]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)),
+                            new SamAccountNameDuplicateRule()
+                        ),
+
+                        // Checks for TargetAddress
+                        new TargetAddressComposedRule(
+                            new StringMaxLengthRule(255),
+                            new FixProxyTargetAddressRule(),
+                            new NoDuplicatesRule()
+                        )
+                    };
 
                     // Updated UPN 
                     //  Should confirm to rfc2822 -- checked in mtChecks
@@ -124,6 +147,9 @@ namespace IdFix.Rules
 
         #region AttributesToQuery
 
+        /// <summary>
+        /// Set of attributes to return for this collection's queries
+        /// </summary>
         public override string[] AttributesToQuery => new string[] {
             StringLiterals.Cn,
             StringLiterals.DisplayName,
@@ -147,6 +173,11 @@ namespace IdFix.Rules
 
         #region Skip
 
+        /// <summary>
+        /// Logic to determine if a given <see cref="SearchResultEntry"/> is skipped for processing
+        /// </summary>
+        /// <param name="entry"><see cref="SearchResultEntry"/> to check</param>
+        /// <returns>True if <paramref name="entry"/> should be skipped, false if it should be processed</returns>
         public override bool Skip(SearchResultEntry entry)
         {
             string objectDn = String.Empty;
@@ -195,7 +226,7 @@ namespace IdFix.Rules
                 }
 
                 // determine objectClass
-                string objectType = entry.Attributes[StringLiterals.ObjectClass][entry.Attributes[StringLiterals.ObjectClass].Count - 1].ToString();
+                string objectType = ComposedRule.GetObjectType(entry);
 
                 // User objects are filtered if:
                 if (objectType.Equals("user", StringComparison.CurrentCultureIgnoreCase))

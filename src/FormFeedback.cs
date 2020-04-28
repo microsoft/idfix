@@ -11,9 +11,9 @@ namespace IdFix
 {
     public partial class FormFeedback : Form
     {
-        private Form1 myParent;
+        private FormApp myParent;
 
-        public FormFeedback(Form1 frm1)
+        public FormFeedback(FormApp frm1)
         {
             InitializeComponent();
             myParent = frm1;

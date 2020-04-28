@@ -1,11 +1,8 @@
 ﻿using IdFix.Rules.Shared;
 using IdFix.Settings;
-using System;
 using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdFix.Rules.MultiTentant
 {
@@ -14,9 +11,18 @@ namespace IdFix.Rules.MultiTentant
     /// </summary>
     class TargetAddressComposedRule : ComposedRule
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="TargetAddressComposedRule"/> class
+        /// </summary>
+        /// <param name="additionalRules">Any additional rules to include within this special compound rule</param>
         public TargetAddressComposedRule(params Rule[] additionalRules)
             : base(StringLiterals.TargetAddress, additionalRules) { }
 
+        /// <summary>
+        /// Executes implementation for this rule
+        /// </summary>
+        /// <param name="entry">The search result we are checking</param>
+        /// <returns>Either a success or error result</returns>
         public override ComposedRuleResult[] Execute(SearchResultEntry entry)
         {
             var result = this.InitResult(entry, out bool isValuePresent);
@@ -34,6 +40,7 @@ namespace IdFix.Rules.MultiTentant
 
             // reset rule list
             var rulesList = this.Rules.ToList();
+
             // then need to do special cases to add in the rules based on what is needed
             if (Constants.SMTPRegex.IsMatch(attributeValue))
             {

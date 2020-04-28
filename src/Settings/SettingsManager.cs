@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdFix.Settings
 {
+    /// <summary>
+    /// Used to centrally track application runtime settings
+    /// </summary>
+    /// <remarks>Settings are managed via FormSettings and read throughout the application from this central store</remarks>
     class SettingsManager
     {
         private static SettingsManager _instance = null;
@@ -36,6 +36,9 @@ namespace IdFix.Settings
             this.Server = System.Environment.MachineName;
         }
 
+        /// <summary>
+        /// Gets the singleton instance containing the application settings
+        /// </summary>
         public static SettingsManager Instance
         {
             get
@@ -114,7 +117,7 @@ namespace IdFix.Settings
         public string Username { get; set; }
 
         /// <summary>
-        /// Specified username used in non-current user mode
+        /// Specified password used in non-current user mode
         /// </summary>
         public string Password { get; set; }
     }

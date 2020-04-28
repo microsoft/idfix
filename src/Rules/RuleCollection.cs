@@ -3,23 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices.Protocols;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdFix.Rules
 {
-    class RuleCollectionError
-    {
-        string DistinguisedName { get; set; }
-        string ObjectClass { get; set; }
-        string AttributeName { get; set; }
-        string Error { get; set; }
-        string OriginalValue { get; set; }
-        string UpdatedValue { get; set; }
-    }
-
     public class RuleCollectionResult
     {
         /// <summary>

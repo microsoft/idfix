@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace IdFix.Settings
 {
+    /// <summary>
+    /// Defines constants used in this application
+    /// </summary>
     static class Constants
     {
         public static string[] WellKnownExclusions = {
@@ -38,6 +36,7 @@ namespace IdFix.Settings
         public static Regex InvalidProxyAddressRegex = new Regex(@"[\s<>\(\)\,\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         public static Regex InvalidTargetAddressSMTPRegEx = new Regex(@"[\s\\<>\(\)\;\,\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         public static Regex InvalidTargetAddressRegEx = new Regex(@"[\s\\<>\(\)\,\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        
         // source: https://www.ietf.org/rfc/rfc2253.txt
         public static Regex InvalidX400ProxyAddressRegex = new Regex(@"[\f\n\r\t\v\(\)\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         public static Regex InvalidX500ProxyAddressRegex = new Regex(@"[\f\n\r\t\v\(\)\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);

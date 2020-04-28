@@ -4,10 +4,18 @@ using System.Text.RegularExpressions;
 
 namespace IdFix.Rules.Shared
 {
+    /// <summary>
+    /// Rule used to ensure attribute values conform to RFC 2822 and suggest a replacement if they do not
+    /// </summary>
     class RFC2822Rule : Rule
     {
-        public RFC2822Rule() : base() { }
-
+        /// <summary>
+        /// Executes implementation for this rule
+        /// </summary>
+        /// <param name="parent">The composed rule containing this rule</param>
+        /// <param name="entry">The search result we are checking</param>
+        /// <param name="attributeValue">The current attribute value as pass through the chain</param>
+        /// <returns>Either a success or error result</returns>
         public override RuleResult Execute(ComposedRule parent, SearchResultEntry entry, string attributeValue)
         {
             var tldList = new ValidTLDList();
@@ -20,7 +28,7 @@ namespace IdFix.Rules.Shared
                 string tldDomain = validateAttribute.ToLowerInvariant().Substring(validateAttribute.LastIndexOf("."));
                 if (tldDomain.Length > 1)
                 {
-                    if (!tldList.Contains(tldDomain))
+                    if (!tldList.IsValid(tldDomain))
                     {
                         success = false;
                         errors |= ErrorType.TopLevelDomain;
