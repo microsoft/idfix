@@ -211,6 +211,8 @@ namespace IdFix.Controls
                     this.CurrentCell = this.Rows[0].Cells[StringLiterals.DistinguishedName];
                 }
 
+                this.OnStatusUpdate?.Invoke("Populated DataGrid");
+
                 timer.Stop();
                 this.OnStatusUpdate?.Invoke(StringLiterals.ElapsedTimePopulateDataGridView + timer.Elapsed.TotalSeconds);
 
@@ -438,7 +440,7 @@ namespace IdFix.Controls
         /// Enables filling from the ldf file written by <seealso cref="ToLdf"/>
         /// </summary>
         /// <param name="reader"></param>
-        public void SetFromLdf(StreamReader reader)
+        public void SetFromLdf(StreamReader reader, bool isUndo = false)
         {
             this.Reset();
             this._filledFromResults = false;
@@ -472,6 +474,15 @@ namespace IdFix.Controls
                             this.Rows[lineIndex].Cells[StringLiterals.Update].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);
                             break;
                     }
+                }
+            }
+
+            if (isUndo)
+            {
+                for (var i = 0; i < this.Rows.Count; i++)
+                {
+                    // auto fill the proposed action to undo so if they accept it will fill the drop downs as expected
+                    this.Rows[i].Cells[StringLiterals.ProposedAction].Value = StringLiterals.Undo;
                 }
             }
 

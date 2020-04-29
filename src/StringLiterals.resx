@@ -258,8 +258,8 @@
   <data name="IdFixPrivacyTitle" xml:space="preserve">
     <value>IdFix Privacy Statement</value>
   </data>
-  <data name="IdFixVersion" xml:space="preserve">
-    <value>IdFix version 2.1.3.0</value>
+  <data name="IdFixVersionFormat" xml:space="preserve">
+    <value>IdFix version {0}</value>
   </data>
   <data name="ImportFile" xml:space="preserve">
     <value>Import File</value>

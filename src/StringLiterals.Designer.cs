@@ -493,11 +493,11 @@ namespace IdFix {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IdFix version 2.1.3.0.
+        ///   Looks up a localized string similar to IdFix version {0}.
         /// </summary>
-        internal static string IdFixVersion {
+        internal static string IdFixVersionFormat {
             get {
-                return ResourceManager.GetString("IdFixVersion", resourceCulture);
+                return ResourceManager.GetString("IdFixVersionFormat", resourceCulture);
             }
         }
         

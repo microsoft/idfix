@@ -1,17 +1,11 @@
-﻿using IdFix.Controls;
-using IdFix.Rules;
+﻿using IdFix.Rules;
 using IdFix.Settings;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.Protocols;
-using System.Globalization;
-using System.Linq;
 using System.IO;
-using System.Net;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace IdFix
@@ -33,13 +27,12 @@ namespace IdFix
             {
                 this.firstRun = true; //Only the first time.
                 InitializeComponent();
-                statusDisplay("Initialized - " + StringLiterals.IdFixVersion);
+                statusDisplay("Initialized - " + StringLiterals.IdFixVersionFormat);
                 MessageBox.Show(StringLiterals.IdFixPrivacyBody,
                         StringLiterals.IdFixPrivacyTitle,
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Exclamation,
                         MessageBoxDefaultButton.Button1);
-                this.Text = StringLiterals.IdFixVersion;
             }
             catch (Exception ex)
             {
@@ -54,6 +47,8 @@ namespace IdFix
             EnableButtons();
             try
             {
+                this.Text = string.Format(StringLiterals.IdFixVersionFormat, Application.ProductVersion);
+
                 // setup the grid to display results
                 if (firstRun)
                 {
@@ -91,6 +86,9 @@ namespace IdFix
                     else if (args.Cancelled)
                     {
                         statusDisplay(StringLiterals.CancelQuery);
+
+                        // TODO:: on cancel need to update button display, check with original code to see how they did it.
+
                     }
                     else
                     {
@@ -111,8 +109,8 @@ namespace IdFix
                             var results = (RulesRunnerResult)args.Result;
 
                             // update status with final results
-                            statusDisplay(string.Format("Query Count: {0} Error Count: {1} Duplicates: {2} Skipped: {3}", results.TotalProcessed, results.TotalErrors, results.TotalDuplicates, results.TotalSkips));
                             statusDisplay(string.Format("Total Elapsed Time: {0}s", results.TotalElapsed.TotalSeconds));
+                            statusDisplay(string.Format("Total Entries Found: {0} Error Count: {1} Duplicates: {2} Skipped: {3}", results.TotalFound, results.TotalErrors, results.TotalDuplicates, results.TotalSkips));
 
                             // set the results on our grid which will handle filling itself
                             this.grid.SetFromResults(results);
@@ -137,12 +135,6 @@ namespace IdFix
                 acceptToolStripMenuItem.Enabled = false;
                 applyToolStripMenuItem.Enabled = false;
                 exportToolStripMenuItem.Enabled = false;
-
-                /* We can hide them, but we won't.
-                acceptToolStripMenuItem.Visible = false;
-                applyToolStripMenuItem.Visible = false;
-                exportToolStripMenuItem.Visible = false;
-                */
             }
             else
             {
@@ -150,12 +142,6 @@ namespace IdFix
                 acceptToolStripMenuItem.Enabled = true;
                 applyToolStripMenuItem.Enabled = true;
                 exportToolStripMenuItem.Enabled = true;
-
-                /*
-                acceptToolStripMenuItem.Visible = true;
-                applyToolStripMenuItem.Visible = true;
-                exportToolStripMenuItem.Visible = true;
-                */
             }
 
         }
@@ -247,11 +233,12 @@ namespace IdFix
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question,
                     MessageBoxDefaultButton.Button2);
+
                 if (result == DialogResult.Yes)
                 {
                     foreach (DataGridViewRow row in grid.Rows)
                     {
-                        if (!Enum.TryParse(row.Cells[StringLiterals.ProposedAction].Value.ToString(), true, out ActionType proposedAction))
+                        if (!Enum.TryParse(row.GetCellString(StringLiterals.ProposedAction, "Edit"), true, out ActionType proposedAction))
                         {
                             proposedAction = ActionType.Edit;
                         }
@@ -266,6 +253,9 @@ namespace IdFix
                                 break;
                             case ActionType.Remove:
                                 row.Cells[StringLiterals.Action].Value = StringLiterals.Remove;
+                                break;
+                            case ActionType.Undo:
+                                row.Cells[StringLiterals.Action].Value = StringLiterals.Undo;
                                 break;
                             default:
                                 row.Cells[StringLiterals.Action].Value = StringLiterals.Edit;
@@ -560,11 +550,11 @@ namespace IdFix
 
             if (SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant)
             {
-                this.Text = StringLiterals.IdFixVersion + StringLiterals.MultiTenant + " - Import";
+                this.Text = string.Format(StringLiterals.IdFixVersionFormat, Application.ProductVersion) + StringLiterals.MultiTenant + " - Import";
             }
             else
             {
-                this.Text = StringLiterals.IdFixVersion + StringLiterals.Dedicated + " - Import";
+                this.Text = string.Format(StringLiterals.IdFixVersionFormat, Application.ProductVersion) + StringLiterals.Dedicated + " - Import";
             }
 
             action.Items.Clear();
@@ -632,7 +622,7 @@ namespace IdFix
 
                         using (StreamReader reader = new StreamReader(openFileDialog.FileName))
                         {
-                            this.grid.SetFromLdf(reader);
+                            this.grid.SetFromLdf(reader, true);
                         }
 
                         statusDisplay(StringLiterals.ActionSelection);
