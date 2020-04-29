@@ -190,11 +190,12 @@ namespace IdFix.Controls
                 this.OnStatusUpdate?.Invoke("Populating DataGrid");
 
                 // calculate the results to show based on page size and current page
-                var displaySet = this._results.Skip(this._currentPage * this.PageSize).Take(this.PageSize);
-
+                var displaySet = this._results.Skip(this._currentPage * this.PageSize).Take(this.PageSize).ToArray();
+                var len = displaySet.Length;
                 // show those results
-                foreach (var item in displaySet)
+                for (var i = 0; i < len; i++)
                 {
+                    var item = displaySet[i];
                     var rowIndex = this.Rows.Add();
                     var row = this.Rows[rowIndex];
                     row.Cells[StringLiterals.DistinguishedName].Value = item.EntityDistinguishedName;
@@ -244,7 +245,13 @@ namespace IdFix.Controls
         {
             this._filledFromResults = true;
             this.Reset();
-            this._results = results.ToDataset();
+            var result = this.BeginInvoke(new Func<IEnumerable<ComposedRuleResult>>(() =>
+            {
+                var r = results.ToDataset();
+                this._totalResults = r.Count();
+                return r;
+            }));
+            this._results = (IEnumerable<ComposedRuleResult>)this.EndInvoke(result);
             this._totalResults = this._results.Count();
             this._pageCount = (this._totalResults + this.PageSize - 1) / this.PageSize;
             this.FillGrid();

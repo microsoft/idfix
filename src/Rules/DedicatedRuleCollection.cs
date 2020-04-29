@@ -26,8 +26,8 @@ namespace IdFix.Rules
         /// <param name="connection">Configured <see cref="LdapConnection"/> used to make queries</param>
         /// <param name="distinguishedName"></param>
         /// <param name="pageSize"></param>
-        public DedicatedRuleCollection(LdapConnection connection, string distinguishedName)
-            : base(connection, distinguishedName)
+        public DedicatedRuleCollection(string distinguishedName)
+            : base(distinguishedName)
         {
         }
 

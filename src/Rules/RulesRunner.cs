@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.DirectoryServices.Protocols;
 using System.Linq;
 
@@ -105,7 +106,7 @@ namespace IdFix.Rules
         public RulesRunner()
         {
             this.WorkerSupportsCancellation = true;
-            this.DoWork += this.RunRules;
+            this.DoWork += this.Run;
         }
 
         /// <summary>
@@ -113,14 +114,14 @@ namespace IdFix.Rules
         /// </summary>
         public event OnStatusUpdateDelegate OnStatusUpdate;
 
-        #region RunRules
+        #region Run
 
         /// <summary>
         /// Runs the rules
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e">args</param>
-        private void RunRules(object sender, DoWorkEventArgs e)
+        private void Run(object sender, DoWorkEventArgs e)
         {
             try
             {
@@ -155,10 +156,20 @@ namespace IdFix.Rules
                     var identifier = servers.Length > 0 ? servers.First() : Guid.NewGuid().ToString("D");
 
                     // get the rule collection to run
-                    var ruleCollection = this.GetRuleCollection(connection, distinguishedName);
+                    var ruleCollection = this.GetRuleCollection(distinguishedName);
 
-                    // run that collection and add the results into the collector
-                    results.Add(identifier, ruleCollection.Run());
+                    // runs the rule collection
+                    var result = this.ExecuteRuleCollection(ruleCollection, connection);
+
+                    // handle the cancel case
+                    if (result == null && this.CancellationPending)
+                    {
+                        e.Result = null;
+                        return;
+                    }
+
+                    // add our result to the list
+                    results.Add(identifier, result);
                 });
 
                 // we pass back the collection of all results for processing into the UI grid
@@ -185,21 +196,122 @@ namespace IdFix.Rules
         /// <param name="connection">LdapConnection used to make the requests</param>
         /// <param name="distinguishedName">Distinguised name calculated while constructing the connection</param>
         /// <returns>A rule collection to run against the supplied connection</returns>
-        private RuleCollection GetRuleCollection(LdapConnection connection, string distinguishedName)
+        private RuleCollection GetRuleCollection(string distinguishedName)
         {
             RuleCollection collection;
             if (SettingsManager.Instance.CurrentRuleMode == RuleMode.MultiTenant)
             {
-                collection = new MultiTenantRuleCollection(connection, distinguishedName);
+                collection = new MultiTenantRuleCollection(distinguishedName);
             }
             else
             {
-                collection = new DedicatedRuleCollection(connection, distinguishedName);
+                collection = new DedicatedRuleCollection(distinguishedName);
             }
 
             collection.OnStatusUpdate += (string message) => { this.OnStatusUpdate?.Invoke(message); };
 
             return collection;
+        }
+
+        #endregion
+
+        #region ExecuteRuleCollection
+
+        /// <summary>
+        /// Executes a rule collection against the supplied connection
+        /// </summary>
+        /// <param name="collection">The rule collection to execute</param>
+        /// <param name="connection">The connection used to retrieve entries for processing</param>
+        /// <returns><see cref="RuleCollectionResult"/> or null if canceled</returns>
+        private RuleCollectionResult ExecuteRuleCollection(RuleCollection collection, LdapConnection connection)
+        {
+            // these count all the totals for the connection against which this RuleCollection is being run
+            var stopWatch = new Stopwatch();
+            long skipCount = 0;
+            long entryCount = 0;
+            long duplicateCount = 0;
+            long errorCount = 0;
+
+            this.OnStatusUpdate?.Invoke("Please wait while the LDAP Connection is established.");
+            var searchRequest = collection.CreateSearchRequest();
+            this.OnStatusUpdate?.Invoke("LDAP Connection established.");
+
+            var errors = new List<ComposedRuleResult>();
+
+            this.OnStatusUpdate?.Invoke("Beginning query");
+
+            while (true)
+            {
+                var searchResponse = (SearchResponse)connection.SendRequest(searchRequest);
+
+                // verify support for paged results
+                if (searchResponse.Controls.Length != 1 || !(searchResponse.Controls[0] is PageResultResponseControl))
+                {
+                    this.OnStatusUpdate?.Invoke("The server cannot page the result set.");
+                    throw new InvalidOperationException("The server cannot page the result set.");
+                }
+
+                foreach (SearchResultEntry entry in searchResponse.Entries)
+                {
+                    if (this.CancellationPending)
+                    {
+                        return null;
+                    }
+
+                    if (collection.Skip(entry))
+                    {
+                        skipCount++;
+                        continue;
+                    }
+
+                    // this tracks the number of entries we have processed and not skipped
+                    entryCount++;
+
+                    foreach (var composedRule in collection.Rules)
+                    {
+                        // run each composed rule which can produce multiple results
+                        var results = composedRule.Execute(entry);
+
+                        for (var i = 0; i < results.Length; i++)
+                        {
+                            if (!results[i].Success)
+                            {
+                                errorCount++;
+
+                                if (results[i].Results.Any(r => (r.ErrorTypeFlags & ErrorType.Duplicate) != 0))
+                                {
+                                    duplicateCount++;
+                                }
+
+                                errors.Add(results[i]);
+                            }
+                        }
+                    }
+                }
+
+                // handle paging
+                var cookie = searchResponse.Controls.OfType<PageResultResponseControl>().First().Cookie;
+
+                // if this is true, there are no more pages to request
+                if (cookie.Length == 0)
+                    break;
+
+                searchRequest.Controls.OfType<PageResultRequestControl>().First().Cookie = cookie;
+            }
+
+            // we are all done, stop tracking time
+            stopWatch.Stop();
+
+            return new RuleCollectionResult
+            {
+                TotalDuplicates = duplicateCount,
+                TotalErrors = errorCount,
+                TotalFound = skipCount + entryCount,
+                TotalSkips = skipCount,
+                TotalProcessed = entryCount,
+                Elapsed = stopWatch.Elapsed,
+                Errors = errors.ToArray()
+            };
         }
 
         #endregion

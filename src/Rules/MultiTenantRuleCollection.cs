@@ -25,8 +25,8 @@ namespace IdFix.Rules
         /// <param name="connection">Configured <see cref="LdapConnection"/> used to make queries</param>
         /// <param name="distinguishedName"></param>
         /// <param name="pageSize"></param>
-        public MultiTenantRuleCollection(LdapConnection connection, string distinguishedName)
-            : base(connection, distinguishedName)
+        public MultiTenantRuleCollection(string distinguishedName)
+            : base(distinguishedName)
         {
             this._rules = null;
         }

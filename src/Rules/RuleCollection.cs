@@ -1,12 +1,11 @@
 ﻿using IdFix.Settings;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.DirectoryServices.Protocols;
-using System.Linq;
 
 namespace IdFix.Rules
 {
+    #region RuleCollectionResult
+
     public class RuleCollectionResult
     {
         /// <summary>
@@ -45,18 +44,18 @@ namespace IdFix.Rules
         public ComposedRuleResult[] Errors { get; set; }
     }
 
+    #endregion
+
     abstract class RuleCollection
     {
-        protected RuleCollection(LdapConnection connection, string distinguishedName, int pageSize = 1000)
+        protected RuleCollection(string distinguishedName, int pageSize = 1000)
         {
-            this.Connection = connection;
             this.DistinguishedName = distinguishedName;
             this.PageSize = pageSize;
         }
 
         public event OnStatusUpdateDelegate OnStatusUpdate;
 
-        protected LdapConnection Connection { get; private set; }
         protected string DistinguishedName { get; private set; }
         protected int PageSize { get; private set; }
 
@@ -64,106 +63,13 @@ namespace IdFix.Rules
         public abstract bool Skip(SearchResultEntry entry);
         public abstract IComposedRule[] Rules { get; }
 
-        public virtual RuleCollectionResult Run()
-        {
-            // these count all the totals for the connection against which this RuleCollection is being run
-            var stopWatch = new Stopwatch();
-            long skipCount = 0;
-            long entryCount = 0;
-            long duplicateCount = 0;
-            long errorCount = 0;
-
-            this.OnStatusUpdate?.Invoke("Please wait while the LDAP Connection is established.");
-            var searchRequest = this.CreateSearchRequest();
-
-            var errors = new List<ComposedRuleResult>();
-
-            while (true)
-            {
-                var searchResponse = (SearchResponse)this.Connection.SendRequest(searchRequest);
-
-                // verify support for paged results
-                if (searchResponse.Controls.Length != 1 || !(searchResponse.Controls[0] is PageResultResponseControl))
-                {
-                    this.InvokeStatus("The server cannot page the result set.");
-                    throw new InvalidOperationException("The server cannot page the result set.");
-                }
-
-                foreach (SearchResultEntry entry in searchResponse.Entries)
-                {
-                    // TODO:: check for cancel - need to figure out how this works with background worker
-                    //if (backgroundWorker1.CancellationPending)
-                    //{
-                    //    e.Cancel = true;
-                    //    e.Result = StringLiterals.CancelQuery;
-                    //    files.DeleteByType(FileTypes.Error);
-                    //    files.DeleteByType(FileTypes.Duplicate);
-                    //    return;
-                    //}
-
-                    if (this.Skip(entry))
-                    {
-                        skipCount++;
-                        continue;
-                    }
-
-                    // this tracks the number of entries we have processed and not skipped
-                    entryCount++;
-
-                    foreach (var composedRule in this.Rules)
-                    {
-                        // run each composed rule which can produce multiple results
-                        var results = composedRule.Execute(entry);
-
-                        for (var i = 0; i < results.Length;i++)
-                        {
-                            if (!results[i].Success)
-                            {
-                                errorCount++;
-
-                                if (results[i].Results.Any(r => (r.ErrorTypeFlags & ErrorType.Duplicate) != 0))
-                                {
-                                    duplicateCount++;
-                                }
-
-                                errors.Add(results[i]);
-                            }
-                        }
-                    }
-                }
-
-                // handle paging
-                var cookie = searchResponse.Controls.OfType<PageResultResponseControl>().First().Cookie;
-
-                // if this is true, there are no more pages to request
-                if (cookie.Length == 0)
-                    break;
-
-                searchRequest.Controls.OfType<PageResultRequestControl>().First().Cookie = cookie;
-            }
-
-            // we are all done, stop tracking time
-            stopWatch.Stop();
-
-            return new RuleCollectionResult
-            {
-                TotalDuplicates = duplicateCount,
-                TotalErrors = errorCount,
-                TotalFound = skipCount + entryCount,
-                TotalSkips = skipCount,
-                TotalProcessed = entryCount,
-                Elapsed = stopWatch.Elapsed,
-                Errors = errors.ToArray()
-            };
-        }
-
         #region CreateSearchRequest
 
         /// <summary>
         /// Creates the search request for this rule collection
         /// </summary>
         /// <returns>Configured search request</returns>
-        protected virtual SearchRequest CreateSearchRequest(bool includePaging = true)
+        public virtual SearchRequest CreateSearchRequest(bool includePaging = true)
         {
             var searchRequest = new SearchRequest(
                 this.DistinguishedName,

@@ -13,7 +13,6 @@ namespace IdFix
     public partial class FormApp : Form
     {
         Files files = new Files();
-
         RulesRunner runner;
 
         internal bool firstRun = false;
@@ -54,70 +53,9 @@ namespace IdFix
                 {
                     this.grid.OnStatusUpdate += (string message) =>
                     {
-                        this.BeginInvoke((MethodInvoker)delegate
-                        {
-                            statusDisplay(message);
-                        });
+                        statusDisplay(message);
                     };
                 }
-
-                // setup the background worker
-                runner = new RulesRunner();
-                runner.OnStatusUpdate += (string message) =>
-                {
-                    this.BeginInvoke((MethodInvoker)delegate
-                    {
-                        statusDisplay(message);
-                    });
-                };
-                runner.RunWorkerCompleted += (object s, RunWorkerCompletedEventArgs args) =>
-                {
-                    if (args.Error != null || args.Result is Exception)
-                    {
-                        if (args.Result is Exception)
-                        {
-                            MessageBox.Show((args.Result as Exception).Message);
-                        }
-                        else
-                        {
-                            MessageBox.Show(args.Error.Message);
-                        }
-                    }
-                    else if (args.Cancelled)
-                    {
-                        statusDisplay(StringLiterals.CancelQuery);
-
-                        // TODO:: on cancel need to update button display, check with original code to see how they did it.
-
-                    }
-                    else
-                    {
-                        this.BeginInvoke((MethodInvoker)delegate
-                        {
-                            firstRun = false;
-
-                            queryToolStripMenuItem.Enabled = true;
-                            cancelToolStripMenuItem.Enabled = false;
-                            acceptToolStripMenuItem.Enabled = true;
-                            applyToolStripMenuItem.Enabled = true;
-                            exportToolStripMenuItem.Enabled = true;
-                            importToolStripMenuItem.Enabled = true;
-                            undoToolStripMenuItem.Enabled = true;
-
-                            // this should update the UI grid with all our error results
-                            // also need to check for errors
-                            var results = (RulesRunnerResult)args.Result;
-
-                            // update status with final results
-                            statusDisplay(string.Format("Total Elapsed Time: {0}s", results.TotalElapsed.TotalSeconds));
-                            statusDisplay(string.Format("Total Entries Found: {0} Error Count: {1} Duplicates: {2} Skipped: {3}", results.TotalFound, results.TotalErrors, results.TotalDuplicates, results.TotalSkips));
-
-                            // set the results on our grid which will handle filling itself
-                            this.grid.SetFromResults(results);
-                            this.SetPagingVisibility();
-                        });
-                    }
-                };
             }
             catch (Exception ex)
             {
@@ -143,13 +81,67 @@ namespace IdFix
                 applyToolStripMenuItem.Enabled = true;
                 exportToolStripMenuItem.Enabled = true;
             }
-
         }
 
         private void SetPagingVisibility()
         {
             previousToolStripMenuItem.Visible = this.grid.HasPrev;
             nextToolStripMenuItem.Visible = this.grid.HasNext;
+        }
+
+        private void InitRunner()
+        {
+            // setup the background worker
+            runner = new RulesRunner();
+            runner.OnStatusUpdate += (string message) =>
+            {
+                statusDisplay(message);
+            };
+            runner.RunWorkerCompleted += (object s, RunWorkerCompletedEventArgs args) =>
+            {
+                if (args.Error != null || args.Result is Exception)
+                {
+                    if (args.Result is Exception)
+                    {
+                        MessageBox.Show((args.Result as Exception).Message);
+                    }
+                    else
+                    {
+                        MessageBox.Show(args.Error.Message);
+                    }
+                }
+                else if (args.Cancelled)
+                {
+                    statusDisplay(StringLiterals.CancelQuery);
+                }
+                else
+                {
+                    firstRun = false;
+
+                    this.Invoke(new Action(() =>
+                     {
+                         queryToolStripMenuItem.Enabled = true;
+                         cancelToolStripMenuItem.Enabled = false;
+                         acceptToolStripMenuItem.Enabled = true;
+                         applyToolStripMenuItem.Enabled = true;
+                         exportToolStripMenuItem.Enabled = true;
+                         importToolStripMenuItem.Enabled = true;
+                         undoToolStripMenuItem.Enabled = true;
+
+                         // this should update the UI grid with all our error results
+                         // also need to check for errors
+                         var results = (RulesRunnerResult)args.Result;
+
+                         // update status with final results
+                         statusDisplay(string.Format("Total Elapsed Time: {0}s", results.TotalElapsed.TotalSeconds));
+                         statusDisplay(string.Format("Total Entries Found: {0} Error Count: {1} Duplicates: {2} Skipped: {3}", results.TotalFound, results.TotalErrors, results.TotalDuplicates, results.TotalSkips));
+
+                         // set the results on our grid which will handle filling itself
+                         this.grid.SetFromResults(results);
+                         this.SetPagingVisibility();
+                     }));
+                }
+            };
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -168,6 +160,7 @@ namespace IdFix
         #region menu
         private void queryToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            this.InitRunner();
             try
             {
                 statusDisplay(StringLiterals.Query);
@@ -203,18 +196,23 @@ namespace IdFix
                 statusDisplay(StringLiterals.Exception + toolStripStatusLabel1.Text + "  " + ex.Message);
                 throw;
             }
+            finally
+            {
+                runner.Dispose();
+            }
         }
 
         private void cancelQueryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
-                BeginInvoke((MethodInvoker)delegate
-                {
-                    cancelToolStripMenuItem.Enabled = false;
-                });
+
+                cancelToolStripMenuItem.Enabled = false;
                 statusDisplay("Canceling...");
-                runner.CancelAsync();
+                if (runner != null)
+                {
+                    runner.CancelAsync();
+                }
                 statusDisplay("Canceled");
             }
             catch (Exception ex)
@@ -577,14 +575,18 @@ namespace IdFix
                     {
                         //First reset firstRun
                         firstRun = false;
-                        EnableButtons();
 
-                        using (var reader = new StreamReader(openFileDialog.FileName))
+                        this.Invoke(new Action(() =>
                         {
-                            this.grid.SetFromCsv(reader);
-                        }
+                            using (var reader = new StreamReader(openFileDialog.FileName))
+                            {
+                                this.grid.SetFromCsv(reader);
+                            }
 
-                        statusDisplay(StringLiterals.ActionSelection);
+                            EnableButtons();
+
+                            statusDisplay(StringLiterals.ActionSelection);
+                        }));
                     }
                 }
             }
@@ -609,23 +611,27 @@ namespace IdFix
                     {
                         //First reset firstRun
                         firstRun = false;
-                        EnableButtons();
                         statusDisplay(StringLiterals.LoadingUpdates);
-                        grid.Columns[StringLiterals.Update].ReadOnly = true;
-                        grid.Rows.Clear();
-                        action.Items.Clear();
-                        action.Items.Add(StringLiterals.Undo);
-                        action.Items.Add(StringLiterals.Complete);
-                        editActionToolStripMenuItem.Visible = false;
-                        removeActionToolStripMenuItem.Visible = false;
-                        undoActionToolStripMenuItem.Visible = true;
 
-                        using (StreamReader reader = new StreamReader(openFileDialog.FileName))
+                        this.Invoke(new Action(() =>
                         {
-                            this.grid.SetFromLdf(reader, true);
-                        }
+                            grid.Columns[StringLiterals.Update].ReadOnly = true;
+                            grid.Rows.Clear();
+                            action.Items.Clear();
+                            action.Items.Add(StringLiterals.Undo);
+                            action.Items.Add(StringLiterals.Complete);
+                            editActionToolStripMenuItem.Visible = false;
+                            removeActionToolStripMenuItem.Visible = false;
+                            undoActionToolStripMenuItem.Visible = true;
 
-                        statusDisplay(StringLiterals.ActionSelection);
+                            using (StreamReader reader = new StreamReader(openFileDialog.FileName))
+                            {
+                                this.grid.SetFromLdf(reader, true);
+                            }
+                            EnableButtons();
+
+                            statusDisplay(StringLiterals.ActionSelection);
+                        }));
                     }
                 }
             }
@@ -640,8 +646,13 @@ namespace IdFix
         {
             try
             {
-                this.grid.CurrentPage = this.grid.CurrentPage + 1;
-                this.SetPagingVisibility();
+                var page = this.grid.CurrentPage + 1;
+                statusDisplay(string.Format("Loading page {0}...", page));
+                this.Invoke(new Action(() =>
+                {
+                    this.grid.CurrentPage = page;
+                    this.SetPagingVisibility();
+                }));
             }
             catch (Exception ex)
             {
@@ -654,11 +665,16 @@ namespace IdFix
         {
             try
             {
-                if (this.grid.CurrentPage > 1)
+                var page = this.grid.CurrentPage - 1;
+                statusDisplay(string.Format("Loading page {0}...", page));
+                this.Invoke(new Action(() =>
                 {
-                    this.grid.CurrentPage = this.grid.CurrentPage - 1;
-                    this.SetPagingVisibility();
-                }
+                    if (this.grid.CurrentPage > 1)
+                    {
+                        this.grid.CurrentPage = page;
+                        this.SetPagingVisibility();
+                    }
+                }));
             }
             catch (Exception ex)
             {
