@@ -1,0 +1,444 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AcceptAllUpdates" xml:space="preserve">
+    <value>Accept All Updates</value>
+  </data>
+  <data name="AcceptAllUpdatesBody" xml:space="preserve">
+    <value>Are you sure you wish to Accept all suggested updates and set their Action to EDIT?  NOTE: The user assumes all risk for inspecting each row marked EDIT for suitability and accuracy.  Format errors will not be marked with EDIT as these require user intervention.</value>
+  </data>
+  <data name="Action" xml:space="preserve">
+    <value>action</value>
+  </data>
+  <data name="ActionSelection" xml:space="preserve">
+    <value>Action Selection</value>
+  </data>
+  <data name="AdQueryFail" xml:space="preserve">
+    <value>AD Query Fail</value>
+  </data>
+  <data name="Alpha2" xml:space="preserve">
+    <value>alpha2,</value>
+  </data>
+  <data name="ApplyPending" xml:space="preserve">
+    <value>Apply Pending</value>
+  </data>
+  <data name="ApplyPendingBody" xml:space="preserve">
+    <value>Are you sure you wish to Apply the update values for all transactions with an action?  NOTE: The user assumes all risk for inspecting each row marked with Action for suitability and accuracy.</value>
+  </data>
+  <data name="Attribute" xml:space="preserve">
+    <value>attribute</value>
+  </data>
+  <data name="Blank" xml:space="preserve">
+    <value>blank,</value>
+  </data>
+  <data name="C" xml:space="preserve">
+    <value>c</value>
+  </data>
+  <data name="CancelQuery" xml:space="preserve">
+    <value>Cancel Query</value>
+  </data>
+  <data name="Character" xml:space="preserve">
+    <value>character,</value>
+  </data>
+  <data name="Click" xml:space="preserve">
+    <value>Click</value>
+  </data>
+  <data name="Cn" xml:space="preserve">
+    <value>cn</value>
+  </data>
+  <data name="Co" xml:space="preserve">
+    <value>co</value>
+  </data>
+  <data name="Complete" xml:space="preserve">
+    <value>COMPLETE</value>
+  </data>
+  <data name="Data" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="Dedicated" xml:space="preserve">
+    <value> - Dedicated</value>
+  </data>
+  <data name="Directory" xml:space="preserve">
+    <value>Directory</value>
+  </data>
+  <data name="DirectoryException" xml:space="preserve">
+    <value>DirectoryException:  </value>
+  </data>
+  <data name="DirectoryNotFoundException" xml:space="preserve">
+    <value>DirectoryNotFoundException:  </value>
+  </data>
+  <data name="DirectoryOperationException" xml:space="preserve">
+    <value>DirectoryOperationException:  </value>
+  </data>
+  <data name="DirectoryServicesCOMException" xml:space="preserve">
+    <value>DirectoryServicesCOMException:  </value>
+  </data>
+  <data name="DisplayName" xml:space="preserve">
+    <value>displayName</value>
+  </data>
+  <data name="DistinguishedName" xml:space="preserve">
+    <value>distinguishedName</value>
+  </data>
+  <data name="DomainPart" xml:space="preserve">
+    <value>domainpart,</value>
+  </data>
+  <data name="Duplicate" xml:space="preserve">
+    <value>duplicate,</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>EDIT</value>
+  </data>
+  <data name="ElapsedTimeAdQuery" xml:space="preserve">
+    <value>Elapsed Time: Query - </value>
+  </data>
+  <data name="ElapsedTimeDuplicateChecks" xml:space="preserve">
+    <value>Elapsed Time: Duplicate Checks - </value>
+  </data>
+  <data name="ElapsedTimePopulateDataGridView" xml:space="preserve">
+    <value>Elapsed Time: Populate DataGridView - </value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>error</value>
+  </data>
+  <data name="Exception" xml:space="preserve">
+    <value>Exception: </value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="ExportFile" xml:space="preserve">
+    <value>Export File</value>
+  </data>
+  <data name="ExportFileFilter" xml:space="preserve">
+    <value>Comma Delimited (*.csv)|*.csv|LDAP Data Interchange Format (*.ldf)|*.ldf</value>
+  </data>
+  <data name="Fail" xml:space="preserve">
+    <value>FAIL</value>
+  </data>
+  <data name="Feedback" xml:space="preserve">
+    <value>Feedback</value>
+  </data>
+  <data name="FileActions" xml:space="preserve">
+    <value>File Actions</value>
+  </data>
+  <data name="Format" xml:space="preserve">
+    <value>format,</value>
+  </data>
+  <data name="GivenName" xml:space="preserve">
+    <value>givenName</value>
+  </data>
+  <data name="GroupType" xml:space="preserve">
+    <value>groupType</value>
+  </data>
+  <data name="HomeMdb" xml:space="preserve">
+    <value>homeMdb</value>
+  </data>
+  <data name="IdFix" xml:space="preserve">
+    <value>IdFix</value>
+  </data>
+  <data name="IdFixPrivacyBody" xml:space="preserve">
+    <value>This privacy statement applies to IdFix only.  It does not apply to any other Microsoft Office 365 server or other applications by Microsoft Corporation. IdFix is intended for IT Administrators.  If you are an end-user, Microsoft recommends that you end this program and contact your IT Administrator for assistance.  IdFix collects data from your corporate network and can optionally store data that may contain personal data in a Comma Separated Value (.csv) or LDAP Data Interchange Format (.ldf) file located on the computer where the program was run.  Microsoft recommends that you remove this file when you have completed your use of the program.  IdFix does not send any collected data back to Microsoft or it’s partners.</value>
+  </data>
+  <data name="IdFixPrivacyTitle" xml:space="preserve">
+    <value>IdFix Privacy Statement</value>
+  </data>
+  <data name="IdFixVersionFormat" xml:space="preserve">
+    <value>IdFix version {0}</value>
+  </data>
+  <data name="ImportFile" xml:space="preserve">
+    <value>Import File</value>
+  </data>
+  <data name="ImportFileFilter" xml:space="preserve">
+    <value>Comma Delimited (*.csv)|*.csv</value>
+  </data>
+  <data name="IsCriticalSystemObject" xml:space="preserve">
+    <value>isCriticalSystemObject</value>
+  </data>
+  <data name="Keep" xml:space="preserve">
+    <value>KEEP</value>
+  </data>
+  <data name="Length" xml:space="preserve">
+    <value>length,</value>
+  </data>
+  <data name="Limit" xml:space="preserve">
+    <value>limit,</value>
+  </data>
+  <data name="LoadingUpdates" xml:space="preserve">
+    <value>Loading Updates</value>
+  </data>
+  <data name="LocalPart" xml:space="preserve">
+    <value>localpart,</value>
+  </data>
+  <data name="Mail" xml:space="preserve">
+    <value>mail</value>
+  </data>
+  <data name="MailNickName" xml:space="preserve">
+    <value>mailnickname</value>
+  </data>
+  <data name="Member" xml:space="preserve">
+    <value>member</value>
+  </data>
+  <data name="MenuAccept" xml:space="preserve">
+    <value>MenuAccept</value>
+  </data>
+  <data name="MenuAD" xml:space="preserve">
+    <value>Joined Active Directory</value>
+  </data>
+  <data name="MenuCurrentCredentials" xml:space="preserve">
+    <value>Current Credentials</value>
+  </data>
+  <data name="MenuDedicated" xml:space="preserve">
+    <value>MenuDedicated</value>
+  </data>
+  <data name="MenuFeedback" xml:space="preserve">
+    <value>MenuFeedback</value>
+  </data>
+  <data name="MenuFilter" xml:space="preserve">
+    <value>MenuFilter</value>
+  </data>
+  <data name="MenuLDAP" xml:space="preserve">
+    <value>Other LDAP Directory</value>
+  </data>
+  <data name="MenuMultiTenant" xml:space="preserve">
+    <value>MenuMultiTenant</value>
+  </data>
+  <data name="MenuNext" xml:space="preserve">
+    <value>MenuNext</value>
+  </data>
+  <data name="MenuOtherCredentials" xml:space="preserve">
+    <value>Other Credentials</value>
+  </data>
+  <data name="MenuPort3268" xml:space="preserve">
+    <value>Port 3268</value>
+  </data>
+  <data name="MenuPort389" xml:space="preserve">
+    <value>Port 389</value>
+  </data>
+  <data name="MenuPort636" xml:space="preserve">
+    <value>Port 636</value>
+  </data>
+  <data name="MenuPrevious" xml:space="preserve">
+    <value>MenuPrevious</value>
+  </data>
+  <data name="MenuSettings" xml:space="preserve">
+    <value>Settings - </value>
+  </data>
+  <data name="MoreErrors" xml:space="preserve">
+    <value>More Errors</value>
+  </data>
+  <data name="MsExchHideFromAddressLists" xml:space="preserve">
+    <value>msExchHideFromAddressLists</value>
+  </data>
+  <data name="MsExchRecipientTypeDetails" xml:space="preserve">
+    <value>msExchRecipientTypeDetails</value>
+  </data>
+  <data name="MultiSelect" xml:space="preserve">
+    <value>MultiSelect</value>
+  </data>
+  <data name="MultiTenant" xml:space="preserve">
+    <value> - Multi-Tenant</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>name,</value>
+  </data>
+  <data name="Numeric" xml:space="preserve">
+    <value>numeric,</value>
+  </data>
+  <data name="ObjectClass" xml:space="preserve">
+    <value>objectClass</value>
+  </data>
+  <data name="PrintDataGridView" xml:space="preserve">
+    <value>Print DataGridView</value>
+  </data>
+  <data name="ProxyAddresses" xml:space="preserve">
+    <value>proxyAddresses</value>
+  </data>
+  <data name="Query" xml:space="preserve">
+    <value>Query</value>
+  </data>
+  <data name="ReadDuplicateFile" xml:space="preserve">
+    <value>ReadDuplicateFile</value>
+  </data>
+  <data name="ReadErrorFile" xml:space="preserve">
+    <value>ReadErrorFile</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>REMOVE</value>
+  </data>
+  <data name="SamAccountName" xml:space="preserve">
+    <value>sAMAccountName</value>
+  </data>
+  <data name="SelectDirectorythenQueryAD" xml:space="preserve">
+    <value>Select Directory then Query AD</value>
+  </data>
+  <data name="Sn" xml:space="preserve">
+    <value>sn</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="TargetAddress" xml:space="preserve">
+    <value>targetAddress</value>
+  </data>
+  <data name="Threadsafe" xml:space="preserve">
+    <value>Threadsafe Violation</value>
+  </data>
+  <data name="TopLevelDomain" xml:space="preserve">
+    <value>topleveldomain,</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>UNDO</value>
+  </data>
+  <data name="UndoUpdates" xml:space="preserve">
+    <value>Undo Updates</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>update</value>
+  </data>
+  <data name="UpdateFileFilter" xml:space="preserve">
+    <value>Update (*.ldf)|Update*.ldf</value>
+  </data>
+  <data name="UserPrincipalName" xml:space="preserve">
+    <value>userPrincipalName</value>
+  </data>
+  <data name="Value" xml:space="preserve">
+    <value>value</value>
+  </data>
+  <data name="VerboseLogging" xml:space="preserve">
+    <value>Verbose Logging</value>
+  </data>
+  <data name="ViewNextBlock" xml:space="preserve">
+    <value>View Next Block</value>
+  </data>
+  <data name="ViewPreviousBlock" xml:space="preserve">
+    <value>ViewPreviousBlock</value>
+  </data>
+  <data name="WriteUpdate" xml:space="preserve">
+    <value>Write Update</value>
+  </data>
+  <data name="CustomLdapFilter" xml:space="preserve">
+    <value>Custom LDAP Filter</value>
+  </data>
+  <data name="MenuMultipleAD" xml:space="preserve">
+    <value>Multiple Active Directories</value>
+  </data>
+  <data name="ProposedAction" xml:space="preserve">
+    <value>proposedAction</value>
+  </data>
+</root>
