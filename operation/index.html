@@ -455,15 +455,38 @@
 <li>If a blank datagrid is displayed after execution, then no errors were returned.  This is a good thing.</li>
 </ul>
 </li>
-<li>To correct the object attribute values, select one of the following ACTION options from the drop down list:
-|||
-|-|-|
-|COMPLETE|The original value is acceptable and should not be changed despite being identified as being in an error state.  For example, two users may have a proxyAddress identified as duplicate.  Only one can use the value for mail delivery.  The user with the correct value should be marked as COMPLETE, while the other user is marked as REMOVE.|
-|REMOVE|The attribute value will be cleared from the source object.  In the case of a multi-valued attribute; e.g. proxyAddresses, only the individual value shown will be cleared.|
-|EDIT|The information in the UPDATE column will be used to modify the attribute value for the selected object.  In many cases, a valid update value has been predetermined.  In these cases, you can mark the ACTION as EDIT and go on to the next error. If the predetermined update value is not desired, you can manually input the new value.|
-|UNDO|This value is only shown if the user has loaded a previously saved Update file.  The sole operation that can be executed is to restore the original value.|
-|FAIL|This value is only shown if an update value has an unknown conflict with the directory rules.  In this case, you may attempt to edit the value again. It may be necessary to analyze the values in the object using ADSIEDIT.|</li>
+<li>To correct the object attribute values, select one of the following ACTION options from the drop down list:</li>
 </ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>COMPLETE</td>
+<td>The original value is acceptable and should not be changed despite being identified as being in an error state.  For example, two users may have a proxyAddress identified as duplicate.  Only one can use the value for mail delivery.  The user with the correct value should be marked as COMPLETE, while the other user is marked as REMOVE.</td>
+</tr>
+<tr>
+<td>REMOVE</td>
+<td>The attribute value will be cleared from the source object.  In the case of a multi-valued attribute; e.g. proxyAddresses, only the individual value shown will be cleared.</td>
+</tr>
+<tr>
+<td>EDIT</td>
+<td>The information in the UPDATE column will be used to modify the attribute value for the selected object.  In many cases, a valid update value has been predetermined.  In these cases, you can mark the ACTION as EDIT and go on to the next error. If the predetermined update value is not desired, you can manually input the new value.</td>
+</tr>
+<tr>
+<td>UNDO</td>
+<td>This value is only shown if the user has loaded a previously saved Update file.  The sole operation that can be executed is to restore the original value.</td>
+</tr>
+<tr>
+<td>FAIL</td>
+<td>This value is only shown if an update value has an unknown conflict with the directory rules.  In this case, you may attempt to edit the value again. It may be necessary to analyze the values in the object using ADSIEDIT.</td>
+</tr>
+</tbody>
+</table>
 <blockquote>
 <p>Only errors with a customer selected Action will be considered for update.  To reiterate; unless a specific choice is made IdFix will not perform any operation on the error.   </p>
 </blockquote>
