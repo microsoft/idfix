@@ -46,6 +46,9 @@ namespace IdFix.Controls
         /// </summary>
         private bool _filledFromResults;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="IdFixGrid"/> class
+        /// </summary>
         public IdFixGrid() : base()
         {
             this._results = null;
@@ -245,13 +248,13 @@ namespace IdFix.Controls
         {
             this._filledFromResults = true;
             this.Reset();
-            var result = this.BeginInvoke(new Func<IEnumerable<ComposedRuleResult>>(() =>
+            var invokeResult = this.BeginInvoke(new Func<IEnumerable<ComposedRuleResult>>(() =>
             {
                 var r = results.ToDataset();
                 this._totalResults = r.Count();
                 return r;
             }));
-            this._results = (IEnumerable<ComposedRuleResult>)this.EndInvoke(result);
+            this._results = (IEnumerable<ComposedRuleResult>)this.EndInvoke(invokeResult);
             this._totalResults = this._results.Count();
             this._pageCount = (this._totalResults + this.PageSize - 1) / this.PageSize;
             this.FillGrid();

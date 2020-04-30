@@ -43,7 +43,7 @@ namespace IdFix.Rules
                     /*
                      * ** NOTE **
                      * Based on the original design it matters the order rules are added into a composed rule because the eventual proposed value
-                     * is passed through the chain of rules and potentially could be updated multiple times. The original order of the code is
+                     * is passed through the chain of rules and potentially could be updated multiple times. The original run order of the checks is
                      * preserved here for each composed rule
                      * 
                      * */

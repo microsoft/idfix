@@ -12,21 +12,23 @@ namespace IdFix
 {
     public partial class FormApp : Form
     {
-        Files files = new Files();
+        Files files;
         RulesRunner runner;
+        internal bool firstRun;
 
-        internal bool firstRun = false;
+        #region FormApp
 
-        internal const int maxUserNameLength = 64;
-        internal const int maxDomainLength = 48;
-
+        /// <summary>
+        /// Creates a new instance of the <see cref="FormApp"/> class
+        /// </summary>
         public FormApp()
         {
             try
             {
                 this.firstRun = true; //Only the first time.
+                files = new Files();
                 InitializeComponent();
-                statusDisplay("Initialized - " + StringLiterals.IdFixVersionFormat);
+                statusDisplay("Initialized - " + string.Format(StringLiterals.IdFixVersionFormat, Application.ProductVersion));
                 MessageBox.Show(StringLiterals.IdFixPrivacyBody,
                         StringLiterals.IdFixPrivacyTitle,
                         MessageBoxButtons.OK,
@@ -40,6 +42,15 @@ namespace IdFix
             }
         }
 
+        #endregion
+
+        #region Form1_Load
+
+        /// <summary>
+        /// Handles setting up the form on load
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
             //Let's enable only the first run buttons
@@ -64,6 +75,13 @@ namespace IdFix
             }
         }
 
+        #endregion
+
+        #region EnableButtons
+
+        /// <summary>
+        /// Sets the enabled state of tool strip buttons
+        /// </summary>
         private void EnableButtons()
         {
             //We use the firstRun flag to decide what to do
@@ -83,11 +101,22 @@ namespace IdFix
             }
         }
 
+        #endregion
+
+        #region SetPagingVisibility
+
+        /// <summary>
+        /// Update the visibility of the paging controls based on the availability of previous or next pages
+        /// </summary>
         private void SetPagingVisibility()
         {
             previousToolStripMenuItem.Visible = this.grid.HasPrev;
             nextToolStripMenuItem.Visible = this.grid.HasNext;
         }
+
+        #endregion
+
+        #region InitRunner
 
         private void InitRunner()
         {
@@ -144,10 +173,18 @@ namespace IdFix
             };
         }
 
+        #endregion
+
+        #region Form1_FormClosed
+
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             try
             {
+                if (runner != null)
+                {
+                    runner.Dispose();
+                }
                 Application.Exit();
             }
             catch (Exception ex)
@@ -157,7 +194,10 @@ namespace IdFix
             }
         }
 
-        #region menu
+        #endregion
+
+        #region queryToolStripMenuItem_Click
+
         private void queryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.InitRunner();
@@ -202,6 +242,10 @@ namespace IdFix
             }
         }
 
+        #endregion
+
+        #region cancelQueryToolStripMenuItem_Click
+
         private void cancelQueryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -221,6 +265,10 @@ namespace IdFix
                 throw;
             }
         }
+
+        #endregion
+
+        #region acceptToolStripMenuItem_Click
 
         private void acceptToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -269,10 +317,12 @@ namespace IdFix
             }
         }
 
+        #endregion
+
+        #region applyToolStripMenuItem_Click
+
         private void applyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // TODO:: can we improve this or break the code out somehow?
-
             DialogResult result = MessageBox.Show(StringLiterals.ApplyPendingBody,
                 StringLiterals.ApplyPending,
                 MessageBoxButtons.YesNo,
@@ -285,6 +335,7 @@ namespace IdFix
             }
 
             statusDisplay(StringLiterals.ApplyPending);
+
             grid.CurrentCell = grid.Rows[0].Cells[StringLiterals.DistinguishedName];
 
             files.DeleteByType(FileTypes.Apply);
@@ -433,6 +484,7 @@ namespace IdFix
                     try
                     {
                         // now we execute all of our collected modify requests (1 or 2) here so an error in one allows processing to continue
+                        // previous versions would error out the entire update if one of the pre-requests failed
                         foreach (var request in modifyRequest)
                         {
                             connection.SendRequest(request);
@@ -506,6 +558,10 @@ namespace IdFix
             statusDisplay(StringLiterals.Complete);
         }
 
+        #endregion
+
+        #region exportToolStripMenuItem_Click
+
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -540,6 +596,10 @@ namespace IdFix
                 throw;
             }
         }
+
+        #endregion
+
+        #region importToolStripMenuItem_Click
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -597,6 +657,10 @@ namespace IdFix
             }
         }
 
+        #endregion
+
+        #region undoUpdatesToolStripMenuItem_Click
+
         private void undoUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -642,6 +706,10 @@ namespace IdFix
             }
         }
 
+        #endregion
+
+        #region nextToolStripMenuItem_Click
+
         private void nextToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -660,6 +728,10 @@ namespace IdFix
                 throw;
             }
         }
+
+        #endregion
+
+        #region previousToolStripMenuItem_Click
 
         private void previousToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -683,6 +755,10 @@ namespace IdFix
             }
         }
 
+        #endregion
+
+        #region settingsToolStripMenuItem_Click
+
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -697,6 +773,10 @@ namespace IdFix
             }
         }
 
+        #endregion
+
+        #region feedbackToolStripMenuItem_Click
+
         private void feedbackToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -710,7 +790,10 @@ namespace IdFix
                 throw;
             }
         }
+
         #endregion
+
+        #region statusDisplay
 
         public void statusDisplay(string display)
         {
@@ -730,7 +813,10 @@ namespace IdFix
             }
         }
 
+        #endregion
+
         #region contextMenu
+
         private void dataGridView1_MouseClick(object sender, MouseEventArgs e)
         {
             try
