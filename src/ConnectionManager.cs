@@ -35,13 +35,13 @@ namespace IdFix.Rules
                     if (SettingsManager.Instance.Port == 3268)
                     {
                         serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, activeForest)).Name;
-                        distinguishedName = String.IsNullOrEmpty(SettingsManager.Instance.SearchBase) ? string.Empty : SettingsManager.Instance.SearchBase;
+                        distinguishedName = SettingsManager.Instance.SearchBaseEnabled && !String.IsNullOrEmpty(SettingsManager.Instance.SearchBase) ? SettingsManager.Instance.SearchBase : string.Empty;
                     }
                     else
                     {
                         serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, activeForest)).Domains[0].FindDomainController().Name;
                         //targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, forestList[forestListIndex])).Name.Replace(".", ",dc=");
-                        if (!String.IsNullOrEmpty(SettingsManager.Instance.SearchBase))
+                        if (SettingsManager.Instance.SearchBaseEnabled && !String.IsNullOrEmpty(SettingsManager.Instance.SearchBase))
                             distinguishedName = SettingsManager.Instance.SearchBase;
                         else
                             distinguishedName = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, activeForest)).Name.Replace(".", ",dc=");

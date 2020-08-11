@@ -139,11 +139,6 @@ namespace IdFix
                             SettingsManager.Instance.SearchBase = textBoxSearchBase.Text;
                         }
                     }
-                    else
-                    {
-                        // This is for the re-entrant case. UI shows no SearchBase, so we should do that.
-                        SettingsManager.Instance.SearchBase = String.Empty;
-                    }
                 }
                 else
                 {
@@ -294,12 +289,13 @@ namespace IdFix
                 {
                     SettingsManager.Instance.SearchBaseEnabled = true;
                     textBoxSearchBase.Enabled = true;
-                    //We need to put in default value
+                    // We need to put in default value
                     ResetSearchBase(0);
                 }
-                else //This covers 0 or more than 1
+                else // This covers 0 or more than 1
                 {
                     //If we so we disable the checkbox and set the SearchBase to empty
+                    SettingsManager.Instance.SearchBaseEnabled = false;
                     textBoxSearchBase.Enabled = false;
                     textBoxSearchBase.Text = String.Empty;
                     searchBaseCheckBox.Checked = false;
@@ -307,6 +303,7 @@ namespace IdFix
             }
             else
             {
+                SettingsManager.Instance.SearchBaseEnabled = false;
                 textBoxSearchBase.Enabled = false;
                 textBoxSearchBase.Text = String.Empty;
             }
@@ -358,6 +355,12 @@ namespace IdFix
 
         internal void ResetSearchBase(int index)
         {
+            if (!string.IsNullOrEmpty(SettingsManager.Instance.SearchBase))
+            {
+                textBoxSearchBase.Text = SettingsManager.Instance.SearchBase;
+                return;
+            }
+
             string user = SettingsManager.Instance.CurrentCredentialMode == CredentialMode.CurrentUser ? null : SettingsManager.Instance.Username;
             string password = SettingsManager.Instance.CurrentCredentialMode == CredentialMode.CurrentUser ? null : SettingsManager.Instance.Password;
             string selectedForest = null;
