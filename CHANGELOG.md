@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 2.2.0.0 - 2020-04-30
+
+- Full refactoring of existing code
+- Fixed issue with tld errors being misreported
+- Fixed issue with valid x400 & x500 addresses being flagged as invalid
+- Added check for (') char in proxy address and UPN
+
 ## 2.1.3.0 - 2020-04-06
 
 - Added Alternate ID option in the settings that permit to skip checks on UserPrincipalName attribute

@@ -109,7 +109,7 @@ namespace IdFix.Controls
                 {
                     if (value < 1)
                     {
-                        throw new ArgumentOutOfRangeException("PageSize", value, "Pages start at 1.");
+                        throw new ArgumentOutOfRangeException("CurrentPage", value, "Pages start at 1.");
                     }
 
                     if (value <= this._pageCount)
