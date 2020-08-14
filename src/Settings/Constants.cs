@@ -38,8 +38,8 @@ namespace IdFix.Settings
         public static Regex InvalidTargetAddressRegEx = new Regex(@"[\s\\<>\(\)\,\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         
         // source: https://www.ietf.org/rfc/rfc2253.txt
-        public static Regex InvalidX400ProxyAddressRegex = new Regex(@"[\f\n\r\t\v\(\)\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-        public static Regex InvalidX500ProxyAddressRegex = new Regex(@"[\f\n\r\t\v\(\)\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        public static Regex InvalidX400ProxyAddressRegex = new Regex(@"[\f\n\r\t\v\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        public static Regex InvalidX500ProxyAddressRegex = new Regex(@"[\f\n\r\t\v\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     }
 }
 
