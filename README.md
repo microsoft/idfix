@@ -1,3 +1,8 @@
+# Archive Notice
+
+Due to organizational changes we are no longer able to maintain this code. To ensure the project status is clear we have taken the difficult decision to archive this repository. The current release along with source code will remain available. We understand this is disruptive to current IdFix users. If you find the tool valuable and would like to see it continue please us [UserVoice](https://feedback.azure.com/forums/169401-azure-active-directory) to express the need. You may also find the [AADConnect tool](https://www.microsoft.com/en-us/download/details.aspx?id=47594) of use for similar scenarios.
+
+
 # IdFix : Directory Synchronization Error Remediation Tool
 
 IdFix is used to perform discovery and remediation of identity objects and their attributes in an on-premises Active Directory environment in preparation for migration to Azure Active Directory. IdFix is intended for the Active Directory administrators responsible for directory synchronization with Azure Active Directory.
