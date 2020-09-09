@@ -1,6 +1,8 @@
 # Archive Notice
 
-Due to organizational changes we are no longer able to maintain this code. To ensure the project status is clear we have taken the difficult decision to archive this repository. The current release along with source code will remain available. We understand this is disruptive to current IdFix users. If you find the tool valuable and would like to see it continue please us [UserVoice](https://feedback.azure.com/forums/169401-azure-active-directory) to express the need. You may also find the [AADConnect tool](https://www.microsoft.com/en-us/download/details.aspx?id=47594) of use for similar scenarios.
+Update: We are in the process of transfering ownership to a new team who will maintain the project moving forward. Appreciate everyone's patience during the transition. 
+
+~Due to organizational changes we are no longer able to maintain this code. To ensure the project status is clear we have taken the difficult decision to archive this repository. The current release along with source code will remain available. We understand this is disruptive to current IdFix users. If you find the tool valuable and would like to see it continue please us [UserVoice](https://feedback.azure.com/forums/169401-azure-active-directory) to express the need. You may also find the [AADConnect tool](https://www.microsoft.com/en-us/download/details.aspx?id=47594) of use for similar scenarios.~
 
 
 # IdFix : Directory Synchronization Error Remediation Tool
