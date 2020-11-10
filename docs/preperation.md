@@ -73,7 +73,7 @@ See the following support article for information on the attributes that can be 
 
 ### Active Directory Attribute Values
 
-IdFix checks several Active Directory attributes for the types of errors included in the [Planning Directory Synchronization – Active Directory Cleanup](http://technet.microsoft.com/en-us/library/hh852469.aspx).
+IdFix checks several Active Directory attributes for the types of errors included in the [Planning Directory Synchronization – Active Directory Cleanup](https://docs.microsoft.com/en-us/microsoft-365/enterprise/prepare-for-directory-synchronization?view=o365-worldwide).
 
 ## Dedicated
 
