@@ -2,7 +2,7 @@ site_name: 'Microsoft - IdFix'
 docs_dir: 'docs'
 nav:
   - Home: 'index.md'
-  - 'Preperation': 'preperation.md'
+  - 'Preparation': 'preparation.md'
   - 'Installation': 'installation.md'
   - 'Operation': 'operation.md'
   - 'Supported Errors': 'supported-errors.md'
