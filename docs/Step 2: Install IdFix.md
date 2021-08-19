@@ -1,6 +1,6 @@
 # Step 2: Install IdFix
 
-Select setup.exe to download and install the IdFix tool on your Windows machine.
+Select _**[setup.exe](https://raw.githubusercontent.com/Microsoft/idfix/master/publish/setup.exe)**_ to download and install the IdFix tool on your Windows machine.
 
 The following prerequisites will be installed if they are not already present on your machine:
 
@@ -17,4 +17,7 @@ You can uninstall the application at any time using the standard Windows Add or 
 
 ## Resources
 
- •	Report an issue
+ • [ClickOnce and .NET Framework Resources](https://go.microsoft.com/fwlink/?LinkId=154571)
+ 
+ • [Report an issue](https://github.com/Microsoft/idfix/issues)
+ 
