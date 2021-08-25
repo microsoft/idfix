@@ -12,7 +12,7 @@ theme:
   name: 'material'
   palette:
     primary: 'blue grey'
-  logo: 'img/IdFix logo.png'
+  logo: 'img/IdFixLogo.png'
   feature:
     tabs: true
 extra_css:
