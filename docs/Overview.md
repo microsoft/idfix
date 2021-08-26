@@ -1,4 +1,4 @@
-# Query and fix invalid object attributes with the IdFix tool ![IdFix logo](IdFix logo.png)
+# Query and fix invalid object attributes with the IdFix tool ![IdFix logo](IdFixLogo.png)
 
 ## What is the IdFix tool?
 
