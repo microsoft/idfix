@@ -12,7 +12,7 @@ theme:
   name: 'material'
   palette:
     primary: 'blue grey'
-  logo: 'img/microsoft-365-logo.png'
+  logo: 'img/IdFixlogo.png'
   feature:
     tabs: true
 extra_css:
