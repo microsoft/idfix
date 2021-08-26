@@ -7,7 +7,7 @@ Directory synchronization rule sets are different depending on which version of 
 2.	The scope of the query can be limited by selecting Settings and entering a valid directory path in the Filter   field to use as a start for the subtree search. Only one starting point can be designated at a time.
 The subtree point will be used for all successive queries until changed. Deleting the value will reset the query to the whole forest. The value must be entered in the format OU=myOu,DC=Contoso,DC=com.
 
-![Settings page](img\IdFixSettings.png)
+![Settings page](img/IdFixSettings.png)
 
 3.	Select Query to query for objects containing invalid attributes that will cause directory synchronization errors.
 
@@ -15,7 +15,7 @@ IdFix queries all objects with a filter for applicable attributes. IdFix updates
 
 If you don’t want to continue, you can select Cancel to terminate a running query.
 
-![IdFix running query](img\IdFixQuery.png)
+![IdFix running query](img/IdFixQuery.png)
 
 4.	IdFix applies rules against the required AD attributes to determine which objects must be remediated and presents you with any detected error conditions.
     
