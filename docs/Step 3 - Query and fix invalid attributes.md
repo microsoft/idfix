@@ -1,13 +1,13 @@
 # Step 3: Query and fix invalid attributes
 
-![Screen shot of the tool running](IdFix blank.png)
+![Screen shot of the tool running](IdFixblank.png)
 
 1.	Log on to the Windows machine where you installed the IdFix tool using an account that has read/write permissions to your on-premises Active Directory objects.
 Directory synchronization rule sets are different depending on which version of Microsoft 365 is in use. Use Settings to choose between running the Multi-Tenant or Dedicated/ITAR   rule sets to detect attribute values known to cause directory synchronization errors relevant to the version of Office 365 in use.
 2.	The scope of the query can be limited by selecting Settings and entering a valid directory path in the Filter   field to use as a start for the subtree search. Only one starting point can be designated at a time.
 The subtree point will be used for all successive queries until changed. Deleting the value will reset the query to the whole forest. The value must be entered in the format OU=myOu,DC=Contoso,DC=com.
 
-![Settings page](IdFix settings.png)
+![Settings page](IdFixSettings.png)
 
 3.	Select Query to query for objects containing invalid attributes that will cause directory synchronization errors.
 
@@ -15,7 +15,7 @@ IdFix queries all objects with a filter for applicable attributes. IdFix updates
 
 If you don’t want to continue, you can select Cancel to terminate a running query.
 
-![IdFix running query](IdFix query.png)
+![IdFix running query](IdFixQuery.png)
 
 4.	IdFix applies rules against the required AD attributes to determine which objects must be remediated and presents you with any detected error conditions.
     
