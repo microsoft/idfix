@@ -4,7 +4,7 @@ nav:
   - Overview: 'index.md'
   - 'Step 1: Review the prerequisites': 'Step 1 - Review the prerequisites.md'
   - 'Step 2: Install IdFix': 'Step 2 - Install IdFix.md'
-  - 'Step 3: Query and fix invalid attibutes': 'Step 3 - Query and fix invalid attributes.md'
+  - 'Step 3: Query and fix invalid attributes': 'Step 3 - Query and fix invalid attributes.md'
   - 'Errors supported by the IdFix tool': 'Errors supported by the IdFix tool.md'
   - 'Frequently asked questions.': 'Frequently asked questions (FAQ).md'
   - 'Build Documentation': 'build-docs.md'
