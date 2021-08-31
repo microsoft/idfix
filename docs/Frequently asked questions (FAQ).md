@@ -7,14 +7,16 @@ Bug reports and desired feature requests can be submitted to an issues list, htt
 ## Performance
 
 IdFix performance will vary based on the hardware utilized and the network latency to the Active Directory global catalog (GC) server. Machines should have the minimum RAM specified and will benefit by using faster hard drives because temporary files are written to disk during the AD Query. 
-Number of errors shown
+
+## Number of errors shown
 
 Customers with more than 50,000 errors returned might exceed physical memory in attempting to display all data at one time. To alleviate this issue, errors are broken into blocks of 50,000. Exceeding the block size enables the More Errors options of View Next Block and View Previous Block.
 
 ## Temporary files
 
 Large volumes of data may be parsed in the search for duplicate values. For instance, a user may have up to six attributes that must be checked and the proxyAddresses field can have many values. The duplicate check count may routinely exceed five times the number of objects returned. For this reason, data must be written to disk to avoid the out-of-memory exception on most workstations. Don’t delete the temporary files while running. This will trigger an exception and might cause unpredictable results.
-Directory Exceptions
+
+## Directory Exceptions
 
 There are 60 separate LDAP return codes and four types of directory exceptions that can occur when contacting a directory server. These should be gracefully handled with a message box and an error written to the log. Client-server timeout is one example where the condition might be sporadic. To alleviate this issue, the default LDAP time-out interval has been increased from 30 seconds to two minutes. This is a server-side limitation, and the application respects all server-side limits. If this should occur, then wait for a period of time when the GC is not so heavily utilized and/or launch the application from a lower-latency location. For example, directly on a global catalog server.
 
@@ -25,7 +27,8 @@ If the response to an update was COMPLETE, then the value has been applied to th
 ## FAIL (ACTION)
 
 Extensive efforts have been made to make the schema and value limits of the Active Directory unobtrusive. With that caveat, it is still possible for the value entered in the UPDATE column to conflict with a directory rule within AD. If the ACTION value on a row turns to FAIL, then there is an unknown conflict between the UPDATE column and the attribute values stored in the directory. These conflicts will require that the attribute values currently stored be examined more closely and might require ADSIEDIT to resolve.
-Double Byte Characters
+
+## Double Byte Characters
 
 IdFix has not been localized and double byte characters have not been tested in the application. Please send any errors of this type to IdFixSupport@Microsoft.com for further investigation.
 
