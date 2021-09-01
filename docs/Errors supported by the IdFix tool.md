@@ -1,4 +1,5 @@
-# Supported Errors
+# Errors supported by the IdFix tool  
+
 
 ## Multi-Tenant Errors
 
