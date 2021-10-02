@@ -50,7 +50,6 @@ namespace IdFix.Rules
 
                     var rules = new List<IComposedRule>
                     {
-
                         // Additional check for DisplayName. 
                         //  Value is non-blank if present
                         //  Max Length = 255. 

@@ -142,6 +142,15 @@ namespace IdFix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Beginning query.
+        /// </summary>
+        internal static string BeginningQuery {
+            get {
+                return ResourceManager.GetString("BeginningQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to blank,.
         /// </summary>
         internal static string Blank {
@@ -165,6 +174,15 @@ namespace IdFix {
         internal static string CancelQuery {
             get {
                 return ResourceManager.GetString("CancelQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The server cannot page the result set..
+        /// </summary>
+        internal static string CannotPageResultSet {
+            get {
+                return ResourceManager.GetString("CannotPageResultSet", resourceCulture);
             }
         }
         
@@ -538,6 +556,42 @@ namespace IdFix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to LDAP Connection established.
+        /// </summary>
+        internal static string LdapConnectionEstablished {
+            get {
+                return ResourceManager.GetString("LdapConnectionEstablished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please wait while the LDAP Connection is established..
+        /// </summary>
+        internal static string LdapConnectionEstablishing {
+            get {
+                return ResourceManager.GetString("LdapConnectionEstablishing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Accounts outside of the server&apos;s domain will not be analyzed for errors.  Do you want to continue?.
+        /// </summary>
+        internal static string LdapPortWarningMessage {
+            get {
+                return ResourceManager.GetString("LdapPortWarningMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Non Global Catalog Port Configured.
+        /// </summary>
+        internal static string LdapPortWarningTitle {
+            get {
+                return ResourceManager.GetString("LdapPortWarningTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to length,.
         /// </summary>
         internal static string Length {
@@ -885,6 +939,24 @@ namespace IdFix {
         internal static string SamAccountName {
             get {
                 return ResourceManager.GetString("SamAccountName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following attributes are present in the schema but are not marked for replication to the Global Catalog and will not be analyzed for errors. Do you want to continue? {0}.
+        /// </summary>
+        internal static string SchemaWarningMessage {
+            get {
+                return ResourceManager.GetString("SchemaWarningMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Schema Warning.
+        /// </summary>
+        internal static string SchemaWarningTitle {
+            get {
+                return ResourceManager.GetString("SchemaWarningTitle", resourceCulture);
             }
         }
         

@@ -111,8 +111,18 @@ namespace IdFix
         {
             try
             {
+                int port = string.IsNullOrEmpty(comboBoxPort.Text) ? 0 : int.Parse(comboBoxPort.Text);
+
+                if (port != Constants.GlobalCatalogPort)
+                {
+                    if (MessageBox.Show(this, StringLiterals.LdapPortWarningMessage, StringLiterals.LdapPortWarningTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+
                 SettingsManager.Instance.Filter = textBoxFilter.Text;
-                SettingsManager.Instance.Port = string.IsNullOrEmpty(comboBoxPort.Text) ? 0 : int.Parse(comboBoxPort.Text);
+                SettingsManager.Instance.Port = port;
 
                 if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
                 {

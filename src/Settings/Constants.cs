@@ -40,6 +40,14 @@ namespace IdFix.Settings
         // source: https://www.ietf.org/rfc/rfc2253.txt
         public static Regex InvalidX400ProxyAddressRegex = new Regex(@"[\f\n\r\t\v\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         public static Regex InvalidX500ProxyAddressRegex = new Regex(@"[\f\n\r\t\v\[\]""']", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+        public static int GlobalCatalogPort = 3268;
+        public static int LdapPort = 389;
+        public static int LdapSslPort = 636;
+
+        public static string SchemaNamingContextAttribute = "schemaNamingContext";
+        public static string LdapDisplayNameAttribute = "lDAPDisplayName";
+        public static string IsMemberOfPartialAttributeSetAttribute = "isMemberOfPartialAttributeSet";
     }
 }
 
