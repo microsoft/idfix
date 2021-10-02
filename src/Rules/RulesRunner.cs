@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.DirectoryServices.Protocols;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace IdFix.Rules
 {
@@ -158,6 +159,37 @@ namespace IdFix.Rules
                     // get the rule collection to run
                     var ruleCollection = this.GetRuleCollection(distinguishedName);
 
+                    // if connecting to Global Catalog Server, make sure the collection's analyzed attributes are replicated.
+                    if (SettingsManager.Instance.Port == Constants.GlobalCatalogPort)
+                    {
+                        var schemaResult = this.ExecuteRuleCollectionSchemaCheck(ruleCollection, connection);
+
+                        // handle the cancel case
+                        if (schemaResult == null && this.CancellationPending)
+                        {
+                            e.Result = null;
+                            return;
+                        }
+
+                        // display errors
+                        if (schemaResult.Count > 0)
+                        {
+                            DialogResult dialogResult = DialogResult.None;
+
+                            // Show message box on main thread.
+                            FormApp.Instance.Invoke(new Action(() =>
+                            {
+                                var message = string.Format(StringLiterals.SchemaWarningMessage, Environment.NewLine + string.Join(Environment.NewLine, schemaResult.ToArray()));
+                                dialogResult = MessageBox.Show(FormApp.Instance, message, StringLiterals.SchemaWarningTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                            }));
+
+                            if (dialogResult == DialogResult.No)
+                            {
+                                return;
+                            }
+                        }
+                    }
+
                     // runs the rule collection
                     var result = this.ExecuteRuleCollection(ruleCollection, connection);
 
@@ -183,6 +215,56 @@ namespace IdFix.Rules
             finally
             {
                 DuplicateStore.Reset();
+            }
+        }
+
+        #endregion
+
+        #region GetSchemaDistinguishedName
+
+        private string GetSchemaDistinguishedName(LdapConnection connection)
+        {
+            var request = new SearchRequest(null, "(objectClass=*)", SearchScope.Base, Constants.SchemaNamingContextAttribute);
+
+            var response = (SearchResponse)connection.SendRequest(request);
+
+            return response.Entries[0].Attributes[Constants.SchemaNamingContextAttribute][0].ToString();
+        }
+
+        #endregion
+
+        #region ExecuteRuleCollectionSchemaCheck
+
+        private List<string> ExecuteRuleCollectionSchemaCheck(RuleCollection collection, LdapConnection connection)
+        {
+            this.OnStatusUpdate?.Invoke(StringLiterals.LdapConnectionEstablishing);
+            var schemaDistinguishedName = this.GetSchemaDistinguishedName(connection);
+            using (var searcher = collection.CreateSchemaSearcher(schemaDistinguishedName))
+            {
+                this.OnStatusUpdate?.Invoke(StringLiterals.LdapConnectionEstablished);
+                this.OnStatusUpdate?.Invoke(StringLiterals.BeginningQuery);
+
+                if (this.CancellationPending)
+                {
+                    return null;
+                }
+
+                var replicatedAttributes = new List<string>();
+                var results = searcher.FindAll();
+
+                foreach (System.DirectoryServices.SearchResult entry in results)
+                {
+                    if (entry.Properties.Contains(Constants.IsMemberOfPartialAttributeSetAttribute)
+                     && entry.Properties[Constants.IsMemberOfPartialAttributeSetAttribute].Count > 0
+                     && (bool)entry.Properties[Constants.IsMemberOfPartialAttributeSetAttribute][0] == true)
+                    {
+                        replicatedAttributes.Add(entry.Properties[Constants.LdapDisplayNameAttribute][0].ToString());
+                    }
+                }
+
+                var notReplicatedAttributes = collection.AttributesToQuery.Where(_ => !replicatedAttributes.Contains(_)).ToList();
+
+                return notReplicatedAttributes; 
             }
         }
 
@@ -232,13 +314,13 @@ namespace IdFix.Rules
             long duplicateCount = 0;
             long errorCount = 0;
 
-            this.OnStatusUpdate?.Invoke("Please wait while the LDAP Connection is established.");
+            this.OnStatusUpdate?.Invoke(StringLiterals.LdapConnectionEstablishing);
             var searchRequest = collection.CreateSearchRequest();
-            this.OnStatusUpdate?.Invoke("LDAP Connection established.");
+            this.OnStatusUpdate?.Invoke(StringLiterals.LdapConnectionEstablished);
 
             var errors = new List<ComposedRuleResult>();
 
-            this.OnStatusUpdate?.Invoke("Beginning query");
+            this.OnStatusUpdate?.Invoke(StringLiterals.BeginningQuery);
 
             while (true)
             {
@@ -247,8 +329,8 @@ namespace IdFix.Rules
                 // verify support for paged results
                 if (searchResponse.Controls.Length != 1 || !(searchResponse.Controls[0] is PageResultResponseControl))
                 {
-                    this.OnStatusUpdate?.Invoke("The server cannot page the result set.");
-                    throw new InvalidOperationException("The server cannot page the result set.");
+                    this.OnStatusUpdate?.Invoke(StringLiterals.CannotPageResultSet);
+                    throw new InvalidOperationException(StringLiterals.CannotPageResultSet);
                 }
 
                 foreach (SearchResultEntry entry in searchResponse.Entries)

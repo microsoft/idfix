@@ -253,7 +253,7 @@
     <value>IdFix</value>
   </data>
   <data name="IdFixPrivacyBody" xml:space="preserve">
-    <value>This privacy statement applies to IdFix only.  It does not apply to any other Microsoft Office 365 server or other applications by Microsoft Corporation. IdFix is intended for IT Administrators.  If you are an end-user, Microsoft recommends that you end this program and contact your IT Administrator for assistance.  IdFix collects data from your corporate network and can optionally store data that may contain personal data in a Comma Separated Value (.csv) or LDAP Data Interchange Format (.ldf) file located on the computer where the program was run.  Microsoft recommends that you remove this file when you have completed your use of the program.  IdFix does not send any collected data back to Microsoft or it’s partners.</value>
+    <value>This privacy statement applies to IdFix only.  It does not apply to any other Microsoft Office 365 server or other applications by Microsoft Corporation. IdFix is intended for IT Administrators.  If you are an end-user, Microsoft recommends that you end this program and contact your IT Administrator for assistance.  IdFix collects data from your corporate network and can optionally store data that may contain personal data in a Comma Separated Value (.csv) or LDAP Data Interchange Format (.ldf) file located on the computer where the program was run.  Microsoft recommends that you remove this file when you have completed your use of the program.  IdFix does not send any collected data back to Microsoft or its partners.</value>
   </data>
   <data name="IdFixPrivacyTitle" xml:space="preserve">
     <value>IdFix Privacy Statement</value>
@@ -440,5 +440,29 @@
   </data>
   <data name="ProposedAction" xml:space="preserve">
     <value>proposedAction</value>
+  </data>
+  <data name="LdapPortWarningMessage" xml:space="preserve">
+    <value>Accounts outside of the server's domain will not be analyzed for errors.  Do you want to continue?</value>
+  </data>
+  <data name="LdapPortWarningTitle" xml:space="preserve">
+    <value>Non Global Catalog Port Configured</value>
+  </data>
+  <data name="CannotPageResultSet" xml:space="preserve">
+    <value>The server cannot page the result set.</value>
+  </data>
+  <data name="BeginningQuery" xml:space="preserve">
+    <value>Beginning query</value>
+  </data>
+  <data name="LdapConnectionEstablished" xml:space="preserve">
+    <value>LDAP Connection established</value>
+  </data>
+  <data name="LdapConnectionEstablishing" xml:space="preserve">
+    <value>Please wait while the LDAP Connection is established.</value>
+  </data>
+  <data name="SchemaWarningMessage" xml:space="preserve">
+    <value>The following attributes are present in the schema but are not marked for replication to the Global Catalog and will not be analyzed for errors. Do you want to continue? {0}</value>
+  </data>
+  <data name="SchemaWarningTitle" xml:space="preserve">
+    <value>Schema Warning</value>
   </data>
 </root>

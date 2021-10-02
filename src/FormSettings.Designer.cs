@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using IdFix.Settings;
+
 namespace IdFix
 {
     partial class FormSettings
@@ -242,15 +244,15 @@ namespace IdFix
             this.comboBoxPort.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxPort.FormattingEnabled = true;
             this.comboBoxPort.Items.AddRange(new object[] {
-            "3268",
-            "389",
-            "636"});
+            Constants.GlobalCatalogPort.ToString(),
+            Constants.LdapPort.ToString(),
+            Constants.LdapSslPort.ToString()});
             this.comboBoxPort.Location = new System.Drawing.Point(88, 110);
             this.comboBoxPort.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.comboBoxPort.Name = "comboBoxPort";
             this.comboBoxPort.Size = new System.Drawing.Size(287, 25);
             this.comboBoxPort.TabIndex = 4;
-            this.toolTip1.SetToolTip(this.comboBoxPort, "Use 3268 for AD");
+            this.toolTip1.SetToolTip(this.comboBoxPort, "Use " + Constants.GlobalCatalogPort.ToString() + " for AD");
             // 
             // textBoxFilter
             // 

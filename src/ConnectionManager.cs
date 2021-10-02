@@ -32,7 +32,7 @@ namespace IdFix.Rules
 
                 if (SettingsManager.Instance.CurrentDirectoryType == DirectoryType.ActiveDirectory)
                 {
-                    if (SettingsManager.Instance.Port == 3268)
+                    if (SettingsManager.Instance.Port == Constants.GlobalCatalogPort)
                     {
                         serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, activeForest)).Name;
                         distinguishedName = SettingsManager.Instance.SearchBaseEnabled && !String.IsNullOrEmpty(SettingsManager.Instance.SearchBase) ? SettingsManager.Instance.SearchBase : string.Empty;
@@ -40,7 +40,6 @@ namespace IdFix.Rules
                     else
                     {
                         serverName = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, activeForest)).Domains[0].FindDomainController().Name;
-                        //targetSearch = "dc=" + Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, forestList[forestListIndex])).Name.Replace(".", ",dc=");
                         if (SettingsManager.Instance.SearchBaseEnabled && !String.IsNullOrEmpty(SettingsManager.Instance.SearchBase))
                             distinguishedName = SettingsManager.Instance.SearchBase;
                         else
@@ -75,7 +74,7 @@ namespace IdFix.Rules
         {
             var connection = new LdapConnection(server);
 
-            if (SettingsManager.Instance.Port == 636)
+            if (SettingsManager.Instance.Port == Constants.LdapSslPort)
             {
                 connection.SessionOptions.ProtocolVersion = 3;
                 connection.SessionOptions.SecureSocketLayer = true;

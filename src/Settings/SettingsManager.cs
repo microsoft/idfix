@@ -17,7 +17,7 @@ namespace IdFix.Settings
         private SettingsManager()
         {
             // set defaults
-            this.Port = 3268;
+            this.Port = Constants.GlobalCatalogPort;
             this.Filter = SettingsManager.DefaultMTFilter;
             this.SearchBaseEnabled = false;
             this.CurrentDirectoryType = DirectoryType.ActiveDirectory;

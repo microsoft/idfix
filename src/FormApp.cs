@@ -16,6 +16,8 @@ namespace IdFix
         RulesRunner runner;
         internal bool firstRun;
 
+        public static FormApp Instance { get; private set; }
+
         #region FormApp
 
         /// <summary>
@@ -23,6 +25,7 @@ namespace IdFix
         /// </summary>
         public FormApp()
         {
+            Instance = this;
             try
             {
                 this.firstRun = true; //Only the first time.
@@ -387,7 +390,7 @@ namespace IdFix
                     }
 
                     // logic from original application
-                    var updatePort = SettingsManager.Instance.Port == 3268 ? 389 : SettingsManager.Instance.Port;
+                    var updatePort = SettingsManager.Instance.Port == Constants.GlobalCatalogPort ? Constants.LdapPort : SettingsManager.Instance.Port;
 
                     // this is the full name used to create the connection
                     var fullServerName = string.Format("{0}:{1}", serverName, updatePort);

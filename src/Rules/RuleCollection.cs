@@ -1,6 +1,8 @@
 ﻿using IdFix.Settings;
 using System;
+using System.DirectoryServices;
 using System.DirectoryServices.Protocols;
+using System.Text;
 
 namespace IdFix.Rules
 {
@@ -74,7 +76,7 @@ namespace IdFix.Rules
             var searchRequest = new SearchRequest(
                 this.DistinguishedName,
                 SettingsManager.Instance.Filter,
-                SearchScope.Subtree,
+                System.DirectoryServices.Protocols.SearchScope.Subtree,
                 this.AttributesToQuery);
 
             if (includePaging)
@@ -98,6 +100,46 @@ namespace IdFix.Rules
             this.OnStatusUpdate?.Invoke(message);
         }
 
+        #endregion
+
+        #region CreateSchemaSearchRequest
+        /// <summary>
+        /// Creates the search request for this rule collection
+        /// </summary>
+        /// <returns>Configured search request</returns>
+        public virtual DirectorySearcher CreateSchemaSearcher(string schemaDistinguishedName)
+        {
+            var searcher = new DirectorySearcher();
+
+            if (SettingsManager.Instance.CurrentCredentialMode == CredentialMode.Specified)
+            {
+                searcher.SearchRoot = new DirectoryEntry("LDAP://" + schemaDistinguishedName, SettingsManager.Instance.Username, SettingsManager.Instance.Password);
+            }
+            else
+            {
+                searcher.SearchRoot = new DirectoryEntry("LDAP://" + schemaDistinguishedName);
+            }
+
+            searcher.Filter = this.GetSchemaLDAPFilter();
+
+            return searcher;
+        }
+
+        /// <summary>
+        /// Creates an LDAP filter for the attributes analyzed by this rule collection
+        /// </summary>
+        /// <returns>The LDAP filter</returns>
+        private string GetSchemaLDAPFilter()
+        {
+            var sb = new StringBuilder();
+
+            foreach (var attribute in this.AttributesToQuery)
+            {
+                sb.AppendFormat("({0}={1})", Constants.LdapDisplayNameAttribute, attribute);
+            }
+
+            return string.Format("(|{0})", sb.ToString());
+        }
         #endregion
     }
 }
