@@ -19,6 +19,7 @@ namespace IdFix
     /// </summary>
     class Files
     {
+        private string _directory = string.Empty;
         private string _fileBase;
 
         public Files(string seed = null)
@@ -28,13 +29,29 @@ namespace IdFix
                 seed = new Regex(@"[/:]", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant).Replace(DateTime.Now.ToString(), "-");
             }
             this._fileBase = seed;
+
+            // Test if the user has permissions to write to the current directory.
+            try
+            {
+                var testFileName = "test.txt";
+                File.WriteAllText(testFileName, "test");
+                File.Delete(testFileName);
+            }
+            catch
+            {
+                _directory = Path.GetDirectoryName(Path.GetTempPath());
+                if (!_directory.EndsWith(@"\"))
+                {
+                    _directory += @"\";
+                }
+            }
         }
 
         public string VerboseFileName
         {
             get
             {
-                return string.Format("Verbose {0}.txt", this._fileBase);
+                return string.Format(_directory + "Verbose {0}.txt", this._fileBase);
             }
         }
 
@@ -42,7 +59,7 @@ namespace IdFix
         {
             get
             {
-                return string.Format("Update {0}.ldf", this._fileBase);
+                return string.Format(_directory + "Update {0}.ldf", this._fileBase);
             }
         }
 
@@ -50,7 +67,7 @@ namespace IdFix
         {
             get
             {
-                return string.Format("Error {0}.txt", this._fileBase);
+                return string.Format(_directory + "Error {0}.txt", this._fileBase);
             }
         }
 
