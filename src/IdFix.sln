@@ -26,6 +26,7 @@ Global
 		{C8335487-70D4-41C4-888D-06CE372B4EC1}.Debug|x64.ActiveCfg = Debug
 		{C8335487-70D4-41C4-888D-06CE372B4EC1}.Debug|x86.ActiveCfg = Debug
 		{C8335487-70D4-41C4-888D-06CE372B4EC1}.Release|x64.ActiveCfg = Release
+		{C8335487-70D4-41C4-888D-06CE372B4EC1}.Release|x64.Build.0 = Release
 		{C8335487-70D4-41C4-888D-06CE372B4EC1}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
