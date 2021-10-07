@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <Product Id="*" Name="Microsoft IdFix" Language="1033" Version="1.0.0.0" Manufacturer="Microsoft FastTrack Open Source" UpgradeCode="81f4a0e0-be55-4d44-b07c-ed11abdb6e36">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <Feature Id="ProductFeature" Title="Microsoft IdFix" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+    <!-- Adds a UI to the Installer-->
+    <UIRef Id="WixUI_InstallDir"/>
+
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.IdFix.ProjectDir)LICENSE.rtf" />
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="MicrosoftFastTrackOpenSource" Name="Microsoft FastTrack Open Source">
+          <Directory Id="INSTALLFOLDER" Name="Microsoft IdFix" />
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Microsoft IdFix"/>
+      </Directory>
+    </Directory>
+  </Fragment>
+  
+  <Fragment>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="746101DC-94D9-4765-99F1-1B9DBB57C4DC">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="Microsoft IdFix"
+                  Description="Microsoft IdFix"
+                  Target="[#IdFix.exe]"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY" />
+        <RemoveFolder Id="CleanupShortcut" Directory="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\IdFix" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+  
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="IdFixEXE" Guid="6D061E42-27B3-4BAD-B3AC-82A994170770">
+        <File Id="IdFix.exe" Name="IdFix.exe" Source="$(var.IdFix.TargetPath)" KeyPath="yes" />
+      </Component>
+      <Component Id="IdFixExeCONFIG" Guid="DD5AECED-1E1F-4269-9CB2-836E3D917873">
+        <File Id="IdFix.exe.config" Name="IdFix.exe.config" Source="$(var.IdFix.TargetPath).config" KeyPath="yes" />
+      </Component>
+      <Component Id="IDFixIconICO" Guid="A558519F-7E51-4901-A2C2-C29B0D58A7DC">
+        <File Id="IDFixIcon.ico" Name="IDFixIcon.ico" Source="$(var.IdFix.ProjectDir)IDFixIcon.ico" KeyPath="yes" />
+      </Component>
+      <Component Id="LICENSERTF" Guid="697E0069-ACCF-4773-B46D-ACDE199164D3">
+        <File Id="LICENSE.rtf" Name="LICENSE.txt" Source="$(var.IdFix.ProjectDir)LICENSE.rtf" KeyPath="yes" />
+      </Component>
+      <Component Id="alert_inline_failPNG" Guid="0129C358-411A-4C39-86D6-0D78C3A2636C">
+        <File Id="alert_inline_fail.png" Source="$(var.IdFix.ProjectDir)Resources/alert_inline_fail.png" KeyPath="yes" />
+      </Component>
+      <Component Id="alert_inline_infoPNG" Guid="24DE5215-D3DD-41F8-8914-070C03B8A092">
+        <File Id="alert_inline_info.png" Source="$(var.IdFix.ProjectDir)Resources/alert_inline_info.png" KeyPath="yes" />
+      </Component>
+      <Component Id="alert_inline_staticPNG" Guid="6883F8E7-4EBD-4F06-8855-9AA2BE9B1067">
+        <File Id="alert_inline_static.png" Source="$(var.IdFix.ProjectDir)Resources/alert_inline_static.png" KeyPath="yes" />
+      </Component>
+      <Component Id="alert_inline_successCopyPNG" Guid="57FD0D93-6699-4361-9F20-D89FC09A7842">
+        <File Id="alert_inline_successCopyPNG" Name="alert_inline_success - Copy.png" Source="$(var.IdFix.ProjectDir)Resources/alert_inline_success - Copy.png" KeyPath="yes" />
+      </Component>
+      <Component Id="alert_inline_successPNG" Guid="00FBCA15-1775-47CA-92C7-66E37FA5C185">
+        <File Id="alert_inline_success.png" Source="$(var.IdFix.ProjectDir)Resources/alert_inline_success.png" KeyPath="yes" />
+      </Component>
+      <Component Id="FastTrackPNG" Guid="CA1668C5-A11A-4208-88BA-46874982C08C">
+        <File Id="FastTrack.png" Source="$(var.IdFix.ProjectDir)Resources/FastTrack.png" KeyPath="yes" />
+      </Component>
+      <Component Id="icons_filter_dropdownPNG" Guid="84FF9439-FEBF-4B7C-BDC9-A0E789067DC3">
+        <File Id="icons_filter_dropdown.png" Source="$(var.IdFix.ProjectDir)Resources/icons_filter_dropdown.png" KeyPath="yes" />
+      </Component>
+      <Component Id="icons_filter_hover_16x16PNG" Guid="E7AF43B8-BBD7-41D6-9DD2-E12BC2DD7A6C">
+        <File Id="icons_filter_hover_16x16.png" Source="$(var.IdFix.ProjectDir)Resources/icons_filter_hover_16x16.png" KeyPath="yes" />
+      </Component>
+      <Component Id="icons_global_error_28x28PNG" Guid="D61D7DF4-0C95-4E78-831E-AB6336441576">
+        <File Id="icons_global_error_28x28.png" Source="$(var.IdFix.ProjectDir)Resources/icons_global_error_28x28.png" KeyPath="yes" />
+      </Component>
+      <Component Id="icons_search_14x14PNG" Guid="DB05E0A5-DE27-4715-86DE-DFEFF57B16FC">
+        <File Id="icons_search_14x14.png" Source="$(var.IdFix.ProjectDir)Resources/icons_search_14x14.png" KeyPath="yes" />
+      </Component>
+      <Component Id="IDFixIconPNG" Guid="930F4B65-58BD-4108-9FB0-F3AFBED465AA">
+        <File Id="IDFixIcon.png" Source="$(var.IdFix.ProjectDir)Resources/IDFixIcon.png" KeyPath="yes" />
+      </Component>
+      <Component Id="O365BrandSuitePNG" Guid="45040633-54FD-4AD5-8B07-B96932B787F0">
+        <File Id="O365BrandSuite.png" Source="$(var.IdFix.ProjectDir)Resources/O365BrandSuite.png" KeyPath="yes" />
+      </Component>
+      <Component Id="Ofc365_Blk_D_rgbPNG" Guid="59F39C88-A09B-4120-BEBE-8C10F5F714B0">
+        <File Id="Ofc365_Blk_D_rgb.png" Source="$(var.IdFix.ProjectDir)Resources/Ofc365_Blk_D_rgb.png" KeyPath="yes" />
+      </Component>
+      <Component Id="Ofc365_Blk_rgbPNG" Guid="666B1DCD-1288-4E6A-A726-CF79C27F6EB6">
+        <File Id="Ofc365_Blk_rgb.png" Source="$(var.IdFix.ProjectDir)Resources/Ofc365_Blk_rgb.png" KeyPath="yes" />
+      </Component>
+      <Component Id="Ofc365_Orng166_D_rgbPNG" Guid="72B450D8-6917-4512-BC41-B5ECF92F9928">
+        <File Id="Ofc365_Orng166_D_rgb.png" Source="$(var.IdFix.ProjectDir)Resources/Ofc365_Orng166_D_rgb.png" KeyPath="yes" />
+      </Component>
+      <Component Id="Ofc365_Orng166_rgbCopyGIF" Guid="9A31890D-5838-4AE6-B9AA-A6162CAED5EB">
+        <File Id="Ofc365_Orng166_rgbCopyGIF" Name="Ofc365_Orng166_rgb - Copy.gif" Source="$(var.IdFix.ProjectDir)Resources/Ofc365_Orng166_rgb - Copy.gif" KeyPath="yes" />
+      </Component>
+      <Component Id="Ofc365_Orng166_rgbPNG" Guid="6AE10C25-E806-467E-902D-657FA09E8B0F">
+        <File Id="Ofc365_Orng166_rgb.png" Source="$(var.IdFix.ProjectDir)Resources/Ofc365_Orng166_rgb.png" KeyPath="yes" />
+      </Component>
+      <Component Id="Ofc365_Wht_D_rgbPNG" Guid="0909944D-6835-4A1B-840A-5C929FAEE751">
+        <File Id="Ofc365_Wht_D_rgb.png" Source="$(var.IdFix.ProjectDir)Resources/Ofc365_Wht_D_rgb.png" KeyPath="yes" />
+      </Component>
+      <Component Id="Ofc365_Wht_rgbPNG" Guid="434EADFF-83F3-4D05-A089-011C9F1858B3">
+        <File Id="Ofc365_Wht_rgb.png" Source="$(var.IdFix.ProjectDir)Resources/Ofc365_Wht_rgb.png" KeyPath="yes" />
+      </Component>
+      <Component Id="office365_logo_newBMP" Guid="F89C51C3-9790-43E5-85B6-F951C9148A08">
+        <File Id="office365_logo_new.bmp" Source="$(var.IdFix.ProjectDir)Resources/office365_logo_new.bmp" KeyPath="yes" />
+      </Component>
+      <Component Id="office365_logo_origPNG" Guid="CC5A6831-134B-4B05-9BBF-225571EC0032">
+        <File Id="office365_logo_orig.png" Source="$(var.IdFix.ProjectDir)Resources/office365_logo_orig.png" KeyPath="yes" />
+      </Component>
+      <Component Id="printer_hPNG" Guid="F4CCA7F1-6FCC-44D0-929B-35569C8A7E11">
+        <File Id="printer_h.png" Source="$(var.IdFix.ProjectDir)Resources/printer_h.png" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
