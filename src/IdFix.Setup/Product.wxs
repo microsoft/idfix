@@ -18,11 +18,13 @@
     <UIRef Id="WixUI_InstallDir"/>
 
     <WixVariable Id="WixUILicenseRtf" Value="$(var.IdFix.ProjectDir)LICENSE.rtf" />
+
+    <Condition Message="This installer is only supported on 64-bit systems.">VersionNT64</Condition> 
   </Product>
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFilesFolder">
+      <Directory Id="ProgramFiles64Folder">
         <Directory Id="MicrosoftFastTrackOpenSource" Name="Microsoft FastTrack Open Source">
           <Directory Id="INSTALLFOLDER" Name="Microsoft IdFix" />
         </Directory>
