@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Id="*" Name="Microsoft IdFix" Language="1033" Version="1.0.0.0" Manufacturer="Microsoft FastTrack Open Source" UpgradeCode="81f4a0e0-be55-4d44-b07c-ed11abdb6e36">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
@@ -62,7 +62,7 @@
         <File Id="IDFixIcon.ico" Name="IDFixIcon.ico" Source="$(var.IdFix.ProjectDir)IDFixIcon.ico" KeyPath="yes" />
       </Component>
       <Component Id="LICENSERTF" Guid="697E0069-ACCF-4773-B46D-ACDE199164D3">
-        <File Id="LICENSE.rtf" Name="LICENSE.txt" Source="$(var.IdFix.ProjectDir)LICENSE.rtf" KeyPath="yes" />
+        <File Id="LICENSE.rtf" Name="LICENSE.rtf" Source="$(var.IdFix.ProjectDir)LICENSE.rtf" KeyPath="yes" />
       </Component>
       <Component Id="alert_inline_failPNG" Guid="0129C358-411A-4C39-86D6-0D78C3A2636C">
         <File Id="alert_inline_fail.png" Source="$(var.IdFix.ProjectDir)Resources/alert_inline_fail.png" KeyPath="yes" />
