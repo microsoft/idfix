@@ -10,6 +10,14 @@ The Microsoft Office 365 IdFix tool provides the customer with the ability to id
 
 You can _**[launch](https://raw.githubusercontent.com/Microsoft/idfix/master/publish/setup.exe)**_ the application using the ClickOnce installer. Download and run the setup.exe file to install IdFix on your machine.
 
+If you can't launch the application, check the registry key mentioned here: https://github.com/microsoft/idfix/issues/20#issuecomment-704497252
+
+## Alternate MSI Installation
+
+If running the ClickOnce application is not desirable or is not possible in your environment, you can install it using one of the MSI's located at: https://github.com/microsoft/idfix/tree/master/MSIs
+
+Note that only the ClickOnce application is self-updating to the latest version.
+
 ## Documentation
 
 Please see [the docs for details](https://microsoft.github.io/idfix) on using IdFix. If you see any gaps or issues [please let us know](https://github.com/microsoft/idfix/issues).
