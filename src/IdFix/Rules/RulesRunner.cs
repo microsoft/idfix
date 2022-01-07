@@ -264,7 +264,7 @@ namespace IdFix.Rules
 
                 var notReplicatedAttributes = collection.AttributesToQuery.Where(_ => !replicatedAttributes.Contains(_)).ToList();
 
-                return notReplicatedAttributes; 
+                return notReplicatedAttributes;
             }
         }
 
@@ -356,16 +356,42 @@ namespace IdFix.Rules
 
                         for (var i = 0; i < results.Length; i++)
                         {
-                            if (!results[i].Success)
+                            var result = results[i];
+                            if (!result.Success)
                             {
                                 errorCount++;
 
-                                if (results[i].Results.Any(r => (r.ErrorTypeFlags & ErrorType.Duplicate) != 0))
+                                if (result.Results.Any(r => (r.ErrorTypeFlags & ErrorType.Duplicate) != 0))
                                 {
                                     duplicateCount++;
+
+                                    if (result.ProposedAction == ActionType.Edit)
+                                    {
+                                        // Add original LDAP entry with the same value.
+                                        var originalEntry = DuplicateStore.GetOriginalSearchResultEntry(result.AttributeName, result.OriginalValue);
+                                        var additionalResult = new ComposedRuleResult
+                                        {
+                                            AttributeName = result.AttributeName,
+                                            EntityDistinguishedName = originalEntry.DistinguishedName,
+                                            ObjectType = ComposedRule.GetObjectType(entry),
+                                            OriginalValue = result.OriginalValue,
+                                            ProposedAction = result.ProposedAction,
+                                            ProposedValue = result.ProposedValue,
+                                            Results = new RuleResult[] {
+                                                new RuleResult(false)
+                                                {
+                                                    ErrorTypeFlags = ErrorType.Duplicate,
+                                                    ProposedAction = result.ProposedAction,
+                                                    UpdatedValue = result.OriginalValue
+                                                }
+                                            },
+                                            Success = result.Success
+                                        };
+                                        errors.Add(additionalResult);
+                                    }
                                 }
 
-                                errors.Add(results[i]);
+                                errors.Add(result);
                             }
                         }
                     }

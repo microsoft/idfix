@@ -29,7 +29,7 @@ namespace IdFix.Rules.Shared
         public override RuleResult Execute(ComposedRule parent, SearchResultEntry entry, string attributeValue)
         {
             // record in memory the entry details with a list of the attributes that end up needing to be checked
-            if (DuplicateStore.IsDuplicate(parent.AttributeName, attributeValue))
+            if (DuplicateStore.IsDuplicate(parent.AttributeName, attributeValue, entry))
             {
                 // we now need to execute some complicated logic from the original application depending
                 // settings, etc. this isn't pretty but it follows the original for now
@@ -47,7 +47,7 @@ namespace IdFix.Rules.Shared
                             {
                                 if (entry.Attributes.Contains(StringLiterals.MailNickName))
                                 {
-                                    if (attributeValue.Substring(0, 5) == "SMTP:")
+                                    if (attributeValue.ToLowerInvariant().Substring(0, 5) == "smtp:")
                                     {
                                         actionType = ActionType.Complete;
                                     }
