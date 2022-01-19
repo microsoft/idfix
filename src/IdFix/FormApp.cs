@@ -123,11 +123,18 @@ namespace IdFix
 
         private void InitRunner()
         {
+            // Reset warning message flag
+            ValidTLDList.HasSeenMissingFileWarning = false;
+
             // setup the background worker
             runner = new RulesRunner();
             runner.OnStatusUpdate += (string message) =>
             {
-                statusDisplay(message);
+                // Update on main thread.
+                this.Invoke(new Action(() =>
+                {
+                    statusDisplay(message);
+                }));
             };
             runner.RunWorkerCompleted += (object s, RunWorkerCompletedEventArgs args) =>
             {

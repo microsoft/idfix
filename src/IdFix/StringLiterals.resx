@@ -465,4 +465,10 @@
   <data name="SchemaWarningTitle" xml:space="preserve">
     <value>Schema Warning</value>
   </data>
+  <data name="DomainsFileNotFoundMessage" xml:space="preserve">
+    <value>domains.txt does not exist at {0}.  Reverting to use embedded resources defaultdomains.txt.</value>
+  </data>
+  <data name="DomainsFileNotFoundTitle" xml:space="preserve">
+    <value>Top level domains file not found</value>
+  </data>
 </root>

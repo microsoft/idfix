@@ -254,6 +254,7 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="ClassDiagram1.cd" />
+    <EmbeddedResource Include="defaultdomains.txt" />
     <Content Include="LICENSE.rtf" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
@@ -334,7 +335,9 @@
     <Content Include="Resources\office365_logo_new.bmp" />
     <Content Include="Resources\office365_logo_orig.png" />
     <Content Include="Resources\printer_h.png" />
-    <EmbeddedResource Include="domains.txt" />
+    <Content Include="domains.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="IDFixIcon.ico" />
     <None Include="Resources\icons_filter.png" />
   </ItemGroup>
@@ -351,4 +354,7 @@
     <QCustomInput Include="Resources\resources/icons_filter_hover_16x16.png" />
   </ItemGroup>
   <ItemGroup />
+  <PropertyGroup>
+    <PostBuildEvent>copy /y "$(ProjectDir)defaultdomains.txt" "$(TargetDir)domains.txt"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

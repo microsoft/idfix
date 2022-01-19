@@ -262,7 +262,7 @@ namespace IdFix.Rules
                     }
                 }
 
-                var notReplicatedAttributes = collection.AttributesToQuery.Where(_ => !replicatedAttributes.Contains(_)).ToList();
+                var notReplicatedAttributes = collection.AttributesToQuery.Where(_ => !replicatedAttributes.Contains(_, StringComparer.InvariantCultureIgnoreCase)).ToList();
 
                 return notReplicatedAttributes;
             }
