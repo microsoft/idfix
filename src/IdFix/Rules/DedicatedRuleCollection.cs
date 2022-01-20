@@ -79,19 +79,7 @@ namespace IdFix.Rules
 
                         new TargetAddressComposedRule(
                             new StringMaxLengthRule(256),
-                            new BlankStringRule((entry, value) =>
-                            {
-
-                                var objectType = ComposedRule.GetObjectType(entry);
-                                // the orginal code doesn't provide a fix if the type isn't "contact"
-                                if (objectType.Equals("contact", StringComparison.CurrentCultureIgnoreCase))
-                                {
-                                    value = "SMTP:" + entry.Attributes[StringLiterals.Mail][0].ToString();
-                                    return value.Length > 256 ? value.Substring(0, 256) : value;
-                                }
-
-                                return value;
-                            })
+                            new TargetAddressBlankRule()
                         )
                     };
 

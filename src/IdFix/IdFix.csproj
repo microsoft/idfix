@@ -199,6 +199,7 @@
     <Compile Include="ConnectionManager.cs" />
     <Compile Include="Rules\ComposedRule.cs" />
     <Compile Include="Rules\DedicatedRuleCollection.cs" />
+    <Compile Include="Rules\Dedicated\TargetAddressBlankRule.cs" />
     <Compile Include="Rules\Dedicated\MailNicknameBlankRule.cs" />
     <Compile Include="Rules\Dedicated\DisplayNameBlankRule.cs" />
     <Compile Include="Rules\Dedicated\MailNickNamePeriodsRule.cs" />
