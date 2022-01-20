@@ -202,6 +202,7 @@ namespace IdFix.Controls
                     var rowIndex = this.Rows.Add();
                     var row = this.Rows[rowIndex];
                     row.Cells[StringLiterals.DistinguishedName].Value = item.EntityDistinguishedName;
+                    row.Cells[StringLiterals.CommonName].Value = item.EntityCommonName;
                     row.Cells[StringLiterals.ObjectClass].Value = item.ObjectType;
                     row.Cells[StringLiterals.Attribute].Value = item.AttributeName;
                     row.Cells[StringLiterals.Error].Value = item.ErrorsToString();
@@ -333,6 +334,9 @@ namespace IdFix.Controls
                         case "DISTINGUISHEDNAME":
                             mappers.Add(mappingBinder(StringLiterals.DistinguishedName));
                             break;
+                        case "COMMONNAME":
+                            mappers.Add(mappingBinder(StringLiterals.CommonName));
+                            break;
                         case "OBJECTCLASS":
                             mappers.Add(mappingBinder(StringLiterals.ObjectClass));
                             break;
@@ -411,6 +415,7 @@ namespace IdFix.Controls
                 at = row.GetCellString(StringLiterals.Attribute);
 
                 writer.WriteLine("dn: " + row.GetCellString(StringLiterals.DistinguishedName));
+                writer.WriteLine("cn: " + row.GetCellString(StringLiterals.CommonName));
                 writer.WriteLine("changetype: modify");
 
                 if (at.ToUpperInvariant() == StringLiterals.ProxyAddresses.ToUpperInvariant())
@@ -420,6 +425,7 @@ namespace IdFix.Controls
                     writer.WriteLine("-");
                     writer.WriteLine();
                     writer.WriteLine("dn: " + row.GetCellString(StringLiterals.DistinguishedName));
+                    writer.WriteLine("cn: " + row.GetCellString(StringLiterals.CommonName));
                     writer.WriteLine("changetype: modify");
                     writer.WriteLine("add: " + at);
                 }
@@ -467,6 +473,10 @@ namespace IdFix.Controls
                         case "distinguishedName":
                             lineIndex = this.Rows.Add();
                             this.Rows[lineIndex].Cells[StringLiterals.DistinguishedName].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);
+                            break;
+                        case "commonName":
+                            lineIndex = this.Rows.Add();
+                            this.Rows[lineIndex].Cells[StringLiterals.CommonName].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);
                             break;
                         case "objectClass":
                             this.Rows[lineIndex].Cells[StringLiterals.ObjectClass].Value = line.Substring(line.IndexOf(": ", StringComparison.CurrentCulture) + 2);

@@ -19,9 +19,14 @@ namespace IdFix.Rules
         }
 
         /// <summary>
-        /// The distinguised name of the entity to which this composed rule result applies
+        /// The distinguished name of the entity to which this composed rule result applies
         /// </summary>
         public string EntityDistinguishedName { get; set; }
+
+        /// <summary>
+        /// The common name of the entity to which this composed rule result applies
+        /// </summary>
+        public string EntityCommonName { get; set; }
 
         /// <summary>
         /// The type of this entity
@@ -202,6 +207,7 @@ namespace IdFix.Rules
             {
                 AttributeName = this.AttributeName,
                 EntityDistinguishedName = entry.Attributes[StringLiterals.DistinguishedName][0].ToString(),
+                EntityCommonName = entry.Attributes[StringLiterals.Cn][0].ToString(),
                 ObjectType = ComposedRule.GetObjectType(entry),
                 OriginalValue = null,
                 ProposedAction = ActionType.None

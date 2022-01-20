@@ -373,6 +373,7 @@ namespace IdFix.Rules
                                         {
                                             AttributeName = result.AttributeName,
                                             EntityDistinguishedName = originalEntry.DistinguishedName,
+                                            EntityCommonName = originalEntry.Attributes[StringLiterals.Cn][0].ToString(),
                                             ObjectType = ComposedRule.GetObjectType(entry),
                                             OriginalValue = result.OriginalValue,
                                             ProposedAction = result.ProposedAction,

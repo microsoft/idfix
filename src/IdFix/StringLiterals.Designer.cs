@@ -223,6 +223,15 @@ namespace IdFix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to commonName.
+        /// </summary>
+        internal static string CommonName {
+            get {
+                return ResourceManager.GetString("CommonName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to COMPLETE.
         /// </summary>
         internal static string Complete {

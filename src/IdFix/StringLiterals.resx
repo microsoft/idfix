@@ -471,4 +471,7 @@
   <data name="DomainsFileNotFoundTitle" xml:space="preserve">
     <value>Top level domains file not found</value>
   </data>
+  <data name="CommonName" xml:space="preserve">
+    <value>commonName</value>
+  </data>
 </root>
