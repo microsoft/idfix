@@ -38,6 +38,7 @@ namespace IdFix
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormApp));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.queryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,6 +64,7 @@ namespace IdFix
             this.completeActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.grid = new IdFix.Controls.IdFixGrid();
             this.distinguishedName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.commonName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.objectClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.attribute = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.error = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -302,6 +304,7 @@ namespace IdFix
             this.grid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.grid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.distinguishedName,
+            this.commonName,
             this.objectClass,
             this.attribute,
             this.error,
@@ -331,37 +334,44 @@ namespace IdFix
             this.distinguishedName.ReadOnly = true;
             this.distinguishedName.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.distinguishedName.ToolTipText = "click to sort";
-            this.distinguishedName.Width = 148;
+            // 
+            // commonName
+            // 
+            this.commonName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
+            this.commonName.DefaultCellStyle = dataGridViewCellStyle3;
+            this.commonName.HeaderText = "COMMONNAME";
+            this.commonName.Name = "commonName";
+            this.commonName.ReadOnly = true;
+            this.commonName.ToolTipText = "click to sort";
             // 
             // objectClass
             // 
             this.objectClass.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
-            this.objectClass.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
+            this.objectClass.DefaultCellStyle = dataGridViewCellStyle4;
             this.objectClass.HeaderText = "OBJECTCLASS";
             this.objectClass.Name = "objectClass";
             this.objectClass.ReadOnly = true;
             this.objectClass.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.objectClass.ToolTipText = "click to sort";
-            this.objectClass.Width = 107;
             // 
             // attribute
             // 
             this.attribute.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
-            this.attribute.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            this.attribute.DefaultCellStyle = dataGridViewCellStyle5;
             this.attribute.HeaderText = "ATTRIBUTE";
             this.attribute.Name = "attribute";
             this.attribute.ReadOnly = true;
             this.attribute.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.attribute.ToolTipText = "click to sort";
-            this.attribute.Width = 93;
             // 
             // error
             // 
             this.error.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            this.error.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window;
+            this.error.DefaultCellStyle = dataGridViewCellStyle6;
             this.error.HeaderText = "ERROR";
             this.error.Name = "error";
             this.error.ReadOnly = true;
@@ -371,8 +381,8 @@ namespace IdFix
             // value
             // 
             this.value.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window;
-            this.value.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Window;
+            this.value.DefaultCellStyle = dataGridViewCellStyle7;
             this.value.FillWeight = 99.41238F;
             this.value.HeaderText = "VALUE";
             this.value.Name = "value";
@@ -403,7 +413,6 @@ namespace IdFix
             this.action.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.action.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.action.ToolTipText = "click to sort";
-            this.action.Width = 72;
             // 
             // FormApp
             // 
@@ -463,6 +472,7 @@ namespace IdFix
         private System.Windows.Forms.ToolStripMenuItem completeActionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
         private System.Windows.Forms.DataGridViewTextBoxColumn distinguishedName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn commonName;
         private System.Windows.Forms.DataGridViewTextBoxColumn objectClass;
         private System.Windows.Forms.DataGridViewTextBoxColumn attribute;
         private System.Windows.Forms.DataGridViewTextBoxColumn error;

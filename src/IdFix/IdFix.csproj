@@ -199,6 +199,7 @@
     <Compile Include="ConnectionManager.cs" />
     <Compile Include="Rules\ComposedRule.cs" />
     <Compile Include="Rules\DedicatedRuleCollection.cs" />
+    <Compile Include="Rules\Dedicated\TargetAddressBlankRule.cs" />
     <Compile Include="Rules\Dedicated\MailNicknameBlankRule.cs" />
     <Compile Include="Rules\Dedicated\DisplayNameBlankRule.cs" />
     <Compile Include="Rules\Dedicated\MailNickNamePeriodsRule.cs" />
@@ -254,6 +255,7 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="ClassDiagram1.cd" />
+    <EmbeddedResource Include="defaultdomains.txt" />
     <Content Include="LICENSE.rtf" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
@@ -334,7 +336,9 @@
     <Content Include="Resources\office365_logo_new.bmp" />
     <Content Include="Resources\office365_logo_orig.png" />
     <Content Include="Resources\printer_h.png" />
-    <EmbeddedResource Include="domains.txt" />
+    <Content Include="domains.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="IDFixIcon.ico" />
     <None Include="Resources\icons_filter.png" />
   </ItemGroup>
@@ -351,4 +355,7 @@
     <QCustomInput Include="Resources\resources/icons_filter_hover_16x16.png" />
   </ItemGroup>
   <ItemGroup />
+  <PropertyGroup>
+    <PostBuildEvent>copy /y "$(ProjectDir)defaultdomains.txt" "$(TargetDir)domains.txt"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

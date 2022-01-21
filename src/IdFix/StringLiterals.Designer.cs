@@ -19,7 +19,7 @@ namespace IdFix {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class StringLiterals {
@@ -223,6 +223,15 @@ namespace IdFix {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to commonName.
+        /// </summary>
+        internal static string CommonName {
+            get {
+                return ResourceManager.GetString("CommonName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to COMPLETE.
         /// </summary>
         internal static string Complete {
@@ -327,6 +336,24 @@ namespace IdFix {
         internal static string DomainPart {
             get {
                 return ResourceManager.GetString("DomainPart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to domains.txt does not exist at {0}.  Reverting to use embedded resources defaultdomains.txt..
+        /// </summary>
+        internal static string DomainsFileNotFoundMessage {
+            get {
+                return ResourceManager.GetString("DomainsFileNotFoundMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Top level domains file not found.
+        /// </summary>
+        internal static string DomainsFileNotFoundTitle {
+            get {
+                return ResourceManager.GetString("DomainsFileNotFoundTitle", resourceCulture);
             }
         }
         
