@@ -58,6 +58,9 @@
       <Component Id="IdFixExeCONFIG" Guid="DD5AECED-1E1F-4269-9CB2-836E3D917873">
         <File Id="IdFix.exe.config" Name="IdFix.exe.config" Source="$(var.IdFix.TargetPath).config" KeyPath="yes" />
       </Component>
+      <Component Id="domainsTXT" Guid="CA624C55-4B50-4071-9849-47D4D009FBD9">
+        <File Id="domains.txt" Name="domains.txt" Source="$(var.IdFix.ProjectDir)defaultdomains.txt" KeyPath="yes" />
+      </Component>
       <Component Id="IDFixIconICO" Guid="A558519F-7E51-4901-A2C2-C29B0D58A7DC">
         <File Id="IDFixIcon.ico" Name="IDFixIcon.ico" Source="$(var.IdFix.ProjectDir)IDFixIcon.ico" KeyPath="yes" />
       </Component>
