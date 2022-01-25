@@ -54,7 +54,7 @@ namespace IdFix.Settings
         }
 
         /// <summary>
-        /// Gets the domains stream from either the domains.txt file or the embedded defaultdomains.txt file if domains.txt does not exist.
+        /// Gets the domains stream from either the domains.txt file in the installation folder or the embedded domains.txt file if domains.txt does not exist.
         /// </summary>
         /// <returns></returns>
         private Stream GetDomainsStream()
@@ -79,12 +79,12 @@ namespace IdFix.Settings
         }
 
         /// <summary>
-        /// Gets the domains stream from the embedded defaultdomains.txt file
+        /// Gets the domains stream from the embedded domains.txt file
         /// </summary>
         /// <returns></returns>
         private Stream GetEmbeddedDomainsStream()
         {
-            return Assembly.GetExecutingAssembly().GetManifestResourceStream("IdFix.defaultdomains.txt");
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream("IdFix.domains.txt");
         }
 
         /// <summary>
