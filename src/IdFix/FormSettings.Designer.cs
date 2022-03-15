@@ -69,6 +69,10 @@ namespace IdFix
             this.searchBaseLabel = new System.Windows.Forms.Label();
             this.searchBaseCheckBox = new System.Windows.Forms.CheckBox();
             this.chk_alternateloginid = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.comboBoxAuthType = new System.Windows.Forms.ComboBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -77,7 +81,7 @@ namespace IdFix
             // cancelButton
             // 
             this.cancelButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cancelButton.Location = new System.Drawing.Point(325, 576);
+            this.cancelButton.Location = new System.Drawing.Point(325, 646);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 25);
             this.cancelButton.TabIndex = 42;
@@ -88,7 +92,7 @@ namespace IdFix
             // okButton
             // 
             this.okButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.okButton.Location = new System.Drawing.Point(238, 576);
+            this.okButton.Location = new System.Drawing.Point(238, 646);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 25);
             this.okButton.TabIndex = 41;
@@ -244,15 +248,15 @@ namespace IdFix
             this.comboBoxPort.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxPort.FormattingEnabled = true;
             this.comboBoxPort.Items.AddRange(new object[] {
-            Constants.GlobalCatalogPort.ToString(),
-            Constants.LdapPort.ToString(),
-            Constants.LdapSslPort.ToString()});
+            "3268",
+            "389",
+            "636"});
             this.comboBoxPort.Location = new System.Drawing.Point(88, 110);
             this.comboBoxPort.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.comboBoxPort.Name = "comboBoxPort";
             this.comboBoxPort.Size = new System.Drawing.Size(287, 25);
             this.comboBoxPort.TabIndex = 4;
-            this.toolTip1.SetToolTip(this.comboBoxPort, "Use " + Constants.GlobalCatalogPort.ToString() + " for AD");
+            this.toolTip1.SetToolTip(this.comboBoxPort, "Use 3268 for AD");
             // 
             // textBoxFilter
             // 
@@ -419,7 +423,7 @@ namespace IdFix
             // 
             this.chk_alternateloginid.AutoSize = true;
             this.chk_alternateloginid.Location = new System.Drawing.Point(88, 172);
-            this.chk_alternateloginid.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.chk_alternateloginid.Margin = new System.Windows.Forms.Padding(2);
             this.chk_alternateloginid.Name = "chk_alternateloginid";
             this.chk_alternateloginid.Size = new System.Drawing.Size(249, 17);
             this.chk_alternateloginid.TabIndex = 52;
@@ -427,17 +431,63 @@ namespace IdFix
             this.chk_alternateloginid.UseVisualStyleBackColor = true;
             this.chk_alternateloginid.CheckedChanged += new System.EventHandler(this.chk_alternateloginid_CheckedChanged);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(11, 579);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(65, 17);
+            this.label1.TabIndex = 53;
+            this.label1.Text = "Auth Type";
+            // 
+            // comboBoxAuthType
+            // 
+            this.comboBoxAuthType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxAuthType.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxAuthType.FormattingEnabled = true;
+            this.comboBoxAuthType.Location = new System.Drawing.Point(88, 577);
+            this.comboBoxAuthType.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.comboBoxAuthType.Name = "comboBoxAuthType";
+            this.comboBoxAuthType.Size = new System.Drawing.Size(287, 25);
+            this.comboBoxAuthType.TabIndex = 54;
+            this.toolTip1.SetToolTip(this.comboBoxAuthType, "Use 3268 for AD");
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(325, 1113);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 25);
+            this.button1.TabIndex = 56;
+            this.button1.Text = "Cancel";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button2.Location = new System.Drawing.Point(238, 1113);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 25);
+            this.button2.TabIndex = 55;
+            this.button2.Text = "OK";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
             // FormSettings
             // 
             this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.ClientSize = new System.Drawing.Size(416, 612);
+            this.ClientSize = new System.Drawing.Size(416, 683);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.chk_alternateloginid);
             this.Controls.Add(this.textBoxSearchBase);
+            this.Controls.Add(this.comboBoxAuthType);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.searchBaseCheckBox);
             this.Controls.Add(this.searchBaseLabel);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.checkedListBoxAD);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.textBoxFilter);
@@ -512,5 +562,9 @@ namespace IdFix
         private System.Windows.Forms.CheckBox searchBaseCheckBox;
         private System.Windows.Forms.TextBox textBoxSearchBase;
         private System.Windows.Forms.CheckBox chk_alternateloginid;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox comboBoxAuthType;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }

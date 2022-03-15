@@ -78,7 +78,6 @@ namespace IdFix.Rules
             {
                 connection.SessionOptions.ProtocolVersion = 3;
                 connection.SessionOptions.SecureSocketLayer = true;
-                connection.AuthType = AuthType.Negotiate;
             }
 
             if (SettingsManager.Instance.CurrentCredentialMode == CredentialMode.Specified)
@@ -87,6 +86,7 @@ namespace IdFix.Rules
                 connection.Credential = credential;
             }
 
+            connection.AuthType = SettingsManager.Instance.AuthType;
             connection.Timeout = TimeSpan.FromSeconds(120);
 
             return connection;
