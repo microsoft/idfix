@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.DirectoryServices.ActiveDirectory;
+using System.DirectoryServices.Protocols;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -100,6 +101,9 @@ namespace IdFix
                     textBoxPassword.Enabled = true;
                 }
 
+                // Populate auth type combobox
+                comboBoxAuthType.Items.AddRange(Enum.GetNames(typeof(AuthType)));
+                comboBoxAuthType.SelectedItem = SettingsManager.Instance.AuthType.ToString();
             }
             catch (Exception ex)
             {
@@ -161,6 +165,8 @@ namespace IdFix
                     SettingsManager.Instance.Username = textBoxUser.Text;
                     SettingsManager.Instance.Password = textBoxPassword.Text;
                 }
+
+                SettingsManager.Instance.AuthType = (AuthType)Enum.Parse(typeof(AuthType), comboBoxAuthType.SelectedItem.ToString());
 
                 this.Close();
             }

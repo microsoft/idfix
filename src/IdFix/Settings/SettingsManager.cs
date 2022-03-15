@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
+using System.DirectoryServices.Protocols;
 
 namespace IdFix.Settings
 {
@@ -24,6 +25,7 @@ namespace IdFix.Settings
             this.CurrentCredentialMode = CredentialMode.CurrentUser;
             this.CurrentRuleMode = RuleMode.MultiTenant;
             this.UseAlternateLogin = false;
+            this.AuthType = AuthType.Negotiate;
 
             // grab our default forests
             var forests = new List<string>();
@@ -120,5 +122,10 @@ namespace IdFix.Settings
         /// Specified password used in non-current user mode
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// AuthType to use when connecting to AD
+        /// </summary>
+        public AuthType AuthType { get; set; }
     }
 }
