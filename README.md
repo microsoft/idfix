@@ -7,12 +7,12 @@ The purpose of IdFix is to reduce the time involved in remediating the Active Di
 The Microsoft Office 365 IdFix tool provides the customer with the ability to identify and remediate object errors in their Active Directory in preparation for deployment to Azure Active Directory or Office 365. They will then be able to successfully synchronize users, contacts, and groups from the on-premises Active Directory into Azure Active Directory.
 
 ## ClickOnce Launch
-
-You can _**[launch](https://raw.githubusercontent.com/Microsoft/idfix/master/publish/setup.exe)**_ the application using the ClickOnce installer. Download and run the setup.exe file to install IdFix on your machine.
+///////
+**_ the application using the ClickOnce installer. Download and run the setup.exe file to install IdFix on your machine.
 
 If you can't launch the application, check the registry key mentioned here: https://github.com/microsoft/idfix/issues/20#issuecomment-704497252
 
-## Alternate MSI Installation
+##![ ][def]Alternate MSI Installation
 
 If running the ClickOnce application is not desirable or is not possible in your environment, you can install it using one of the MSI's located at: https://github.com/microsoft/idfix/tree/master/MSIs
 
@@ -20,7 +20,7 @@ Note that only the ClickOnce application is self-updating to the latest version.
 
 ## Documentation
 
-Please see [the docs for details](https://microsoft.github.io/idfix) on using IdFix. If you see any gaps or issues [please let us know](https://github.com/microsoft/idfix/issues).
+Please see [the docs for details][def4] on using IdFix. If you see any gaps or issues [please let us know][def5].
 
 ## Contributing
 
@@ -40,3 +40,35 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 -----
 > Part of the Microsoft FastTrack Open Source Software initiative. For full details, please see https://github.com/microsoft/fasttrack.
 
+
+
+[def]: https://opensource.microsoft.com/codeofconduct/
+[def2]: https://raw.githubusercontent.com/Microsoft/idfix/master/publish/setup.exe
+```json
+//////////////////
+
+```(https://)/microsoft.github.io/idfix
+[def4]: https://github.com/microsoft/idfix/issues
+[def5]: https://opensource.microsoft.com/codeofconduct/faq/
+[def6]: mailto:opencode@microsoft.com
+
+[def]: https://
+```
+
+[def]: 
+[def2]: 
+
+[def7]: https://microsoft.github.io/idfix
+
+[def7]: https://microsoft.github.io/idfix
+
+[def3]: 
+
+[def3]: 
+
+[def3]: 
+
+[def3]: 
+
+[def4]: https://microsoft.github.io/idfix
+[def5]: https://github.com/microsoft/idfix/issues
