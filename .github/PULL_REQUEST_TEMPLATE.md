@@ -1,8 +1,8 @@
 #### Category
-- [ ] Bug fix
-- [ ] New feature
-- [ ] New sample
-- [ ] Documentation update
+- [x] Bug fix
+- [x] New feature
+- [x] New sample
+- [x] Documentation update
 
 #### Related Issues
 
