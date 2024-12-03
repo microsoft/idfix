@@ -367,28 +367,35 @@ namespace IdFix.Rules
 
                                     if (result.ProposedAction == ActionType.Edit)
                                     {
-                                        // Add original LDAP entry with the same value.
-                                        var originalEntry = DuplicateStore.GetOriginalSearchResultEntry(result.AttributeName, result.OriginalValue);
-                                        var additionalResult = new ComposedRuleResult
+                                        try
                                         {
-                                            AttributeName = result.AttributeName,
-                                            EntityDistinguishedName = originalEntry.DistinguishedName,
-                                            EntityCommonName = originalEntry.Attributes[StringLiterals.Cn][0].ToString(),
-                                            ObjectType = ComposedRule.GetObjectType(entry),
-                                            OriginalValue = result.OriginalValue,
-                                            ProposedAction = result.ProposedAction,
-                                            ProposedValue = result.ProposedValue,
-                                            Results = new RuleResult[] {
-                                                new RuleResult(false)
-                                                {
-                                                    ErrorTypeFlags = ErrorType.Duplicate,
-                                                    ProposedAction = result.ProposedAction,
-                                                    UpdatedValue = result.OriginalValue
-                                                }
-                                            },
-                                            Success = result.Success
-                                        };
-                                        errors.Add(additionalResult);
+                                            // Add original LDAP entry with the same value.
+                                            var originalEntry = DuplicateStore.GetOriginalSearchResultEntry(result.AttributeName, result.OriginalValue);
+                                            var additionalResult = new ComposedRuleResult
+                                            {
+                                                AttributeName = result.AttributeName,
+                                                EntityDistinguishedName = originalEntry.DistinguishedName,
+                                                EntityCommonName = originalEntry.Attributes[StringLiterals.Cn][0].ToString(),
+                                                ObjectType = ComposedRule.GetObjectType(entry),
+                                                OriginalValue = result.OriginalValue,
+                                                ProposedAction = result.ProposedAction,
+                                                ProposedValue = result.ProposedValue,
+                                                Results = new RuleResult[] {
+                                                    new RuleResult(false)
+                                                    {
+                                                        ErrorTypeFlags = ErrorType.Duplicate,
+                                                        ProposedAction = result.ProposedAction,
+                                                        UpdatedValue = result.OriginalValue
+                                                    }
+                                                },
+                                                Success = result.Success
+                                            };
+                                            errors.Add(additionalResult);
+                                        }
+                                        catch
+                                        {
+                                            // Suppress exception which may occur when adding the other matching duplicate entry.
+                                        }
                                     }
                                 }
 
