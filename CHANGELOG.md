@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 2.6.0.3 - 2024-12-03
+
+- Added error suppression during duplicate detection to resolve error: "Sequence contains no matching element". (#73)
+
 ## 2.6.0.2 - 2022-03-15
 - User can now select AuthType to resolve error message: "The server does not support the control. The control is critical." (#17) Try selecting NTLM or Basic for AuthType on the Settings page if you get this error.
 
