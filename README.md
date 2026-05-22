@@ -1,3 +1,24 @@
+
+# ⚠️ Deprecation Announcement – IdFix
+
+> **This project will be deprecated and no longer supported as of June 30, 2026.**
+
+## Status
+- ❌ No longer maintained
+- ❌ No bug fixes, security updates, or feature updates
+- ❌ No official support from Microsoft or the engineering team
+- 📦 Repository will be archived and provided for reference only
+
+## Installation Notice
+Installers and distribution packages will be removed as part of the deprecation.  
+After deprecation this application should no longer be installed or used in production environments.
+
+## Impact
+Existing users should plan to transition away from this tool. Continued use is at your own risk.
+
+## Additional Information
+This repository remains available strictly for historical and reference purposes.
+
 # IdFix : Directory Synchronization Error Remediation Tool
 
 IdFix is used to perform discovery and remediation of identity objects and their attributes in an on-premises Active Directory environment in preparation for migration to Azure Active Directory. IdFix is intended for the Active Directory administrators responsible for directory synchronization with Azure Active Directory.
