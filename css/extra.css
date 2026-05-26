@@ -31,3 +31,29 @@
      width: 150px;
  }
 }
+
+/* Deprecation banner */
+.deprecation-banner {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-left: 4px solid #ff8f00;
+    border-radius: 4px;
+    padding: 1em 1.5em;
+    margin-bottom: 1.5em;
+    color: #664d03;
+    line-height: 1.6;
+}
+
+.deprecation-banner strong {
+    color: #cc0000;
+}
+
+.deprecation-banner p {
+    margin: 0.4em 0;
+}
+
+.deprecation-banner p:first-child {
+    margin-top: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+}
